@@ -1,0 +1,90 @@
+openapi: 3.0.3
+info:
+  title: CJ
+  description: "Social Network VK"
+  version: 0.0.1
+servers:
+  - url: /api
+security:
+  - BearerAuth: []
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authorization
+      summary: Register user
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/DefaultParameters'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUserRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterUserResponse"
+
+components:
+  parameters:
+    DefaultParameters:
+      in: header
+      name: X-Request-ID
+      schema:
+        type: string
+        format: uuid
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UserName:
+      type: object
+      properties:
+        first:
+          type: string
+          example: John
+        last:
+          type: string
+          example: Doe
+    
+    RegisterUserRequest:
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/UserName"
+        email:
+          type: string
+          example: mail@example.com
+        password:
+          type: string
+          example: password
+
+    RegisterUserResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    BasicResponse:
+      type: object
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          $ref: "#/components/schemas/UserName"
+        email:
+          type: string
+          example: mail@example.com

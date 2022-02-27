@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  app:
+    build:
+      context: ./
+      target: exec
+    image: cj:latest
+    ports:
+      - 8080:8080
+    networks:
+      - mongo-go
+    env_file:
+      - resources/config/.env
+
+  mongodb_container:
+    image: mongo:latest
+    restart: always
+    networks:
+      - mongo-go
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+
+  adminer:
+    image: mongo-express:latest
+    restart: always
+    networks:
+      - mongo-go
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: rootpassword
+      ME_CONFIG_MONGODB_SERVER: mongodb_container
+    ports:
+      - 18081:8081
+
+networks:
+  mongo-go:
+
+volumes:
+  mongodb_data_container:
