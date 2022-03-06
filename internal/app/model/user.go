@@ -36,7 +36,6 @@ func (u *User) BeforeCreate() error {
 		}
 		u.EncryptedPassword = enc
 	}
-
 	return nil
 }
 
@@ -47,3 +46,5 @@ func encryptString(s string) (string, error) {
 	}
 	return string(b), nil
 }
+
+// Data transfer Object
