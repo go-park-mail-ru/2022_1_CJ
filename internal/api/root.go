@@ -58,7 +58,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 
 	authAPI := api.Group("/auth")
 
-	authAPI.POST("/register", authCtrl.RegisterUser)
+	authAPI.POST("/signup", authCtrl.SignupUser)
 
 	return svc, nil
 }

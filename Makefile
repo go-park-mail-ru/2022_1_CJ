@@ -32,4 +32,4 @@ up-debug:
 	docker-compose -f ${DCOMPOSE} up
 
 mod:
-	go mod tidy -compat=1.17 && go get ./... && go mod vendor
+	go mod tidy -compat=1.17 && go get ./...

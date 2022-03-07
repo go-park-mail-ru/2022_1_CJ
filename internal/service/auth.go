@@ -13,7 +13,7 @@ import (
 )
 
 type AuthService interface {
-	Register(ctx context.Context, request *dto.RegisterUserRequest) (*dto.RegisterUserResponse, error)
+	SignupUser(ctx context.Context, request *dto.SignupUserRequest) (*dto.SignupUserResponse, error)
 }
 
 type AuthServiceImpl struct {
@@ -21,7 +21,7 @@ type AuthServiceImpl struct {
 	db  *db.Repository
 }
 
-func (svc *AuthServiceImpl) Register(ctx context.Context, request *dto.RegisterUserRequest) (*dto.RegisterUserResponse, error) {
+func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupUserRequest) (*dto.SignupUserResponse, error) {
 	if exists, err := svc.db.UserRepo.CheckUserEmailExistence(ctx, request.Email); err != nil {
 		return nil, err
 	} else if exists {
@@ -41,7 +41,7 @@ func (svc *AuthServiceImpl) Register(ctx context.Context, request *dto.RegisterU
 		return nil, err
 	}
 
-	return &dto.RegisterUserResponse{}, nil
+	return &dto.SignupUserResponse{}, nil
 }
 
 func NewAuthService(log *logrus.Entry, db *db.Repository) AuthService {

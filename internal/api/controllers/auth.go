@@ -15,13 +15,13 @@ type AuthController struct {
 	registry *service.Registry
 }
 
-func (c *AuthController) RegisterUser(ctx echo.Context) error {
-	request := new(dto.RegisterUserRequest)
+func (c *AuthController) SignupUser(ctx echo.Context) error {
+	request := new(dto.SignupUserRequest)
 	if err := ctx.Bind(request); err != nil {
 		return err
 	}
 
-	response, err := c.registry.AuthService.Register(context.Background(), request)
+	response, err := c.registry.AuthService.SignupUser(context.Background(), request)
 	if err != nil {
 		return err
 	}

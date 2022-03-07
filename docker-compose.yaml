@@ -14,7 +14,7 @@ services:
 
   mongodb_container:
     image: mongo:latest
-    restart: always
+    restart: unless-stopped
     networks:
       - mongo-go
     environment:
@@ -27,7 +27,7 @@ services:
 
   adminer:
     image: mongo-express:latest
-    restart: always
+    restart: unless-stopped
     networks:
       - mongo-go
     environment:
