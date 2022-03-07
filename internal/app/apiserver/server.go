@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	sessionName = "gopherschool"
+	sessionName = "cj_team"
 )
 
 var (
@@ -49,6 +49,8 @@ func (s *server) configureRouter() {
 
 func (s *server) handleUsersCreate() http.HandlerFunc {
 	type request struct {
+		Phone    string `json:"phone"`
+		Name     string `json:"name"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
@@ -61,6 +63,8 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		}
 
 		u := &model.User{
+			Name:     req.Name,
+			Phone:    req.Phone,
 			Email:    req.Email,
 			Password: req.Password,
 		}
