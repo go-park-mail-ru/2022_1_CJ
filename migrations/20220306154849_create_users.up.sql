@@ -5,6 +5,6 @@ CREATE TABLE users (
                        email varchar not null unique,
                        phone varchar not null unique,
 
-                       password varchar not null
+                       password varchar not null,
                        encrypted_password varchar not null
 );
