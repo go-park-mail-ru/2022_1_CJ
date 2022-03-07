@@ -9,11 +9,11 @@ security:
   - BearerAuth: []
 
 paths:
-  /auth/register:
+  /auth/signup:
     post:
       tags:
         - Authorization
-      summary: Register user
+      summary: Signup user
       security: []
       parameters:
         - $ref: '#/components/parameters/DefaultParameters'
@@ -21,7 +21,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RegisterUserRequest"
+              $ref: "#/components/schemas/SignupUserRequest"
         required: true
       responses:
         "500":
@@ -32,7 +32,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RegisterUserResponse"
+                $ref: "#/components/schemas/SignupUserResponse"
 
 components:
   parameters:
@@ -60,7 +60,7 @@ components:
           type: string
           example: Doe
     
-    RegisterUserRequest:
+    SignupUserRequest:
       type: object
       properties:
         name:
@@ -72,7 +72,7 @@ components:
           type: string
           example: password
 
-    RegisterUserResponse:
+    SignupUserResponse:
       $ref: "#/components/schemas/BasicResponse"
 
     BasicResponse:
