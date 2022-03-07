@@ -15,3 +15,6 @@
 # vendor/
 
 .idea/*
+apiserver
+Quest.md
+go_build_main_go
