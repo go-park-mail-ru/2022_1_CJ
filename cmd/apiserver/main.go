@@ -1,9 +1,9 @@
 package main
 
 import (
-	"2022_1_CJ/internal/app/apiserver"
 	"flag"
 	"github.com/BurntSushi/toml"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/app/apiserver"
 	"log"
 )
 
@@ -23,9 +23,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	s := apiserver.New(config)
-	if err := s.Start(); err != nil {
+	if err := apiserver.Start(config); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -34,9 +34,21 @@ func (u *User) BeforeCreate() error {
 		if err != nil {
 			return err
 		}
+
 		u.EncryptedPassword = enc
 	}
+
 	return nil
+}
+
+// Sanitize ...
+func (u *User) Sanitize() {
+	u.Password = ""
+}
+
+// ComparePassword ...
+func (u *User) ComparePassword(password string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(u.EncryptedPassword), []byte(password)) == nil
 }
 
 func encryptString(s string) (string, error) {
@@ -46,5 +58,3 @@ func encryptString(s string) (string, error) {
 	}
 	return string(b), nil
 }
-
-// Data transfer Object

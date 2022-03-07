@@ -1,6 +1,11 @@
-package store
+package sqlstore
 
-import "2022_1_CJ/internal/app/model"
+import (
+	"database/sql"
+
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/app/model"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/app/store"
+)
 
 // UserRepository ...
 type UserRepository struct {
@@ -8,26 +13,22 @@ type UserRepository struct {
 }
 
 // Create ...
-func (r *UserRepository) Create(u *model.User) (*model.User, error) {
+func (r *UserRepository) Create(u *model.User) error {
 	if err := u.Validate(); err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := u.BeforeCreate(); err != nil {
-		return nil, err
+		return err
 	}
 
-	if err := r.store.db.QueryRow(
+	return r.store.db.QueryRow(
 		"INSERT INTO users (name, email, phone, encrypted_password) VALUES ($1, $2, $3, $4) RETURNING id",
 		u.Name,
 		u.Email,
 		u.Phone,
 		u.EncryptedPassword,
-	).Scan(&u.ID); err != nil {
-		return nil, err
-	}
-
-	return u, nil
+	).Scan(&u.ID)
 }
 
 // FindByEmail ...
@@ -43,6 +44,10 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 		&u.Phone,
 		&u.EncryptedPassword,
 	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, store.ErrRecordNotFound
+		}
+
 		return nil, err
 	}
 
