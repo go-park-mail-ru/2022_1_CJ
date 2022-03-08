@@ -43,8 +43,8 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) configureRouter() {
-	s.router.HandleFunc("/users", s.handleUsersCreate())
-	s.router.HandleFunc("/sessions", s.handleSessionsCreate())
+	s.router.HandleFunc("/register", s.handleUsersCreate())
+	s.router.HandleFunc("/auth", s.handleSessionsCreate())
 }
 
 func (s *server) handleUsersCreate() http.HandlerFunc {

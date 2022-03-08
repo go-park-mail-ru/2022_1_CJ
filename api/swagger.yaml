@@ -1,0 +1,125 @@
+openapi: 3.0.3
+info:
+  title: CJ
+  description: "Social Network VK"
+  version: 0.0.1
+servers:
+  - url: /
+security:
+  - BearerAuth: []
+
+paths:
+  /register:
+    post:
+      tags:
+        - Registration
+      summary: Register user
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/DefaultParameters'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUserRequest"
+        required: true
+      responses:
+        "400":
+          description: Bad request
+          content: {}
+        "422":
+          description: Unprocessable entity
+          content: {}
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterUserResponse"
+  /auth:
+    post:
+      tags:
+        - Authorization
+      summary: Authorize user
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/DefaultParameters'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthUserRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "400":
+          description: Bad request
+          content: {}
+        "401":
+          description: Unauthorized
+          content: {}
+        "200":
+          description: Created
+          content: {}
+
+components:
+  parameters:
+    DefaultParameters:
+      in: header
+      name: X-Request-ID
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    RegisterUserRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: John
+        last_name:
+            type: string
+            example: Doe
+        path_to_img:
+          type: string
+          example: /home/usr/img/mybitchface.jpg
+        email:
+          type: string
+          example: mail@example.com
+        password:
+          type: string
+          example: password
+
+    AuthUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          example: mail@example.com
+        password:
+          type: string
+          example: password
+
+    RegisterUserResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    BasicResponse:
+      type: object
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        first_name:
+          type: string
+          example: John
+        last_name:
+            type: string
+            example: Doe
+        email:
+          type: string
+          example: mail@example.com
