@@ -29,3 +29,4 @@ CREATE TABLE relation_post_user
     primary key (user_id, post_id)
 );
 
+

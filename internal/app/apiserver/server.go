@@ -56,12 +56,12 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) configureRouter() {
 	s.router.Use(s.logRequest)
 	s.router.Use(handlers.CORS(handlers.AllowedOrigins([]string{"*"})))
-	s.router.HandleFunc("/api/register", s.handleUsersCreate()).Methods("POST")
-	s.router.HandleFunc("/api/auth", s.handleSessionsCreate()).Methods("POST")
+	s.router.HandleFunc("/api/auth/signup", s.handleUsersCreate()).Methods("POST")
+	s.router.HandleFunc("/api/auth/login", s.handleSessionsCreate()).Methods("POST")
 
 	private := s.router.PathPrefix("/api/private").Subrouter()
 	private.Use(s.authenticateUser)
-	private.HandleFunc("/api/feed", s.handleFeed()).Methods("GET")
+	private.HandleFunc("/feed", s.handleFeed()).Methods("GET")
 }
 
 func (s *server) logRequest(next http.Handler) http.Handler {
@@ -205,3 +205,4 @@ func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data 
 		json.NewEncoder(w).Encode(data)
 	}
 }
+

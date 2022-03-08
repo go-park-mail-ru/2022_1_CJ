@@ -60,3 +60,4 @@ func encryptString(s string) (string, error) {
 	}
 	return string(b), nil
 }
+
