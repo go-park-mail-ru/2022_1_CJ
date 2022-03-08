@@ -8,13 +8,15 @@ import (
 
 // User ...
 type User struct {
-	ID   int    `json:"_id"`
-	Name string `json:"name"`
+	ID       int    `json:"_id"`
+	Name     string `json:"first_name"`
+	LastName string `json:"last_name"`
+	PathImg  string `json:"path_to_img"`
 
 	Email string `json:"email"`
 	Phone string `json:"phone"`
 
-	Password          string `json:"password"`
+	Password          string `json:"password,omitempty"`
 	EncryptedPassword string `json:"-"`
 }
 

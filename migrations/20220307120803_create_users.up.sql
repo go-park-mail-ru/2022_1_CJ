@@ -3,7 +3,7 @@ CREATE TABLE users
     user_id            bigserial not null primary key,
 
     first_name         varchar   not null,
-    second_name        varchar   not null,
+    last_name          varchar   not null,
     path_to_img        varchar   not null,
 
     email              varchar   not null unique,

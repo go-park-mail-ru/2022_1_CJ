@@ -122,7 +122,9 @@ func (s *server) authenticateUser(next http.Handler) http.Handler {
 func (s *server) handleUsersCreate() http.HandlerFunc {
 	type request struct {
 		Phone    string `json:"phone"`
-		Name     string `json:"name"`
+		Name     string `json:"first_name"`
+		LastName string `json:"last_name"`
+		PathImg  string `json:"path_img"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
@@ -136,6 +138,8 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 
 		u := &model.User{
 			Name:     req.Name,
+			LastName: req.LastName,
+			PathImg:  req.PathImg,
 			Phone:    req.Phone,
 			Email:    req.Email,
 			Password: req.Password,
