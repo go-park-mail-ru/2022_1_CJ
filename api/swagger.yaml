@@ -16,7 +16,7 @@ paths:
       summary: Signup user
       security: []
       parameters:
-        - $ref: '#/components/parameters/DefaultParameters'
+        - $ref: "#/components/parameters/DefaultParameters"
       requestBody:
         content:
           application/json:
@@ -33,6 +33,57 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SignupUserResponse"
+
+  /auth/login:
+    post:
+      tags:
+        - Authorization
+      summary: Login user
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUserRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginUserResponse"
+
+  /user/get:
+    post:
+      tags:
+        - User
+      summary: Get user data
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      requestBody:
+        description: On empty user_id returns information about currently authorized user if there's one
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetUserDataRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserDataResponse"
 
 components:
   parameters:
@@ -59,7 +110,7 @@ components:
         last:
           type: string
           example: Doe
-    
+
     SignupUserRequest:
       type: object
       properties:
@@ -75,8 +126,37 @@ components:
     SignupUserResponse:
       $ref: "#/components/schemas/BasicResponse"
 
+    LoginUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          example: mail@example.com
+        password:
+          type: string
+          example: password
+
+    LoginUserResponse:
+      $ref: "#/components/schemas/AuthTokenResponse"
+
+    GetUserDataRequest:
+      type: object
+      properties:
+        user_id:
+          type: string
+
+    GetUserDataResponse:
+      $ref: "#/components/schemas/User"
+
     BasicResponse:
       type: object
+
+    AuthTokenResponse:
+      type: object
+      properties:
+        auth_token:
+          type: string
+          description: jwt token
 
     User:
       type: object

@@ -7,10 +7,13 @@ import (
 )
 
 const (
-	HeaderKeyAuth         = "Authorization"
-	HeaderKeyUserID       = "User-Id"
+	HeaderKeyUserID       = "User-ID"
 	HeaderKeyRequestID    = "X-Request-ID"
 	HeaderKeyUserAuthType = "User-Auth-Type"
+)
+
+const (
+	CookieKeyAuthToken = "Auth-Token"
 )
 
 const (

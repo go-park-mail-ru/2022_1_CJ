@@ -8,3 +8,11 @@ type User struct {
 	Email string          `json:"email"`
 	Name  common.UserName `json:"full_name"`
 }
+
+type GetUserDataRequest struct {
+	UserID string `json:"user_id"`
+}
+
+type GetUserDataResponse struct {
+	User User `json:"user"`
+}

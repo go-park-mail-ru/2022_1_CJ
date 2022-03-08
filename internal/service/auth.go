@@ -10,10 +10,12 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/utils"
 )
 
 type AuthService interface {
 	SignupUser(ctx context.Context, request *dto.SignupUserRequest) (*dto.SignupUserResponse, error)
+	LoginUser(ctx context.Context, request *dto.LoginUserRequest) (*dto.LoginUserResponse, error)
 }
 
 type AuthServiceImpl struct {
@@ -42,6 +44,24 @@ func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupU
 	}
 
 	return &dto.SignupUserResponse{}, nil
+}
+
+func (svc *AuthServiceImpl) LoginUser(ctx context.Context, request *dto.LoginUserRequest) (*dto.LoginUserResponse, error) {
+	user, err := svc.db.UserRepo.GetUserByEmail(ctx, request.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := user.Password.Validate(request.Password); err != nil {
+		return nil, err
+	}
+
+	authToken, err := utils.GenerateAuthToken(&utils.AuthTokenWrapper{UserID: user.ID})
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.LoginUserResponse{AuthToken: authToken}, nil
 }
 
 func NewAuthService(log *logrus.Entry, db *db.Repository) AuthService {

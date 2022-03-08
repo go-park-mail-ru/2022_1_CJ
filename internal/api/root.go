@@ -50,6 +50,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	registry := service.NewRegistry(log, repository)
 
 	authCtrl := controllers.NewAuthController(log, registry)
+	userCtrl := controllers.NewUserController(log, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
 	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware())
@@ -59,6 +60,12 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	authAPI := api.Group("/auth")
 
 	authAPI.POST("/signup", authCtrl.SignupUser)
+	authAPI.POST("/login", authCtrl.LoginUser)
+
+	userAPI := api.Group("/user", svc.AuthMiddleware())
+
+	// TODO: switch to GET
+	userAPI.POST("/get", userCtrl.GetUserData)
 
 	return svc, nil
 }

@@ -10,9 +10,30 @@ import (
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/utils"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 )
+
+func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+			cookie, err := ctx.Cookie(constants.CookieKeyAuthToken)
+			if err != nil {
+				return constants.ErrMissingAuthCookie
+			}
+
+			tw, err := utils.ParseAuthToken(cookie.Value)
+			if err != nil {
+				return err
+			}
+
+			ctx.Request().Header.Set(constants.HeaderKeyUserID, string(tw.UserID))
+
+			return next(ctx)
+		}
+	}
+}
 
 func (svc *APIService) XRequestIDMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
