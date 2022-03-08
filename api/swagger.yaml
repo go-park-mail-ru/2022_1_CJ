@@ -107,7 +107,7 @@ components:
       $ref: "#/components/schemas/BasicResponse"
 
     BasicResponse:
-      type: object
+      $ref: "#/components/schemas/User"
 
     User:
       type: object
