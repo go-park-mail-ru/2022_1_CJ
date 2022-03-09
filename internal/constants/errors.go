@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// COdedError is an error wrapper which wraps errors with http status codes.
+// CodedError is an error wrapper which wraps errors with http status codes.
 type CodedError struct {
 	err  error
 	code int

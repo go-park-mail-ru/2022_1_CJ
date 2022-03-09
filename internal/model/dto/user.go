@@ -10,7 +10,7 @@ type User struct {
 }
 
 type GetUserDataRequest struct {
-	UserID string `json:"user_id"`
+	UserID string `json:"user_id" validate:"required"`
 }
 
 type GetUserDataResponse struct {
@@ -18,7 +18,7 @@ type GetUserDataResponse struct {
 }
 
 type GetUserFeedRequest struct {
-	UserID string `json:"user_id"`
+	UserID string `json:"user_id" validate:"required"`
 }
 
 type GetUserFeedResponse struct {

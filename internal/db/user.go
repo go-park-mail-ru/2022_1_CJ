@@ -11,8 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-//go:generate mockgen -source=user.go -destination=user_mock.go -package=db
-
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *core.User) error
 

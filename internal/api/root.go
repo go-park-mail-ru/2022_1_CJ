@@ -28,7 +28,6 @@ func (svc *APIService) Shutdown(ctx context.Context) error {
 	if err := svc.router.Shutdown(ctx); err != nil {
 		svc.log.Fatal(err)
 	}
-
 	return nil
 }
 
