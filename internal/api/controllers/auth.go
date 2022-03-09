@@ -48,6 +48,11 @@ func (c *AuthController) LoginUser(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
+func (c *AuthController) LogoutUser(ctx echo.Context) error {
+	ctx.SetCookie(utils.CreateCookie(constants.CookieKeyAuthToken, "", 0))
+	return ctx.JSON(http.StatusOK, &dto.BasicResponse{})
+}
+
 func NewAuthController(log *logrus.Entry, registry *service.Registry) *AuthController {
 	return &AuthController{log: log, registry: registry}
 }
