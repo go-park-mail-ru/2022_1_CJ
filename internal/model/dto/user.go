@@ -16,3 +16,11 @@ type GetUserDataRequest struct {
 type GetUserDataResponse struct {
 	User User `json:"user"`
 }
+
+type GetUserFeedRequest struct {
+	UserID string `json:"user_id"`
+}
+
+type GetUserFeedResponse struct {
+	Posts []Post `json:"posts"`
+}

@@ -34,6 +34,20 @@ func (c *UserController) GetUserData(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
+func (c *UserController) GetUserFeed(ctx echo.Context) error {
+	request := new(dto.GetUserFeedRequest)
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
+
+	response, err := c.registry.UserService.GetUserFeed(context.Background(), request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
 func NewUserController(log *logrus.Entry, registry *service.Registry) *UserController {
 	return &UserController{log: log, registry: registry}
 }

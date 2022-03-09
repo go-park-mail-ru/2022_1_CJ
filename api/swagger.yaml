@@ -15,8 +15,6 @@ paths:
         - Authorization
       summary: Signup user
       security: []
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       requestBody:
         content:
           application/json:
@@ -84,6 +82,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetUserDataResponse"
+                
+  /user/feed:
+    post:
+      tags:
+        - User
+      summary: Get user feed
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      requestBody:
+        description: On empty user_id returns information about currently authorized user if there's one
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetUserFeedRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserFeedResponse"
 
 components:
   parameters:
@@ -137,7 +161,7 @@ components:
           example: password
 
     LoginUserResponse:
-      $ref: "#/components/schemas/AuthTokenResponse"
+      $ref: "#/components/schemas/BasicResponse"
 
     GetUserDataRequest:
       type: object
@@ -147,16 +171,23 @@ components:
 
     GetUserDataResponse:
       $ref: "#/components/schemas/User"
+      
+    GetUserFeedRequest:
+      type: object
+      properties:
+        user_id:
+          type: string
+
+    GetUserFeedResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
 
     BasicResponse:
       type: object
-
-    AuthTokenResponse:
-      type: object
-      properties:
-        auth_token:
-          type: string
-          description: jwt token
 
     User:
       type: object
@@ -168,3 +199,15 @@ components:
         email:
           type: string
           example: mail@example.com
+          
+    Post:
+      type: object
+      properties:
+        author_id:
+          type: string
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
