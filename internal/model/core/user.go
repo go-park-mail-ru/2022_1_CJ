@@ -22,8 +22,7 @@ type User struct {
 	Email string `bson:"email"`
 	Phone string `bson:"phone"`
 
-	CreatedAt int64 `bson:"created_at"`           // unix timestamp
-	UpdatedAt int64 `bson:"updated_at,omitempty"` // unix timestamp
+	CreatedAt int64 `bson:"created_at"` // unix timestamp
 
 	Password UserPassword `bson:"password"`
 }

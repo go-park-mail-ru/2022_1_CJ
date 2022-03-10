@@ -114,7 +114,6 @@ func (svc *APIService) LoggingMiddleware() echo.MiddlewareFunc {
 	}
 }
 
-// TODO: refactor this crap
 func getIP(r *http.Request) string {
 	ip := r.Header.Get("X-REAL-IP")
 	netIP := net.ParseIP(ip)

@@ -87,6 +87,8 @@ func main() {
 
 	go svc.Serve()
 
+	// -------------------- Listen for Interruption signal and shutdown -------------------- //
+
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit

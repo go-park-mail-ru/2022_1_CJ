@@ -40,8 +40,7 @@ func (repo *userRepositoryImpl) CreateUser(ctx context.Context, user *core.User)
 			return err
 		}
 	}
-
-	repo.initUser(user)
+	user.CreatedAt = time.Now().Unix()
 	_, err := repo.coll.InsertOne(ctx, user)
 	return err
 }
@@ -87,18 +86,6 @@ func (repo *userRepositoryImpl) DeleteUser(ctx context.Context, user *core.User)
 	filter := bson.M{"email": user.Email}
 	_, err := repo.coll.DeleteOne(ctx, filter)
 	return err
-}
-
-func (repo *userRepositoryImpl) initUser(user *core.User) error {
-	uid, err := core.GenUUID()
-	if err != nil {
-		return err
-	}
-	user.ID = uid
-	timeNow := time.Now().Unix()
-	user.CreatedAt = timeNow
-	user.UpdatedAt = timeNow
-	return nil
 }
 
 // NewUserRepository creates a new instance of userRepositoryImpl
