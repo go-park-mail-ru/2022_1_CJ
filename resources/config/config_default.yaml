@@ -1,0 +1,20 @@
+version: 1.0.0
+
+service:
+  bind:
+    address: 0.0.0.0
+    port: 8080
+  shutdown_timeout: 10
+  jwt_ttl: 14400
+  jwt_secret: somesecretstringchangemeplease
+  base_url: 127.0.0.1:8080/api
+  scheme: http
+  host: 127.0.0.1
+  port: 8080
+
+logging:
+  level: debug
+
+db:
+  database: cj
+  connection_string: mongodb://root:rootpassword@mongodb_container:27017

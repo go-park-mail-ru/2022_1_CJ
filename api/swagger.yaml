@@ -1,0 +1,231 @@
+openapi: 3.0.3
+info:
+  title: CJ
+  description: "Social Network VK"
+  version: 0.0.1
+servers:
+  - url: /api
+security:
+  - CookieAuth: []
+
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - Authorization
+      summary: Signup user
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupUserRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignupUserResponse"
+
+  /auth/login:
+    post:
+      tags:
+        - Authorization
+      summary: Login user
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUserRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginUserResponse"
+                
+  /auth/logout:
+    delete:
+      tags:
+        - Authorization
+      summary: Logout user
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BasicResponse"
+
+  /user/get:
+    post:
+      tags:
+        - User
+      summary: Get user data
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      requestBody:
+        description: On empty user_id returns information about currently authorized user if there's one
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetUserDataRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserDataResponse"
+                
+  /user/feed:
+    post:
+      tags:
+        - User
+      summary: Get user feed
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      requestBody:
+        description: On empty user_id returns information about currently authorized user if there's one
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetUserFeedRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserFeedResponse"
+
+components:
+  parameters:
+    DefaultParameters:
+      in: header
+      name: X-Request-ID
+      schema:
+        type: string
+        format: uuid
+
+  securitySchemes:
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: AuthToken 
+
+  schemas:
+    UserName:
+      type: object
+      properties:
+        first:
+          type: string
+          example: John
+        last:
+          type: string
+          example: Doe
+
+    SignupUserRequest:
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/UserName"
+        email:
+          type: string
+          example: mail@example.com
+        password:
+          type: string
+          example: password
+
+    SignupUserResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    LoginUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          example: mail@example.com
+        password:
+          type: string
+          example: password
+
+    LoginUserResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    GetUserDataRequest:
+      type: object
+      properties:
+        user_id:
+          type: string
+
+    GetUserDataResponse:
+      $ref: "#/components/schemas/User"
+      
+    GetUserFeedRequest:
+      type: object
+      properties:
+        user_id:
+          type: string
+
+    GetUserFeedResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+
+    BasicResponse:
+      type: object
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          $ref: "#/components/schemas/UserName"
+        email:
+          type: string
+          example: mail@example.com
+          
+    Post:
+      type: object
+      properties:
+        author_id:
+          type: string
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
