@@ -40,7 +40,11 @@ func (repo *userRepositoryImpl) CreateUser(ctx context.Context, user *core.User)
 			return err
 		}
 	}
-	user.CreatedAt = time.Now().Unix()
+
+	if err := repo.InitUser(user); err != nil {
+		return err
+	}
+
 	_, err := repo.coll.InsertOne(ctx, user)
 	return err
 }
@@ -91,4 +95,14 @@ func (repo *userRepositoryImpl) DeleteUser(ctx context.Context, user *core.User)
 // NewUserRepository creates a new instance of userRepositoryImpl
 func NewUserRepository(db *mongo.Database) (*userRepositoryImpl, error) {
 	return &userRepositoryImpl{db: db, coll: db.Collection("users")}, nil
+}
+
+func (repo *userRepositoryImpl) InitUser(user *core.User) error {
+	uid, err := core.GenUUID()
+	if err != nil {
+		return err
+	}
+	user.ID = uid
+	user.CreatedAt = time.Now().Unix()
+	return nil
 }
