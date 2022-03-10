@@ -6,7 +6,7 @@ info:
 servers:
   - url: /api
 security:
-  - BearerAuth: []
+  - CookieAuth: []
 
 paths:
   /auth/signup:
@@ -56,6 +56,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LoginUserResponse"
+                
+  /auth/logout:
+    delete:
+      tags:
+        - Authorization
+      summary: Logout user
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BasicResponse"
 
   /user/get:
     post:
@@ -88,7 +107,6 @@ paths:
       tags:
         - User
       summary: Get user feed
-      security: []
       parameters:
         - $ref: "#/components/parameters/DefaultParameters"
       requestBody:
@@ -119,10 +137,10 @@ components:
         format: uuid
 
   securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: AuthToken 
 
   schemas:
     UserName:
