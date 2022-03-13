@@ -4,65 +4,128 @@ info:
   description: "Social Network VK"
   version: 0.0.1
 servers:
-  - url: /
+  - url: /api
 security:
-  - BearerAuth: []
+  - CookieAuth: []
 
 paths:
-  /register:
-    post:
-      tags:
-        - Registration
-      summary: Register user
-      security: []
-      parameters:
-        - $ref: '#/components/parameters/DefaultParameters'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RegisterUserRequest"
-        required: true
-      responses:
-        "400":
-          description: Bad request
-          content: {}
-        "422":
-          description: Unprocessable entity
-          content: {}
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RegisterUserResponse"
-  /auth:
+  /auth/signup:
     post:
       tags:
         - Authorization
-      summary: Authorize user
+      summary: Signup user
       security: []
-      parameters:
-        - $ref: '#/components/parameters/DefaultParameters'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AuthUserRequest"
+              $ref: "#/components/schemas/SignupUserRequest"
         required: true
       responses:
         "500":
           description: Internal error
           content: {}
-        "400":
-          description: Bad request
-          content: {}
-        "401":
-          description: Unauthorized
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignupUserResponse"
+
+  /auth/login:
+    post:
+      tags:
+        - Authorization
+      summary: Login user
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUserRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
           content: {}
         "200":
-          description: Created
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginUserResponse"
+                
+  /auth/logout:
+    delete:
+      tags:
+        - Authorization
+      summary: Logout user
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      responses:
+        "500":
+          description: Internal error
           content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BasicResponse"
+
+  /user/get:
+    post:
+      tags:
+        - User
+      summary: Get user data
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      requestBody:
+        description: On empty user_id returns information about currently authorized user if there's one
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetUserDataRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserDataResponse"
+                
+  /user/feed:
+    post:
+      tags:
+        - User
+      summary: Get user feed
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      requestBody:
+        description: On empty user_id returns information about currently authorized user if there's one
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetUserFeedRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserFeedResponse"
 
 components:
   parameters:
@@ -73,19 +136,28 @@ components:
         type: string
         format: uuid
 
+  securitySchemes:
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: AuthToken 
+
   schemas:
-    RegisterUserRequest:
+    UserName:
       type: object
       properties:
-        first_name:
+        first:
           type: string
           example: John
-        last_name:
-            type: string
-            example: Doe
-        path_to_img:
+        last:
           type: string
-          example: /home/usr/img/mybitchface.jpg
+          example: Doe
+
+    SignupUserRequest:
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/UserName"
         email:
           type: string
           example: mail@example.com
@@ -93,7 +165,10 @@ components:
           type: string
           example: password
 
-    AuthUserRequest:
+    SignupUserResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    LoginUserRequest:
       type: object
       properties:
         email:
@@ -103,23 +178,54 @@ components:
           type: string
           example: password
 
-    RegisterUserResponse:
+    LoginUserResponse:
       $ref: "#/components/schemas/BasicResponse"
 
-    BasicResponse:
+    GetUserDataRequest:
+      type: object
+      properties:
+        user_id:
+          type: string
+
+    GetUserDataResponse:
       $ref: "#/components/schemas/User"
+      
+    GetUserFeedRequest:
+      type: object
+      properties:
+        user_id:
+          type: string
+
+    GetUserFeedResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+
+    BasicResponse:
+      type: object
 
     User:
       type: object
       properties:
         id:
           type: string
-        first_name:
-          type: string
-          example: John
-        last_name:
-            type: string
-            example: Doe
+        name:
+          $ref: "#/components/schemas/UserName"
         email:
           type: string
           example: mail@example.com
+          
+    Post:
+      type: object
+      properties:
+        author_id:
+          type: string
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
