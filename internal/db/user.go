@@ -22,6 +22,7 @@ type UserRepository interface {
 	UpdateUser(ctx context.Context, user *core.User) error
 
 	DeleteUser(ctx context.Context, user *core.User) error
+	UserAddPost(ctx context.Context, user *core.User, postID string) error
 }
 
 type userRepositoryImpl struct {
@@ -83,6 +84,20 @@ func (repo *userRepositoryImpl) UpdateUser(ctx context.Context, user *core.User)
 	filter := bson.M{"_id": user.ID}
 	_, err := repo.coll.ReplaceOne(ctx, filter, user)
 	return err
+}
+
+// Add new user post
+func (repo *userRepositoryImpl) UserAddPost(ctx context.Context, user *core.User, postID string) error {
+	// TODO find in []string, if not exist than add
+	//filter := bson.M{"posts": user.Posts}
+	//err := repo.coll.FindOne(ctx, postID).Err()
+	//if err != nil {
+	//	if err == mongo.ErrNoDocuments {
+	//		return false, nil
+	//	}
+	//	return false, err
+	//}
+	return nil
 }
 
 // DeleteUser deletes from the db user with the provided email

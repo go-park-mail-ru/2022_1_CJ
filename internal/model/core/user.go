@@ -16,15 +16,14 @@ type UserPassword struct {
 
 // User describes a user entity
 type User struct {
-	ID   string          `bson:"_id"`
-	Name common.UserName `bson:"name"`
-
-	Email string `bson:"email"`
-	Phone string `bson:"phone"`
-
-	CreatedAt int64 `bson:"created_at"` // unix timestamp
-
-	Password UserPassword `bson:"password"`
+	ID        string          `bson:"_id"`
+	Name      common.UserName `bson:"name"`
+	Image     string          `bson:"images"`
+	Email     string          `bson:"email"`
+	Phone     string          `bson:"phone"`
+	CreatedAt int64           `bson:"created_at"` // unix timestamp
+	Password  UserPassword    `bson:"password"`
+	Posts     []string        `bson:"posts"`
 }
 
 // Init generates salt and hash with given password and fills corresponding fields.

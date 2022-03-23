@@ -26,7 +26,6 @@ func GenerateAuthToken(atw *AuthTokenWrapper) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("%w: %v", constants.ErrSignToken, err)
 	}
-
 	return authToken, nil
 }
 

@@ -50,6 +50,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 
 	authCtrl := controllers.NewAuthController(log, registry)
 	userCtrl := controllers.NewUserController(log, registry)
+	postCtrl := controllers.NewPostController(log, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
 	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware())
@@ -65,8 +66,15 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	userAPI := api.Group("/user", svc.AuthMiddleware())
 
 	// TODO: switch to GET
-	userAPI.POST("/get", userCtrl.GetUserData)
-	userAPI.POST("/feed", userCtrl.GetUserFeed)
+	userAPI.GET("/get", userCtrl.GetUserData)
+	userAPI.GET("/feed", userCtrl.GetUserFeed)
+
+	postAPI := api.Group("/post", svc.AuthMiddleware())
+
+	postAPI.POST("/create", postCtrl.CreatePost)
+	//postAPI.PUT("/edit", postCtrl.EditPost)
+	//postAPI.DELETE("/delete", postCtrl.DeletePost)
+	//userAPI.GET("/?post_id=[0-9]+", userCtrl.DeletePost)
 
 	return svc, nil
 }
