@@ -29,7 +29,6 @@ func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
 			}
 
 			ctx.Request().Header.Set(constants.HeaderKeyUserID, string(tw.UserID))
-
 			return next(ctx)
 		}
 	}

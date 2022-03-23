@@ -22,7 +22,6 @@ func (repo *postRepositoryImpl) CreatePost(ctx context.Context, post *core.Post)
 	if err := repo.InitPost(post); err != nil {
 		return nil, err
 	}
-
 	_, err := repo.coll.InsertOne(ctx, post)
 	return post, err
 }
@@ -37,7 +36,7 @@ func (repo *postRepositoryImpl) InitPost(post *core.Post) error {
 		return err
 	}
 	post.ID = uid
-	post.AuthorID = uid
+	post.AuthorID = post.AuthorID
 	post.CreatedAt = time.Now().Unix()
 	return nil
 }

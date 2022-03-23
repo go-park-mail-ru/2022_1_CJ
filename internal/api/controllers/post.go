@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/labstack/echo"
@@ -18,6 +19,10 @@ func (c *PostController) CreatePost(ctx echo.Context) error {
 	request := new(dto.GetPostDataRequest)
 	if err := ctx.Bind(request); err != nil {
 		return err
+	}
+
+	if len(request.UserID) == 0 {
+		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
 	}
 
 	response, err := c.registry.PostService.CreatePost(context.Background(), request)

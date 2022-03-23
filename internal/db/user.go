@@ -88,15 +88,18 @@ func (repo *userRepositoryImpl) UpdateUser(ctx context.Context, user *core.User)
 
 // Add new user post
 func (repo *userRepositoryImpl) UserAddPost(ctx context.Context, user *core.User, postID string) error {
-	// TODO find in []string, if not exist than add
-	//filter := bson.M{"posts": user.Posts}
-	//err := repo.coll.FindOne(ctx, postID).Err()
-	//if err != nil {
-	//	if err == mongo.ErrNoDocuments {
-	//		return false, nil
+	//filter := bson.M{"posts": bson.M{"$in": postID}}
+	//if err := repo.coll.FindOne(ctx, filter).Err(); err != mongo.ErrNoDocuments {
+	//	if err == nil {
+	//		return constants.ErrGenerateUUID
+	//	} else {
+	//		return err
 	//	}
-	//	return false, err
 	//}
+
+	if _, err := repo.coll.UpdateByID(ctx, user.ID, bson.M{"$push": bson.M{"posts": postID}}); err == nil {
+		return err
+	}
 	return nil
 }
 

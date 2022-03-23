@@ -8,7 +8,7 @@ type Post struct {
 }
 
 type GetPostDataRequest struct {
-	UserID  string   `json:"user_id" validate:"required"`
+	UserID  string   `json:"user_id"`
 	Message string   `json:"message"`
 	Images  []string `json:"images"`
 }
