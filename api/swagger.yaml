@@ -126,7 +126,78 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetUserFeedResponse"
-
+  /post/create:
+    post:
+      tags:
+        - Post
+      summary: Create new post
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      requestBody:
+        description: On empty user_id returns information about currently authorized user if there's one
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetPostDataRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPostDataResponse"
+  /post/delete:
+    delete:
+      tags:
+        - Post
+      summary: Delete post
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      requestBody:
+        description: On empty user_id returns information about currently authorized user if there's one
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetPostDeleteRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BasicResponse"
+  /post/edit:
+    put:
+      tags:
+        - Post
+      summary: Edit post
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      requestBody:
+        description: On empty user_id returns information about currently authorized user if there's one
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetPostEditRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPostDataResponse"
 components:
   parameters:
     DefaultParameters:
@@ -153,6 +224,40 @@ components:
           type: string
           example: Doe
 
+    GetPostDataRequest:
+      type: object
+      properties:
+        message:
+          type: string
+          example: This is my new post
+        images:
+          type: array
+          items:
+            type: string
+            example: src/image.jpg
+
+    GetPostEditRequest:
+      type: object
+      properties:
+        post_id:
+          type: string
+          example: 640115b8-540e-450e-a19c-6c68ec0f91a7
+        message:
+          type: string
+          example: This is my new post
+        images:
+          type: array
+          items:
+            type: string
+            example: src/image.jpg
+
+    GetPostDeleteRequest:
+      type: object
+      properties:
+        post_id:
+          type: string
+          example: 640115b8-540e-450e-a19c-6c68ec0f91a7
+
     SignupUserRequest:
       type: object
       properties:
@@ -164,6 +269,9 @@ components:
         password:
           type: string
           example: password
+
+    GetPostDataResponse:
+      $ref: "#/components/schemas/Post"
 
     SignupUserResponse:
       $ref: "#/components/schemas/BasicResponse"
@@ -222,6 +330,8 @@ components:
       type: object
       properties:
         author_id:
+          type: string
+        post_id:
           type: string
         message:
           type: string

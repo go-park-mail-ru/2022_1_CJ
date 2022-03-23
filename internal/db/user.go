@@ -22,7 +22,9 @@ type UserRepository interface {
 	UpdateUser(ctx context.Context, user *core.User) error
 
 	DeleteUser(ctx context.Context, user *core.User) error
+
 	UserAddPost(ctx context.Context, user *core.User, postID string) error
+	UserDeletePost(ctx context.Context, user *core.User, postID string) error
 }
 
 type userRepositoryImpl struct {
@@ -86,18 +88,21 @@ func (repo *userRepositoryImpl) UpdateUser(ctx context.Context, user *core.User)
 	return err
 }
 
-// Add new user post
+// UserAddPost Add new user post
 func (repo *userRepositoryImpl) UserAddPost(ctx context.Context, user *core.User, postID string) error {
-	//filter := bson.M{"posts": bson.M{"$in": postID}}
-	//if err := repo.coll.FindOne(ctx, filter).Err(); err != mongo.ErrNoDocuments {
-	//	if err == nil {
-	//		return constants.ErrGenerateUUID
-	//	} else {
-	//		return err
-	//	}
-	//}
-
 	if _, err := repo.coll.UpdateByID(ctx, user.ID, bson.M{"$push": bson.M{"posts": postID}}); err == nil {
+		return err
+	}
+	return nil
+}
+
+// UserDeletePost Add new user post
+func (repo *userRepositoryImpl) UserDeletePost(ctx context.Context, user *core.User, postID string) error {
+	filter := bson.M{"posts": bson.M{"$in": postID}}
+	if err := repo.coll.FindOne(ctx, filter).Err(); err == mongo.ErrNoDocuments {
+		return constants.ErrDBNotFound
+	}
+	if _, err := repo.coll.UpdateByID(ctx, user.ID, bson.M{"$pull": bson.M{"posts": postID}}); err == nil {
 		return err
 	}
 	return nil
