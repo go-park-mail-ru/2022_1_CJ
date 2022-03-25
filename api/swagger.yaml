@@ -198,6 +198,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetPostDataResponse"
+  /post/{id}:
+    put:
+      tags:
+        - Post
+      summary: Get post
+      parameters:
+        - $ref: "#/components/parameters/DefaultParameters"
+      requestBody:
+        description: On empty user_id returns information about currently authorized user if there's one
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetPostRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPostDataResponse"
 components:
   parameters:
     DefaultParameters:
@@ -252,6 +276,13 @@ components:
             example: src/image.jpg
 
     GetPostDeleteRequest:
+      type: object
+      properties:
+        post_id:
+          type: string
+          example: 640115b8-540e-450e-a19c-6c68ec0f91a7
+
+    GetPostRequest:
       type: object
       properties:
         post_id:

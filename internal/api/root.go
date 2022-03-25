@@ -74,7 +74,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	postAPI.POST("/create", postCtrl.CreatePost)
 	postAPI.PUT("/edit", postCtrl.EditPost)
 	postAPI.DELETE("/delete", postCtrl.DeletePost)
-	//userAPI.GET("/?post_id=[0-9]+", userCtrl.DeletePost)
+	userAPI.GET("/{id}", postCtrl.Post)
 
 	return svc, nil
 }

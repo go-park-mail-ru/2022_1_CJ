@@ -13,6 +13,7 @@ type PostService interface {
 	CreatePost(ctx context.Context, request *dto.GetPostDataRequest) (*dto.GetPostDataResponse, error)
 	EditPost(ctx context.Context, request *dto.GetPostEditDataRequest) (*dto.GetPostDataResponse, error)
 	DeletePost(ctx context.Context, request *dto.GetPostDeleteDataRequest) error
+	Post(ctx context.Context, request *dto.GetPostRequest) (*dto.GetPostDataResponse, error)
 }
 
 type postServiceImpl struct {
@@ -79,6 +80,20 @@ func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.GetPost
 	}
 
 	err = svc.db.UserRepo.UserAddPost(ctx, user, post.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.GetPostDataResponse{Post: convert.Post2DTO(post)}, nil
+}
+
+func (svc *postServiceImpl) Post(ctx context.Context, request *dto.GetPostRequest) (*dto.GetPostDataResponse, error) {
+	_, err := svc.db.UserRepo.GetUserByID(ctx, request.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	post, err := svc.db.PostRepo.GetPostByID(ctx, request.ID)
 	if err != nil {
 		return nil, err
 	}

@@ -29,3 +29,8 @@ type GetPostDeleteDataRequest struct {
 	UserID string `json:"user_id"`
 	ID     string `json:"post_id"`
 }
+
+type GetPostRequest struct {
+	UserID string `json:"user_id"`
+	ID     string `json:"post_id"`
+}
