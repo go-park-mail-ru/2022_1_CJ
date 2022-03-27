@@ -39,6 +39,7 @@ services:
 
 networks:
   mongo-go:
+    name: cj-backend
 
 volumes:
   mongodb_data_container:
