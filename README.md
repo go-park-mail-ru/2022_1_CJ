@@ -7,8 +7,6 @@
 - [**Ринат Хайруллин**](https://github.com/rinatkh) - *Бэкенд*
 - [**Частиков Александр**](https://github.com/papazloynt) - *Бэкенд*
 
-
-
 ## [Cсылка на фронт](https://github.com/frontend-park-mail-ru/2022_1_CJ/tree/master)
 
 ## Ссылка на API документацию [swagger](https://github.com/go-park-mail-ru/2022_1_CJ/blob/example/api/swagger.yaml)
