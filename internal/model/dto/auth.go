@@ -8,7 +8,7 @@ type SignupUserRequest struct {
 	Password string          `json:"password" validate:"required"`
 }
 
-type SignupUserResponse BasicResponse
+type SignupUserResponse AuthTokenResponse
 
 type LoginUserRequest struct {
 	Email    string `json:"email"    validate:"required,email"`

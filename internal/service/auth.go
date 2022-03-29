@@ -43,7 +43,12 @@ func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupU
 		return nil, err
 	}
 
-	return &dto.SignupUserResponse{}, nil
+	authToken, err := utils.GenerateAuthToken(&utils.AuthTokenWrapper{UserID: user.ID})
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.SignupUserResponse{AuthToken: authToken}, nil
 }
 
 func (svc *AuthServiceImpl) LoginUser(ctx context.Context, request *dto.LoginUserRequest) (*dto.LoginUserResponse, error) {
