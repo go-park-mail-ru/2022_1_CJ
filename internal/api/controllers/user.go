@@ -54,6 +54,10 @@ func (c *UserController) SendRequest(ctx echo.Context) error {
 		return err
 	}
 
+	if len(request.UserID) == 0 {
+		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	}
+
 	response, err := c.registry.UserService.SendRequest(context.Background(), request)
 	if err != nil {
 		return err
