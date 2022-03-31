@@ -22,6 +22,11 @@ type UserRepository interface {
 	UpdateUser(ctx context.Context, user *core.User) error
 
 	DeleteUser(ctx context.Context, user *core.User) error
+
+	// ---------------REQUEST
+	IsUniqRequest(ctx context.Context, user *core.User, PersonId string) error
+	IsNotFriend(ctx context.Context, user *core.User, PersonId string) error
+	MakeRequest(ctx context.Context, user *core.User, PersonId string) error
 }
 
 type userRepositoryImpl struct {
@@ -90,6 +95,42 @@ func (repo *userRepositoryImpl) DeleteUser(ctx context.Context, user *core.User)
 	filter := bson.M{"email": user.Email}
 	_, err := repo.coll.DeleteOne(ctx, filter)
 	return err
+}
+
+// --------------REQUESTS
+func (repo *userRepositoryImpl) IsUniqRequest(ctx context.Context, user *core.User, PersonId string) error {
+	filter := bson.M{"_id": user.ID, "requests": bson.M{"$in": PersonId}}
+
+	if err := repo.coll.FindOne(ctx, filter).Err(); err != mongo.ErrNoDocuments {
+		if err == nil {
+			return constants.ErrRequestAlreadyExist
+		} else {
+			return err
+		}
+	}
+	return nil
+}
+
+func (repo *userRepositoryImpl) IsNotFriend(ctx context.Context, user *core.User, PersonId string) error {
+	filter := bson.M{"_id": user.ID, "friends": bson.M{"$in": PersonId}}
+
+	if err := repo.coll.FindOne(ctx, filter).Err(); err != mongo.ErrNoDocuments {
+		if err == nil {
+			return constants.ErrAlreadyFriends
+		} else {
+			return err
+		}
+	}
+	return nil
+}
+
+func (repo *userRepositoryImpl) MakeRequest(ctx context.Context, user *core.User, PersonId string) error {
+	filter := bson.M{"requests": bson.M{"$push": PersonId}}
+
+	if _, err := repo.coll.UpdateByID(ctx, user.ID, filter); err != nil {
+		return err
+	}
+	return nil
 }
 
 // NewUserRepository creates a new instance of userRepositoryImpl

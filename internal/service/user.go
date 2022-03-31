@@ -14,6 +14,9 @@ import (
 type UserService interface {
 	GetUserData(ctx context.Context, request *dto.GetUserDataRequest) (*dto.GetUserDataResponse, error)
 	GetUserFeed(ctx context.Context, request *dto.GetUserFeedRequest) (*dto.GetUserFeedResponse, error)
+
+	// ------REQUEST
+	SendRequest(ctx context.Context, request *dto.ReqSendRequest) (*dto.BasicResponse, error)
 }
 
 type userServiceImpl struct {
@@ -35,6 +38,27 @@ func (svc *userServiceImpl) GetUserFeed(ctx context.Context, request *dto.GetUse
 		{AuthorID: "dummy2", Message: "message2", Images: []string{"img2"}},
 	}
 	return &dto.GetUserFeedResponse{Posts: posts}, nil
+}
+
+func (svc *userServiceImpl) SendRequest(ctx context.Context, request *dto.ReqSendRequest) (*dto.BasicResponse, error) {
+	person, err := svc.db.UserRepo.GetUserByID(ctx, request.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := svc.db.UserRepo.IsUniqRequest(ctx, person, request.UserID); err != nil {
+		return nil, err
+	}
+
+	if err := svc.db.UserRepo.IsNotFriend(ctx, person, request.UserID); err != nil {
+		return nil, err
+	}
+
+	if err := svc.db.UserRepo.MakeRequest(ctx, person, request.UserID); err != nil {
+		return nil, err
+	}
+
+	return &dto.BasicResponse{}, nil
 }
 
 func NewUserService(log *logrus.Entry, db *db.Repository) UserService {

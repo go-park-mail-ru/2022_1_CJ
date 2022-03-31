@@ -44,4 +44,8 @@ var (
 
 	// Conflict
 	ErrEmailAlreadyTaken = &CodedError{errors.New("email is taken already by other user"), http.StatusConflict}
+
+	// Not Uniq
+	ErrRequestAlreadyExist = &CodedError{errors.New("your request already was sent"), http.StatusConflict}
+	ErrAlreadyFriends      = &CodedError{errors.New("your already friend with this person"), http.StatusConflict}
 )
