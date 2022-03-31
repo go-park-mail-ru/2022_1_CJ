@@ -30,6 +30,8 @@ type UserRepository interface {
 	// ----------------ACCEPT
 	MakeFriends(ctx context.Context, UserID string, PersonID string) error
 	DeleteRequest(ctx context.Context, UserID string, PersonID string) error
+	// ----------------DELETE
+	DeleteFriend(ctx context.Context, ExFriendID1 string, ExFriendID2 string) error
 }
 
 type userRepositoryImpl struct {
@@ -158,6 +160,21 @@ func (repo *userRepositoryImpl) DeleteRequest(ctx context.Context, UserID string
 	if _, err := repo.coll.UpdateByID(ctx, UserID, filter); err != nil {
 		return err
 	}
+	return nil
+}
+
+// -------------------------DELETE
+func (repo *userRepositoryImpl) DeleteFriend(ctx context.Context, ExFriendID1 string, ExFriendID2 string) error {
+	filter := bson.M{"$pull": bson.M{"friends": bson.M{"$in": ExFriendID1}}} // Проверить на работу
+	if _, err := repo.coll.UpdateByID(ctx, ExFriendID2, filter); err != nil {
+		return err
+	}
+
+	filter = bson.M{"$pull": bson.M{"friends": bson.M{"$in": ExFriendID2}}} // Проверить на работу
+	if _, err := repo.coll.UpdateByID(ctx, ExFriendID1, filter); err != nil {
+		return err
+	}
+
 	return nil
 }
 

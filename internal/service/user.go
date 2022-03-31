@@ -18,6 +18,7 @@ type UserService interface {
 	// ------REQUEST
 	SendRequest(ctx context.Context, request *dto.ReqSendRequest) (*dto.BasicResponse, error)
 	AcceptRequest(ctx context.Context, request *dto.AcceptRequest) (*dto.AcceptResponse, error)
+	DeleteFriend(ctx context.Context, request *dto.DeleteFriendRequest) (*dto.DeleteFriendResponse, error)
 }
 
 type userServiceImpl struct {
@@ -73,6 +74,18 @@ func (svc *userServiceImpl) AcceptRequest(ctx context.Context, request *dto.Acce
 		return nil, err
 	}
 	return &dto.AcceptResponse{RequestsID: user.Requests}, nil
+}
+
+func (svc *userServiceImpl) DeleteFriend(ctx context.Context, request *dto.DeleteFriendRequest) (*dto.DeleteFriendResponse, error) {
+	if err := svc.db.UserRepo.DeleteFriend(ctx, request.UserID, request.ExFriendID); err != nil {
+		return nil, err
+	}
+
+	user, err := svc.db.UserRepo.GetUserByID(ctx, request.UserID)
+	if err != nil {
+		return nil, err
+	}
+	return &dto.DeleteFriendResponse{FriendsID: user.Friends}, nil
 }
 
 func NewUserService(log *logrus.Entry, db *db.Repository) UserService {
