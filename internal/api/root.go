@@ -68,5 +68,8 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	userAPI.POST("/get", userCtrl.GetUserData)
 	userAPI.POST("/feed", userCtrl.GetUserFeed)
 
+	// TODO: send request
+	userAPI.POST("/request/:person_id", userCtrl.SendRequest) // Как передать нормально id для парсинга
+
 	return svc, nil
 }

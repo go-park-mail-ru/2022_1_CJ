@@ -48,6 +48,20 @@ func (c *UserController) GetUserFeed(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
+func (c *UserController) SendRequest(ctx echo.Context) error {
+	request := new(dto.ReqSendRequest)
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
+
+	response, err := c.registry.UserService.SendRequest(context.Background(), request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
 func NewUserController(log *logrus.Entry, registry *service.Registry) *UserController {
 	return &UserController{log: log, registry: registry}
 }
