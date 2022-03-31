@@ -19,14 +19,17 @@ type UserRepository interface {
 
 	CheckUserEmailExistence(ctx context.Context, email string) (bool, error)
 
-	UpdateUser(ctx context.Context, user *core.User) error
+	/*	UpdateUser(ctx context.Context, user *core.User) error
 
-	DeleteUser(ctx context.Context, user *core.User) error
+		DeleteUser(ctx context.Context, user *core.User) error*/
 
 	// ---------------REQUEST
-	IsUniqRequest(ctx context.Context, user *core.User, PersonId string) error
-	IsNotFriend(ctx context.Context, user *core.User, PersonId string) error
-	MakeRequest(ctx context.Context, user *core.User, PersonId string) error
+	IsUniqRequest(ctx context.Context, UserID string, PersonID string) error
+	IsNotFriend(ctx context.Context, UserID string, PersonID string) error
+	MakeRequest(ctx context.Context, UserID string, PersonID string) error
+	// ----------------ACCEPT
+	MakeFriends(ctx context.Context, UserID string, PersonID string) error
+	DeleteRequest(ctx context.Context, UserID string, PersonID string) error
 }
 
 type userRepositoryImpl struct {
@@ -98,8 +101,8 @@ func (repo *userRepositoryImpl) DeleteUser(ctx context.Context, user *core.User)
 }
 
 // --------------REQUESTS
-func (repo *userRepositoryImpl) IsUniqRequest(ctx context.Context, user *core.User, PersonId string) error {
-	filter := bson.M{"_id": user.ID, "requests": bson.M{"$in": PersonId}}
+func (repo *userRepositoryImpl) IsUniqRequest(ctx context.Context, UserID string, PersonID string) error {
+	filter := bson.M{"_id": UserID, "requests": bson.M{"$in": PersonID}}
 
 	if err := repo.coll.FindOne(ctx, filter).Err(); err != mongo.ErrNoDocuments {
 		if err == nil {
@@ -111,8 +114,8 @@ func (repo *userRepositoryImpl) IsUniqRequest(ctx context.Context, user *core.Us
 	return nil
 }
 
-func (repo *userRepositoryImpl) IsNotFriend(ctx context.Context, user *core.User, PersonId string) error {
-	filter := bson.M{"_id": user.ID, "friends": bson.M{"$in": PersonId}}
+func (repo *userRepositoryImpl) IsNotFriend(ctx context.Context, UserID string, PersonID string) error {
+	filter := bson.M{"_id": UserID, "friends": bson.M{"$in": PersonID}}
 
 	if err := repo.coll.FindOne(ctx, filter).Err(); err != mongo.ErrNoDocuments {
 		if err == nil {
@@ -124,10 +127,35 @@ func (repo *userRepositoryImpl) IsNotFriend(ctx context.Context, user *core.User
 	return nil
 }
 
-func (repo *userRepositoryImpl) MakeRequest(ctx context.Context, user *core.User, PersonId string) error {
-	filter := bson.M{"requests": bson.M{"$push": PersonId}}
+func (repo *userRepositoryImpl) MakeRequest(ctx context.Context, UserID string, PersonID string) error {
+	filter := bson.M{"requests": bson.M{"$push": PersonID}}
 
-	if _, err := repo.coll.UpdateByID(ctx, user.ID, filter); err != nil {
+	if _, err := repo.coll.UpdateByID(ctx, UserID, filter); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *userRepositoryImpl) MakeFriends(ctx context.Context, UserID string, PersonID string) error {
+	// first friend
+	filter := bson.M{"friends": bson.M{"$push": PersonID}}
+	if _, err := repo.coll.UpdateByID(ctx, UserID, filter); err != nil {
+		return err
+	}
+
+	// second friend
+	filter = bson.M{"friends": bson.M{"$push": UserID}}
+	if _, err := repo.coll.UpdateByID(ctx, PersonID, filter); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *userRepositoryImpl) DeleteRequest(ctx context.Context, UserID string, PersonID string) error {
+	// first friend
+	filter := bson.M{"$pull": bson.M{"requests": bson.M{"$in": PersonID}}} // Проверить на работу
+	if _, err := repo.coll.UpdateByID(ctx, UserID, filter); err != nil {
 		return err
 	}
 	return nil
