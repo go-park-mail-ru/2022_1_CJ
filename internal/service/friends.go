@@ -1,0 +1,71 @@
+package service
+
+import (
+	"context"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
+	"github.com/sirupsen/logrus"
+)
+
+type FriendsService interface {
+	SendRequest(ctx context.Context, UserID string, PersonID string) (*dto.ReqSendResponse, error)
+	AcceptRequest(ctx context.Context, request *dto.AcceptRequest, UserID string, PersonID string) (*dto.AcceptResponse, error)
+	DeleteFriend(ctx context.Context, UserID string, ExFriendID string) (*dto.DeleteFriendResponse, error)
+}
+
+type friendsServiceImpl struct {
+	log *logrus.Entry
+	db  *db.Repository
+}
+
+func (svc *friendsServiceImpl) SendRequest(ctx context.Context, UserID string, PersonID string) (*dto.ReqSendResponse, error) {
+	if err := svc.db.FriendsRepo.IsUniqRequest(ctx, PersonID, UserID); err != nil {
+		return nil, err
+	}
+
+	if err := svc.db.FriendsRepo.IsNotFriend(ctx, PersonID, UserID); err != nil {
+		return nil, err
+	}
+
+	if err := svc.db.FriendsRepo.MakeRequest(ctx, PersonID, UserID); err != nil {
+		return nil, err
+	}
+
+	return &dto.ReqSendResponse{}, nil
+}
+
+func (svc *friendsServiceImpl) AcceptRequest(ctx context.Context, request *dto.AcceptRequest, UserID string, PersonID string) (*dto.AcceptResponse, error) {
+	if request.IsAccepted {
+		if err := svc.db.FriendsRepo.MakeFriends(ctx, UserID, PersonID); err != nil {
+			return nil, err
+		}
+	}
+
+	if err := svc.db.FriendsRepo.DeleteRequest(ctx, UserID, PersonID); err != nil {
+		return nil, err
+	}
+
+	requests, err := svc.db.FriendsRepo.GetRequestsByUserID(ctx, UserID)
+	if err != nil {
+		return nil, err
+	}
+	// Get Requests
+	return &dto.AcceptResponse{RequestsID: requests}, nil
+}
+
+func (svc *friendsServiceImpl) DeleteFriend(ctx context.Context, UserID string, ExFriendID string) (*dto.DeleteFriendResponse, error) {
+	if err := svc.db.FriendsRepo.DeleteFriend(ctx, UserID, ExFriendID); err != nil {
+		return nil, err
+	}
+
+	friends, err := svc.db.FriendsRepo.GetFriendsByUserID(ctx, UserID)
+	if err != nil {
+		return nil, err
+	}
+	// Get Requests
+	return &dto.DeleteFriendResponse{FriendsID: friends}, nil
+}
+
+func NewFriendsService(log *logrus.Entry, db *db.Repository) FriendsService {
+	return &friendsServiceImpl{log: log, db: db}
+}

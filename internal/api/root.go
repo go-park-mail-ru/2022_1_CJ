@@ -50,6 +50,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 
 	authCtrl := controllers.NewAuthController(log, registry)
 	userCtrl := controllers.NewUserController(log, registry)
+	friendsCtrl := controllers.NewFriendsController(log, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
 	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware())
@@ -68,10 +69,12 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	userAPI.POST("/get", userCtrl.GetUserData)
 	userAPI.POST("/feed", userCtrl.GetUserFeed)
 
+	friendsAPI := api.Group("/friends", svc.AuthMiddleware())
+
 	// TODO: send request
-	userAPI.POST("/request/:person_id", userCtrl.SendRequest) // Как передать нормально id для парсинга
-	userAPI.POST("/accept/:person_id", userCtrl.AcceptRequest)
-	userAPI.POST("/delete/:ex_friend_id", userCtrl.DeleteFriend)
+	friendsAPI.POST("/request/:person_id", friendsCtrl.SendRequest)
+	friendsAPI.POST("/accept/:person_id", friendsCtrl.AcceptRequest)
+	friendsAPI.POST("/delete/:ex_friend_id", friendsCtrl.DeleteFriend)
 
 	return svc, nil
 }

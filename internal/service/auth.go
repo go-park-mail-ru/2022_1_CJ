@@ -43,6 +43,10 @@ func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupU
 		return nil, err
 	}
 
+	if err := svc.db.FriendsRepo.CreateFriends(ctx, user.FriendsID, user.ID); err != nil {
+		return nil, err
+	}
+
 	authToken, err := utils.GenerateAuthToken(&utils.AuthTokenWrapper{UserID: user.ID})
 	if err != nil {
 		return nil, err

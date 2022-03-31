@@ -48,66 +48,6 @@ func (c *UserController) GetUserFeed(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (c *UserController) SendRequest(ctx echo.Context) error {
-	request := new(dto.ReqSendRequest)
-	if err := ctx.Bind(request); err != nil {
-		return err
-	}
-
-	request.PersonID = ctx.Param("person_id")
-
-	if len(request.UserID) == 0 {
-		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	}
-
-	response, err := c.registry.UserService.SendRequest(context.Background(), request)
-	if err != nil {
-		return err
-	}
-
-	return ctx.JSON(http.StatusOK, response)
-}
-
-func (c *UserController) AcceptRequest(ctx echo.Context) error {
-	request := new(dto.AcceptRequest)
-	if err := ctx.Bind(request); err != nil {
-		return err
-	}
-
-	request.PersonID = ctx.Param("person_id")
-
-	if len(request.UserID) == 0 {
-		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	}
-
-	response, err := c.registry.UserService.AcceptRequest(context.Background(), request)
-	if err != nil {
-		return err
-	}
-
-	return ctx.JSON(http.StatusOK, response)
-}
-
-func (c *UserController) DeleteFriend(ctx echo.Context) error {
-	request := new(dto.DeleteFriendRequest)
-	if err := ctx.Bind(request); err != nil {
-		return err
-	}
-
-	request.ExFriendID = ctx.Param("ex_friend_id")
-
-	if len(request.UserID) == 0 {
-		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	}
-
-	response, err := c.registry.UserService.DeleteFriend(context.Background(), request)
-	if err != nil {
-		return err
-	}
-
-	return ctx.JSON(http.StatusOK, response)
-}
-
 func NewUserController(log *logrus.Entry, registry *service.Registry) *UserController {
 	return &UserController{log: log, registry: registry}
 }
