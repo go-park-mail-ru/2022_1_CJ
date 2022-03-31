@@ -25,8 +25,19 @@ type GetUserFeedResponse struct {
 	Posts []Post `json:"posts"`
 }
 
-// ------------------- REQUEST
+// -------------------REQUEST
 type ReqSendRequest struct {
 	UserID   string `json:"user_id"`
 	PersonID string `json:"person_id" validate:"required"`
+}
+
+// --------------------ACCEPT
+type AcceptRequest struct {
+	UserID     string `json:"user_id"`
+	PersonID   string `json:"person_id" validate:"required"`
+	IsAccepted bool   `json:"is_accepted" validate:"required"`
+}
+
+type AcceptResponse struct {
+	RequestsID []string `json:"friends_id"`
 }
