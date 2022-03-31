@@ -10,5 +10,5 @@
 
 ## [Cсылка на фронт](https://github.com/frontend-park-mail-ru/2022_1_CJ/tree/master)
 
-## Ссылка на API документацию [swagger](https://github.com/go-park-mail-ru/2022_1_CJ/blob/example/api/swagger.yaml)
+## Ссылка на API документацию [swagger](https://app.swaggerhub.com/apis/papazloynt/projectCJ/1.0.0-oas3)
 
