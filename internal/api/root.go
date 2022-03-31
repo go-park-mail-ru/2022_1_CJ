@@ -71,6 +71,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	// TODO: send request
 	userAPI.POST("/request/:person_id", userCtrl.SendRequest) // Как передать нормально id для парсинга
 	userAPI.POST("/accept/:person_id", userCtrl.AcceptRequest)
+	userAPI.POST("/delete/:ex_friend_id", userCtrl.DeleteFriend)
 
 	return svc, nil
 }
