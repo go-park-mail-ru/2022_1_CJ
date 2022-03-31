@@ -54,6 +54,8 @@ func (c *UserController) SendRequest(ctx echo.Context) error {
 		return err
 	}
 
+	request.PersonID = ctx.Param("person_id")
+
 	if len(request.UserID) == 0 {
 		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
 	}
@@ -72,6 +74,8 @@ func (c *UserController) AcceptRequest(ctx echo.Context) error {
 		return err
 	}
 
+	request.PersonID = ctx.Param("person_id")
+
 	if len(request.UserID) == 0 {
 		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
 	}
@@ -89,6 +93,8 @@ func (c *UserController) DeleteFriend(ctx echo.Context) error {
 	if err := ctx.Bind(request); err != nil {
 		return err
 	}
+
+	request.ExFriendID = ctx.Param("ex_friend_id")
 
 	if len(request.UserID) == 0 {
 		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)

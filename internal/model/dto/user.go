@@ -28,13 +28,13 @@ type GetUserFeedResponse struct {
 // -------------------REQUEST
 type ReqSendRequest struct {
 	UserID   string `json:"user_id"`
-	PersonID string `json:"person_id" validate:"required"`
+	PersonID string `json:"person_id"`
 }
 
 // --------------------ACCEPT
 type AcceptRequest struct {
 	UserID     string `json:"user_id"`
-	PersonID   string `json:"person_id" validate:"required"`
+	PersonID   string `json:"person_id"`
 	IsAccepted bool   `json:"is_accepted" validate:"required"`
 }
 
@@ -45,7 +45,7 @@ type AcceptResponse struct {
 // ------------------DELETE
 type DeleteFriendRequest struct {
 	UserID     string `json:"user_id"`
-	ExFriendID string `json:"ex_friend_id" validate:"required"`
+	ExFriendID string `json:"ex_friend_id"`
 }
 
 type DeleteFriendResponse struct {
