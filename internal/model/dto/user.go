@@ -24,3 +24,9 @@ type GetUserFeedRequest struct {
 type GetUserFeedResponse struct {
 	Posts []Post `json:"posts"`
 }
+
+// ------------------- REQUEST
+type ReqSendRequest struct {
+	UserID   string `json:"user_id"`
+	PersonID string `json:"person_id" validate:"required"`
+}

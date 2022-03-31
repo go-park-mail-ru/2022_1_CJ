@@ -22,6 +22,9 @@ type User struct {
 	Email string `bson:"email"`
 	Phone string `bson:"phone"`
 
+	requests []string `bson:"requests"`
+	friends  []string `bson:"friends"`
+
 	CreatedAt int64 `bson:"created_at"` // unix timestamp
 
 	Password UserPassword `bson:"password"`
