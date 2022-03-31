@@ -41,3 +41,13 @@ type AcceptRequest struct {
 type AcceptResponse struct {
 	RequestsID []string `json:"friends_id"`
 }
+
+// ------------------DELETE
+type DeleteFriendRequest struct {
+	UserID     string `json:"user_id"`
+	ExFriendID string `json:"ex_friend_id" validate:"required"`
+}
+
+type DeleteFriendResponse struct {
+	FriendsID []string `json:"friends_id"`
+}
