@@ -38,8 +38,6 @@ paths:
         - Authorization
       summary: Login user
       security: []
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       requestBody:
         content:
           application/json:
@@ -63,8 +61,6 @@ paths:
         - Authorization
       summary: Logout user
       security: []
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       responses:
         "500":
           description: Internal error
@@ -88,7 +84,6 @@ paths:
           schema:
             type: string
           description: On empty userID returns information about currently authorized user if there's one
-        - $ref: "#/components/parameters/DefaultParameters"
       responses:
         "500":
           description: Internal error
@@ -105,8 +100,6 @@ paths:
       tags:
         - User
       summary: Get user feed
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       requestBody:
         description: On empty user_id returns information about currently authorized user if there's one
         content:
@@ -126,14 +119,6 @@ paths:
                 $ref: "#/components/schemas/GetUserFeedResponse"
 
 components:
-  parameters:
-    DefaultParameters:
-      in: header
-      name: X-Request-ID
-      schema:
-        type: string
-        format: uuid
-
   securitySchemes:
     CookieAuth:
       type: apiKey
