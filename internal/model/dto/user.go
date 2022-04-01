@@ -10,7 +10,7 @@ type User struct {
 }
 
 type GetUserDataRequest struct {
-	UserID string `query:"userID"`
+	UserID string `query:"user_id"`
 }
 
 type GetUserDataResponse struct {

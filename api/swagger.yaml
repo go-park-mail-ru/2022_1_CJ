@@ -80,10 +80,10 @@ paths:
       security: []
       parameters:
         - in: query
-          name: userID
+          name: user_id
           schema:
             type: string
-          description: On empty userID returns information about currently authorized user if there's one
+          description: On empty user_id returns information about currently authorized user if there's one
       responses:
         "500":
           description: Internal error
