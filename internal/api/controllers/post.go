@@ -21,11 +21,9 @@ func (c *PostController) CreatePost(ctx echo.Context) error {
 		return err
 	}
 
-	if len(request.UserID) == 0 {
-		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	}
+	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.PostService.CreatePost(context.Background(), request)
+	response, err := c.registry.PostService.CreatePost(context.Background(), request, UserID)
 	if err != nil {
 		return err
 	}
@@ -34,16 +32,10 @@ func (c *PostController) CreatePost(ctx echo.Context) error {
 }
 
 func (c *PostController) DeletePost(ctx echo.Context) error {
-	request := new(dto.GetPostDeleteDataRequest)
-	if err := ctx.Bind(request); err != nil {
-		return err
-	}
+	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	PostID := ctx.Param("post_id")
 
-	if len(request.UserID) == 0 {
-		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	}
-
-	err := c.registry.PostService.DeletePost(context.Background(), request)
+	err := c.registry.PostService.DeletePost(context.Background(), UserID, PostID)
 	if err != nil {
 		return err
 	}
@@ -52,16 +44,16 @@ func (c *PostController) DeletePost(ctx echo.Context) error {
 }
 
 func (c *PostController) EditPost(ctx echo.Context) error {
+
 	request := new(dto.GetPostEditDataRequest)
 	if err := ctx.Bind(request); err != nil {
 		return err
 	}
 
-	if len(request.UserID) == 0 {
-		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	}
+	PostID := ctx.Param("post_id")
+	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.PostService.EditPost(context.Background(), request)
+	response, err := c.registry.PostService.EditPost(context.Background(), request, UserID, PostID)
 	if err != nil {
 		return err
 	}
@@ -70,16 +62,11 @@ func (c *PostController) EditPost(ctx echo.Context) error {
 }
 
 func (c *PostController) Post(ctx echo.Context) error {
-	request := new(dto.GetPostRequest)
-	if err := ctx.Bind(request); err != nil {
-		return err
-	}
 
-	if len(request.UserID) == 0 {
-		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	}
+	PostID := ctx.Param("post_id")
+	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.PostService.Post(context.Background(), request)
+	response, err := c.registry.PostService.Post(context.Background(), PostID, UserID)
 	if err != nil {
 		return err
 	}

@@ -9,7 +9,6 @@ type Post struct {
 }
 
 type GetPostDataRequest struct {
-	UserID  string   `json:"user_id"`
 	Message string   `json:"message"`
 	Images  []string `json:"images"`
 }
@@ -19,18 +18,10 @@ type GetPostDataResponse struct {
 }
 
 type GetPostEditDataRequest struct {
-	UserID  string   `json:"user_id"`
-	ID      string   `json:"post_id"`
 	Message string   `json:"message"`
 	Images  []string `json:"images"`
 }
 
-type GetPostDeleteDataRequest struct {
-	UserID string `json:"user_id"`
-	ID     string `json:"post_id"`
-}
+type GetPostDeleteDataRequest struct{}
 
-type GetPostRequest struct {
-	UserID string `json:"user_id"`
-	ID     string `json:"post_id"`
-}
+type GetPostRequest struct{}

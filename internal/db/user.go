@@ -24,6 +24,7 @@ type UserRepository interface {
 	DeleteUser(ctx context.Context, user *core.User) error
 
 	UserAddPost(ctx context.Context, user *core.User, postID string) error
+	UserCheckPost(ctx context.Context, user *core.User, postID string) error
 	UserDeletePost(ctx context.Context, user *core.User, postID string) error
 }
 
@@ -96,9 +97,18 @@ func (repo *userRepositoryImpl) UserAddPost(ctx context.Context, user *core.User
 	return nil
 }
 
+//UserCheckPost Check existing post in posts by User
+func (repo *userRepositoryImpl) UserCheckPost(ctx context.Context, user *core.User, postID string) error {
+	filter := bson.M{"_id": user.ID, "posts": bson.M{"$in": postID}}
+	if err := repo.coll.FindOne(ctx, filter).Err(); err == mongo.ErrNoDocuments {
+		return constants.ErrDBNotFound
+	}
+	return nil
+}
+
 // UserDeletePost Add new user post
 func (repo *userRepositoryImpl) UserDeletePost(ctx context.Context, user *core.User, postID string) error {
-	filter := bson.M{"posts": bson.M{"$in": postID}}
+	filter := bson.M{"_id": user.ID, "posts": bson.M{"$in": postID}}
 	if err := repo.coll.FindOne(ctx, filter).Err(); err == mongo.ErrNoDocuments {
 		return constants.ErrDBNotFound
 	}

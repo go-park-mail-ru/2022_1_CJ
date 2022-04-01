@@ -15,6 +15,7 @@ type PostRepository interface {
 	EditPost(ctx context.Context, post *core.Post) (*core.Post, error)
 	GetPostByID(ctx context.Context, ID string) (*core.Post, error)
 	DeletePost(ctx context.Context, post *core.Post) error
+	GetPostsByUser(ctx context.Context, UserID string) (*[]core.Post, error)
 }
 
 type postRepositoryImpl struct {
@@ -41,6 +42,13 @@ func (repo *postRepositoryImpl) EditPost(ctx context.Context, post *core.Post) (
 	filter := bson.M{"_id": post.ID}
 	_, err := repo.coll.ReplaceOne(ctx, filter, post)
 	return post, err
+
+}
+func (repo *postRepositoryImpl) GetPostsByUser(ctx context.Context, UserID string) (*[]core.Post, error) {
+	posts := new([]core.Post)
+	filter := bson.M{"author_id": UserID}
+	err := repo.coll.FindOne(ctx, filter).Decode(posts)
+	return posts, err
 
 }
 
