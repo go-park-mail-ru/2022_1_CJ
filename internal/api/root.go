@@ -64,8 +64,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 
 	userAPI := api.Group("/user", svc.AuthMiddleware())
 
-	// TODO: switch to GET
-	userAPI.POST("/get", userCtrl.GetUserData)
+	userAPI.GET("/get", userCtrl.GetUserData)
 	userAPI.POST("/feed", userCtrl.GetUserFeed)
 
 	return svc, nil

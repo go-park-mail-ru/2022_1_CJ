@@ -56,7 +56,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LoginUserResponse"
-                
+
   /auth/logout:
     delete:
       tags:
@@ -77,20 +77,18 @@ paths:
                 $ref: "#/components/schemas/BasicResponse"
 
   /user/get:
-    post:
+    get:
       tags:
         - User
       summary: Get user data
       security: []
       parameters:
+        - in: query
+          name: userID
+          schema:
+            type: string
+          description: On empty userID returns information about currently authorized user if there's one
         - $ref: "#/components/parameters/DefaultParameters"
-      requestBody:
-        description: On empty user_id returns information about currently authorized user if there's one
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/GetUserDataRequest"
-        required: true
       responses:
         "500":
           description: Internal error
@@ -101,7 +99,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetUserDataResponse"
-                
+
   /user/feed:
     post:
       tags:
@@ -140,7 +138,7 @@ components:
     CookieAuth:
       type: apiKey
       in: cookie
-      name: AuthToken 
+      name: AuthToken
 
   schemas:
     UserName:
@@ -181,15 +179,9 @@ components:
     LoginUserResponse:
       $ref: "#/components/schemas/BasicResponse"
 
-    GetUserDataRequest:
-      type: object
-      properties:
-        user_id:
-          type: string
-
     GetUserDataResponse:
       $ref: "#/components/schemas/User"
-      
+
     GetUserFeedRequest:
       type: object
       properties:
@@ -217,7 +209,7 @@ components:
         email:
           type: string
           example: mail@example.com
-          
+
     Post:
       type: object
       properties:
