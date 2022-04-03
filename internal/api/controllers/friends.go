@@ -57,6 +57,28 @@ func (c *FriendsController) DeleteFriend(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
+func (c *FriendsController) GetFriends(ctx echo.Context) error {
+	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+
+	response, err := c.registry.FriendsService.GetFriends(context.Background(), UserID)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (c *FriendsController) GetRequests(ctx echo.Context) error {
+	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+
+	response, err := c.registry.FriendsService.GetRequests(context.Background(), UserID)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
 func NewFriendsController(log *logrus.Entry, registry *service.Registry) *FriendsController {
 	return &FriendsController{log: log, registry: registry}
 }

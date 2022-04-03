@@ -103,6 +103,13 @@ func (repo *userRepositoryImpl) InitUser(user *core.User) error {
 		return err
 	}
 	user.ID = uid
+
+	friendsID, err := core.GenUUID()
+	if err != nil {
+		return err
+	}
+	user.FriendsID = friendsID
+
 	user.CreatedAt = time.Now().Unix()
 	return nil
 }

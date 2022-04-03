@@ -71,10 +71,15 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 
 	friendsAPI := api.Group("/friends", svc.AuthMiddleware())
 
-	// TODO: send request
+	// TODO: check work
+	// TODO: get friends
+	// TODO: get requests
 	friendsAPI.POST("/request/:person_id", friendsCtrl.SendRequest)
 	friendsAPI.POST("/accept/:person_id", friendsCtrl.AcceptRequest)
 	friendsAPI.POST("/delete/:ex_friend_id", friendsCtrl.DeleteFriend)
+	friendsAPI.GET("/get", friendsCtrl.GetFriends)
+	// Лучше вынести в отдельную модель
+	friendsAPI.GET("/requests", friendsCtrl.GetRequests)
 
 	return svc, nil
 }

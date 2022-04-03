@@ -11,6 +11,9 @@ type FriendsService interface {
 	SendRequest(ctx context.Context, UserID string, PersonID string) (*dto.ReqSendResponse, error)
 	AcceptRequest(ctx context.Context, request *dto.AcceptRequest, UserID string, PersonID string) (*dto.AcceptResponse, error)
 	DeleteFriend(ctx context.Context, UserID string, ExFriendID string) (*dto.DeleteFriendResponse, error)
+	// Getter
+	GetFriends(ctx context.Context, UserID string) (*dto.GetFriendsResponse, error)
+	GetRequests(ctx context.Context, UserID string) (*dto.GetRequestsResponse, error)
 }
 
 type friendsServiceImpl struct {
@@ -64,6 +67,24 @@ func (svc *friendsServiceImpl) DeleteFriend(ctx context.Context, UserID string, 
 	}
 	// Get Requests
 	return &dto.DeleteFriendResponse{FriendsID: friends}, nil
+}
+
+func (svc *friendsServiceImpl) GetFriends(ctx context.Context, UserID string) (*dto.GetFriendsResponse, error) {
+	friends, err := svc.db.FriendsRepo.GetFriendsByUserID(ctx, UserID)
+	if err != nil {
+		return nil, err
+	}
+	// Get Requests
+	return &dto.GetFriendsResponse{FriendsID: friends}, nil
+}
+
+func (svc *friendsServiceImpl) GetRequests(ctx context.Context, UserID string) (*dto.GetRequestsResponse, error) {
+	requests, err := svc.db.FriendsRepo.GetRequestsByUserID(ctx, UserID)
+	if err != nil {
+		return nil, err
+	}
+	// Get Requests
+	return &dto.GetRequestsResponse{RequestsID: requests}, nil
 }
 
 func NewFriendsService(log *logrus.Entry, db *db.Repository) FriendsService {
