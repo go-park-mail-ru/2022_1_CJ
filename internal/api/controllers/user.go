@@ -4,8 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
@@ -17,16 +15,9 @@ type UserController struct {
 }
 
 func (c *UserController) GetUserData(ctx echo.Context) error {
-	request := new(dto.GetUserDataRequest)
-	if err := ctx.Bind(request); err != nil {
-		return err
-	}
+	UserID := ctx.Param("user_id")
 
-	if len(request.UserID) == 0 {
-		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	}
-
-	response, err := c.registry.UserService.GetUserData(context.Background(), request)
+	response, err := c.registry.UserService.GetUserData(context.Background(), UserID)
 	if err != nil {
 		return err
 	}
@@ -35,12 +26,9 @@ func (c *UserController) GetUserData(ctx echo.Context) error {
 }
 
 func (c *UserController) GetUserFeed(ctx echo.Context) error {
-	request := new(dto.GetUserFeedRequest)
-	if err := ctx.Bind(request); err != nil {
-		return err
-	}
+	UserID := ctx.Param("user_id")
 
-	response, err := c.registry.UserService.GetUserFeed(context.Background(), request)
+	response, err := c.registry.UserService.GetUserFeed(context.Background(), UserID)
 	if err != nil {
 		return err
 	}

@@ -10,7 +10,7 @@ security:
 
 paths:
   /auth/signup:
-    post:
+    get:
       tags:
         - Authorization
       summary: Signup user
@@ -33,7 +33,7 @@ paths:
                 $ref: "#/components/schemas/SignupUserResponse"
 
   /auth/login:
-    post:
+    get:
       tags:
         - Authorization
       summary: Login user
@@ -56,7 +56,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LoginUserResponse"
-                
+
   /auth/logout:
     delete:
       tags:
@@ -76,8 +76,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/BasicResponse"
 
-  /user/get:
-    post:
+  /user/:user_id:
+    get:
       tags:
         - User
       summary: Get user data
@@ -101,9 +101,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetUserDataResponse"
-                
-  /user/feed:
-    post:
+
+  /user/user_id/posts:
+    get:
       tags:
         - User
       summary: Get user feed
@@ -196,7 +196,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/GetPostDataResponse"
   /post/:post_id:
-    put:
+    get:
       tags:
         - Post
       summary: Get post
@@ -231,7 +231,7 @@ components:
     CookieAuth:
       type: apiKey
       in: cookie
-      name: AuthToken 
+      name: AuthToken
 
   schemas:
     UserName:
@@ -308,18 +308,14 @@ components:
 
     GetUserDataRequest:
       type: object
-      properties:
-        user_id:
-          type: string
+
 
     GetUserDataResponse:
       $ref: "#/components/schemas/User"
-      
+
     GetUserFeedRequest:
       type: object
-      properties:
-        user_id:
-          type: string
+
 
     GetUserFeedResponse:
       type: object
@@ -342,7 +338,7 @@ components:
         email:
           type: string
           example: mail@example.com
-          
+
     Post:
       type: object
       properties:
