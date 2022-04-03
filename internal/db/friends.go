@@ -102,14 +102,14 @@ func (repo *friendsRepositoryImpl) DeleteRequest(ctx context.Context, UserID str
 // -------------------------DELETE
 func (repo *friendsRepositoryImpl) DeleteFriend(ctx context.Context, ExFriendID1 string, ExFriendID2 string) error {
 	filter := bson.M{"user_id": ExFriendID2}
-	update := bson.M{"$pull": bson.M{"friends": bson.M{"$in": ExFriendID1}}} // Проверить на работу
+	update := bson.M{"$pull": bson.M{"friends": ExFriendID1}} // Проверить на работу
 	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
 		return err
 	}
 
 	filter = bson.M{"user_id": ExFriendID1}
-	update = bson.M{"$pull": bson.M{"friends": bson.M{"$in": ExFriendID2}}} // Проверить на работу
-	if _, err := repo.coll.UpdateByID(ctx, filter, update); err != nil {
+	update = bson.M{"$pull": bson.M{"friends": ExFriendID2}} // Проверить на работу
+	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
 		return err
 	}
 
