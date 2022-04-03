@@ -72,8 +72,6 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	friendsAPI := api.Group("/friends", svc.AuthMiddleware())
 
 	// TODO: check work
-	// TODO: get friends
-	// TODO: get requests
 	friendsAPI.POST("/request/:person_id", friendsCtrl.SendRequest)
 	friendsAPI.POST("/accept/:person_id", friendsCtrl.AcceptRequest)
 	friendsAPI.POST("/delete/:ex_friend_id", friendsCtrl.DeleteFriend)

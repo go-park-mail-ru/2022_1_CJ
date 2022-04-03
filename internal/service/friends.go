@@ -37,6 +37,7 @@ func (svc *friendsServiceImpl) SendRequest(ctx context.Context, UserID string, P
 	return &dto.ReqSendResponse{}, nil
 }
 
+// Проверить на самого себя!
 func (svc *friendsServiceImpl) AcceptRequest(ctx context.Context, request *dto.AcceptRequest, UserID string, PersonID string) (*dto.AcceptResponse, error) {
 	if request.IsAccepted {
 		if err := svc.db.FriendsRepo.MakeFriends(ctx, UserID, PersonID); err != nil {
