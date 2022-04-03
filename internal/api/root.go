@@ -51,6 +51,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	authCtrl := controllers.NewAuthController(log, registry)
 	userCtrl := controllers.NewUserController(log, registry)
 	friendsCtrl := controllers.NewFriendsController(log, registry)
+	postCtrl := controllers.NewPostController(log, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
 	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware())
@@ -58,26 +59,27 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	api := svc.router.Group("/api")
 
 	authAPI := api.Group("/auth")
-
 	authAPI.POST("/signup", authCtrl.SignupUser)
 	authAPI.POST("/login", authCtrl.LoginUser)
 	authAPI.DELETE("/logout", authCtrl.LogoutUser)
 
 	userAPI := api.Group("/user", svc.AuthMiddleware())
-
-	// TODO: switch to GET
-	userAPI.POST("/get", userCtrl.GetUserData)
-	userAPI.POST("/feed", userCtrl.GetUserFeed)
+	userAPI.GET("/:user_id", userCtrl.GetUserData)
+	userAPI.GET("/:user_id/posts", userCtrl.GetUserFeed)
 
 	friendsAPI := api.Group("/friends", svc.AuthMiddleware())
-
-	// TODO: check work
 	friendsAPI.POST("/request/:person_id", friendsCtrl.SendRequest)
 	friendsAPI.POST("/accept/:person_id", friendsCtrl.AcceptRequest)
 	friendsAPI.POST("/delete/:ex_friend_id", friendsCtrl.DeleteFriend)
 	friendsAPI.GET("/get", friendsCtrl.GetFriends)
 	// Лучше вынести в отдельную модель
 	friendsAPI.GET("/requests", friendsCtrl.GetRequests)
+
+	postAPI := api.Group("/post", svc.AuthMiddleware())
+	postAPI.GET("/:post_id", postCtrl.GetPost)
+	postAPI.POST("/create", postCtrl.CreatePost)
+	postAPI.PUT("/edit/:post_id", postCtrl.EditPost)
+	postAPI.DELETE("/delete/:post_id", postCtrl.DeletePost)
 
 	return svc, nil
 }

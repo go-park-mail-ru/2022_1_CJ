@@ -12,8 +12,8 @@ import (
 )
 
 type UserService interface {
-	GetUserData(ctx context.Context, request *dto.GetUserDataRequest) (*dto.GetUserDataResponse, error)
-	GetUserFeed(ctx context.Context, request *dto.GetUserFeedRequest) (*dto.GetUserFeedResponse, error)
+	GetUserData(ctx context.Context, UserID string) (*dto.GetUserDataResponse, error)
+	GetUserFeed(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error)
 }
 
 type userServiceImpl struct {
@@ -21,20 +21,25 @@ type userServiceImpl struct {
 	db  *db.Repository
 }
 
-func (svc *userServiceImpl) GetUserData(ctx context.Context, request *dto.GetUserDataRequest) (*dto.GetUserDataResponse, error) {
-	user, err := svc.db.UserRepo.GetUserByID(ctx, request.UserID)
+func (svc *userServiceImpl) GetUserData(ctx context.Context, UserID string) (*dto.GetUserDataResponse, error) {
+	user, err := svc.db.UserRepo.GetUserByID(ctx, UserID)
 	if err != nil {
 		return nil, err
 	}
 	return &dto.GetUserDataResponse{User: convert.User2DTO(user)}, nil
 }
 
-func (svc *userServiceImpl) GetUserFeed(ctx context.Context, request *dto.GetUserFeedRequest) (*dto.GetUserFeedResponse, error) {
-	posts := []dto.Post{
-		{AuthorID: "dummy1", Message: "message1", Images: []string{"img1"}},
-		{AuthorID: "dummy2", Message: "message2", Images: []string{"img2"}},
+func (svc *userServiceImpl) GetUserFeed(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error) {
+	_, err := svc.db.UserRepo.GetUserByID(ctx, UserID)
+	if err != nil {
+		return nil, err
 	}
-	return &dto.GetUserFeedResponse{Posts: posts}, nil
+
+	posts, err := svc.db.UserRepo.GetPostsByUser(ctx, UserID)
+	if err != nil {
+		return nil, err
+	}
+	return &dto.GetUserFeedResponse{PostsID: posts}, nil
 }
 
 func NewUserService(log *logrus.Entry, db *db.Repository) UserService {

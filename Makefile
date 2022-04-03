@@ -15,7 +15,7 @@ all: down build up
 debug: down build-debug up-debug
 
 down:
-	docker-compose -f ${DCOMPOSE} down
+	docker-compose -f ${DCOMPOSE} down --remove-orphans
 
 build:
 	cp ${CONFIG_PATH} ${CONFIG}
@@ -26,10 +26,10 @@ build-debug:
 	${DOCKER_BUILD_KIT} docker-compose build --build-arg CONFIG=${CONFIG}
 
 up:
-	docker-compose -f ${DCOMPOSE} up -d
+	docker-compose -f ${DCOMPOSE} up -d --remove-orphans
 
 up-debug:
-	docker-compose -f ${DCOMPOSE} up
+	docker-compose -f ${DCOMPOSE} up --remove-orphans
 
 # Vendoring is useful for local debugging since you don't have to
 # reinstall all packages again and again in docker
