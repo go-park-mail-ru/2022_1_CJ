@@ -65,6 +65,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 
 	userAPI := api.Group("/user", svc.AuthMiddleware())
 	userAPI.GET("/:user_id", userCtrl.GetUserData)
+	userAPI.GET("/get", userCtrl.GetMyUserData)
 	userAPI.GET("/:user_id/posts", userCtrl.GetUserFeed)
 
 	friendsAPI := api.Group("/friends", svc.AuthMiddleware())
