@@ -13,7 +13,7 @@ type PostService interface {
 	CreatePost(ctx context.Context, request *dto.GetPostDataRequest, UserID string) (*dto.GetPostDataResponse, error)
 	EditPost(ctx context.Context, request *dto.GetPostEditDataRequest, UserID string, PostID string) (*dto.GetPostDataResponse, error)
 	DeletePost(ctx context.Context, UserID string, PostID string) error
-	Post(ctx context.Context, PostID string, UserID string) (*dto.GetPostDataResponse, error)
+	GetPost(ctx context.Context, PostID string) (*dto.GetPostDataResponse, error)
 }
 
 type postServiceImpl struct {
@@ -22,11 +22,6 @@ type postServiceImpl struct {
 }
 
 func (svc *postServiceImpl) DeletePost(ctx context.Context, UserID string, PostID string) error {
-	user, err := svc.db.UserRepo.GetUserByID(ctx, UserID)
-	if err != nil {
-		return err
-	}
-
 	post, err := svc.db.PostRepo.GetPostByID(ctx, PostID)
 	if err != nil {
 		return err
@@ -37,7 +32,7 @@ func (svc *postServiceImpl) DeletePost(ctx context.Context, UserID string, PostI
 		return err
 	}
 
-	err = svc.db.UserRepo.UserDeletePost(ctx, user, PostID)
+	err = svc.db.UserRepo.UserDeletePost(ctx, UserID, PostID)
 	if err != nil {
 		return err
 	}
@@ -52,6 +47,11 @@ func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.GetPostEd
 	}
 
 	err = svc.db.UserRepo.UserCheckPost(ctx, user, PostID)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = svc.db.PostRepo.GetPostByID(ctx, PostID)
 	if err != nil {
 		return nil, err
 	}
@@ -71,11 +71,6 @@ func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.GetPostEd
 }
 
 func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.GetPostDataRequest, UserID string) (*dto.GetPostDataResponse, error) {
-	user, err := svc.db.UserRepo.GetUserByID(ctx, UserID)
-	if err != nil {
-		return nil, err
-	}
-
 	post, err := svc.db.PostRepo.CreatePost(ctx, &core.Post{
 		AuthorID: UserID,
 		Message:  request.Message,
@@ -85,7 +80,7 @@ func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.GetPost
 		return nil, err
 	}
 
-	err = svc.db.UserRepo.UserAddPost(ctx, user, post.ID)
+	err = svc.db.UserRepo.UserAddPost(ctx, UserID, post.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -93,11 +88,7 @@ func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.GetPost
 	return &dto.GetPostDataResponse{Post: convert.Post2DTO(post)}, nil
 }
 
-func (svc *postServiceImpl) Post(ctx context.Context, PostID string, UserID string) (*dto.GetPostDataResponse, error) {
-	_, err := svc.db.UserRepo.GetUserByID(ctx, UserID)
-	if err != nil {
-		return nil, err
-	}
+func (svc *postServiceImpl) GetPost(ctx context.Context, PostID string) (*dto.GetPostDataResponse, error) {
 
 	post, err := svc.db.PostRepo.GetPostByID(ctx, PostID)
 	if err != nil {

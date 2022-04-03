@@ -9,18 +9,14 @@ type User struct {
 	Name  common.UserName `json:"name"`
 }
 
-type GetUserDataRequest struct {
-	UserID string `json:"user_id"` // not required
-}
+type GetUserDataRequest struct{}
 
 type GetUserDataResponse struct {
 	User User `json:"user"`
 }
 
-type GetUserFeedRequest struct {
-	UserID string `json:"user_id" validate:"required"`
-}
+type GetUserFeedRequest struct{}
 
 type GetUserFeedResponse struct {
-	Posts []Post `json:"posts"`
+	PostsID []string `json:"post_ids"`
 }

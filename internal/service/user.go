@@ -35,11 +35,11 @@ func (svc *userServiceImpl) GetUserFeed(ctx context.Context, request *dto.GetUse
 		return nil, err
 	}
 
-	posts, err := svc.db.PostRepo.GetPostsByUser(ctx, request.UserID)
+	posts, err := svc.db.UserRepo.GetPostsByUser(ctx, request.UserID)
 	if err != nil {
 		return nil, err
 	}
-	return &dto.GetUserFeedResponse{Posts: convert.Posts2DTO(posts)}, nil
+	return &dto.GetUserFeedResponse{PostsID: posts}, nil
 }
 
 func NewUserService(log *logrus.Entry, db *db.Repository) UserService {

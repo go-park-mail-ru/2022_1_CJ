@@ -23,9 +23,10 @@ type UserRepository interface {
 
 	DeleteUser(ctx context.Context, user *core.User) error
 
-	UserAddPost(ctx context.Context, user *core.User, postID string) error
+	UserAddPost(ctx context.Context, userID string, postID string) error
 	UserCheckPost(ctx context.Context, user *core.User, postID string) error
-	UserDeletePost(ctx context.Context, user *core.User, postID string) error
+	UserDeletePost(ctx context.Context, userID string, postID string) error
+	GetPostsByUser(ctx context.Context, UserID string) ([]string, error)
 }
 
 type userRepositoryImpl struct {
@@ -90,8 +91,8 @@ func (repo *userRepositoryImpl) UpdateUser(ctx context.Context, user *core.User)
 }
 
 // UserAddPost Add new user post
-func (repo *userRepositoryImpl) UserAddPost(ctx context.Context, user *core.User, postID string) error {
-	if _, err := repo.coll.UpdateByID(ctx, user.ID, bson.M{"$push": bson.M{"posts": postID}}); err == nil {
+func (repo *userRepositoryImpl) UserAddPost(ctx context.Context, userID string, postID string) error {
+	if _, err := repo.coll.UpdateByID(ctx, userID, bson.M{"$push": bson.D{{"posts", postID}}}); err != nil {
 		return err
 	}
 	return nil
@@ -99,7 +100,7 @@ func (repo *userRepositoryImpl) UserAddPost(ctx context.Context, user *core.User
 
 //UserCheckPost Check existing post in posts by User
 func (repo *userRepositoryImpl) UserCheckPost(ctx context.Context, user *core.User, postID string) error {
-	filter := bson.M{"_id": user.ID, "posts": bson.M{"$in": postID}}
+	filter := bson.M{"_id": user.ID, "posts": postID}
 	if err := repo.coll.FindOne(ctx, filter).Err(); err == mongo.ErrNoDocuments {
 		return constants.ErrDBNotFound
 	}
@@ -107,12 +108,12 @@ func (repo *userRepositoryImpl) UserCheckPost(ctx context.Context, user *core.Us
 }
 
 // UserDeletePost Add new user post
-func (repo *userRepositoryImpl) UserDeletePost(ctx context.Context, user *core.User, postID string) error {
-	filter := bson.M{"_id": user.ID, "posts": bson.M{"$in": postID}}
+func (repo *userRepositoryImpl) UserDeletePost(ctx context.Context, userID string, postID string) error {
+	filter := bson.M{"_id": userID, "posts": postID}
 	if err := repo.coll.FindOne(ctx, filter).Err(); err == mongo.ErrNoDocuments {
 		return constants.ErrDBNotFound
 	}
-	if _, err := repo.coll.UpdateByID(ctx, user.ID, bson.M{"$pull": bson.M{"posts": postID}}); err == nil {
+	if _, err := repo.coll.UpdateByID(ctx, userID, bson.M{"$pull": bson.M{"posts": postID}}); err != nil {
 		return err
 	}
 	return nil
@@ -128,6 +129,13 @@ func (repo *userRepositoryImpl) DeleteUser(ctx context.Context, user *core.User)
 // NewUserRepository creates a new instance of userRepositoryImpl
 func NewUserRepository(db *mongo.Database) (*userRepositoryImpl, error) {
 	return &userRepositoryImpl{db: db, coll: db.Collection("users")}, nil
+}
+
+func (repo *userRepositoryImpl) GetPostsByUser(ctx context.Context, UserID string) ([]string, error) {
+	user := new(core.User)
+	filter := bson.M{"_id": UserID}
+	err := repo.coll.FindOne(ctx, filter).Decode(user)
+	return user.Posts, err
 }
 
 func (repo *userRepositoryImpl) InitUser(user *core.User) error {

@@ -17,6 +17,10 @@ type GetPostDataResponse struct {
 	Post Post `json:"post"`
 }
 
+type GetPostDataGetResponse struct {
+	Message string `json:"message"`
+}
+
 type GetPostEditDataRequest struct {
 	Message string   `json:"message"`
 	Images  []string `json:"images"`

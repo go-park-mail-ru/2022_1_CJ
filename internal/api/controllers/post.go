@@ -61,12 +61,10 @@ func (c *PostController) EditPost(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (c *PostController) Post(ctx echo.Context) error {
+func (c *PostController) GetPost(ctx echo.Context) error {
 
 	PostID := ctx.Param("post_id")
-	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-
-	response, err := c.registry.PostService.Post(context.Background(), PostID, UserID)
+	response, err := c.registry.PostService.GetPost(context.Background(), PostID)
 	if err != nil {
 		return err
 	}

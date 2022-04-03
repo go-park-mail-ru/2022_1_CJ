@@ -23,7 +23,7 @@ type User struct {
 	Phone     string          `bson:"phone"`
 	CreatedAt int64           `bson:"created_at"` // unix timestamp
 	Password  UserPassword    `bson:"password"`
-	Posts     []string        `bson:"posts"`
+	Posts     []string        `bson:"posts,omitempty"`
 }
 
 // Init generates salt and hash with given password and fills corresponding fields.

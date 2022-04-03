@@ -22,16 +22,3 @@ func Post2DTO(post *core.Post) dto.Post {
 		Images:   post.Images,
 	}
 }
-
-func Posts2DTO(postsIN *[]core.Post) []dto.Post {
-	var posts []dto.Post
-	for i := 0; i < len(*postsIN); i++ {
-		posts = append(posts, dto.Post{
-			AuthorID: (*postsIN)[i].AuthorID,
-			PostID:   (*postsIN)[i].ID,
-			Message:  (*postsIN)[i].Message,
-			Images:   (*postsIN)[i].Images,
-		})
-	}
-	return posts
-}
