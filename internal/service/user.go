@@ -13,7 +13,8 @@ import (
 
 type UserService interface {
 	GetUserData(ctx context.Context, UserID string) (*dto.GetUserDataResponse, error)
-	GetUserFeed(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error)
+	GetUserPosts(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error)
+	GetFeed(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error)
 }
 
 type userServiceImpl struct {
@@ -29,7 +30,7 @@ func (svc *userServiceImpl) GetUserData(ctx context.Context, UserID string) (*dt
 	return &dto.GetUserDataResponse{User: convert.User2DTO(user)}, nil
 }
 
-func (svc *userServiceImpl) GetUserFeed(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error) {
+func (svc *userServiceImpl) GetUserPosts(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error) {
 	_, err := svc.db.UserRepo.GetUserByID(ctx, UserID)
 	if err != nil {
 		return nil, err
@@ -39,6 +40,20 @@ func (svc *userServiceImpl) GetUserFeed(ctx context.Context, UserID string) (*dt
 	if err != nil {
 		return nil, err
 	}
+	return &dto.GetUserFeedResponse{PostsID: posts}, nil
+}
+
+func (svc *userServiceImpl) GetFeed(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error) {
+	_, err := svc.db.UserRepo.GetUserByID(ctx, UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	posts, err := svc.db.PostRepo.GetFeed(ctx, UserID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &dto.GetUserFeedResponse{PostsID: posts}, nil
 }
 

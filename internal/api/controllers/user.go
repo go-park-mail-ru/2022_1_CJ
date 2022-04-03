@@ -37,10 +37,21 @@ func (c *UserController) GetUserData(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (c *UserController) GetUserFeed(ctx echo.Context) error {
+func (c *UserController) GetUserPosts(ctx echo.Context) error {
 	UserID := ctx.Param("user_id")
 
-	response, err := c.registry.UserService.GetUserFeed(context.Background(), UserID)
+	response, err := c.registry.UserService.GetUserPosts(context.Background(), UserID)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (c *UserController) GetFeed(ctx echo.Context) error {
+	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+
+	response, err := c.registry.UserService.GetFeed(context.Background(), UserID)
 	if err != nil {
 		return err
 	}
