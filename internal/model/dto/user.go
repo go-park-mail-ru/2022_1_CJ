@@ -25,8 +25,6 @@ type GetUserPostsResponse struct {
 	PostIDs []string `json:"post_ids"`
 }
 
-type GetUserFeedRequest struct{}
-
 type GetUserFeedResponse struct {
 	PostIDs []string `json:"post_ids"`
 }

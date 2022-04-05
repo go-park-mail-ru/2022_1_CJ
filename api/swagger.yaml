@@ -114,8 +114,6 @@ paths:
       tags:
         - User
       summary: Get feed
-      parameters:
-        - $ref: "#/components/parameters/GetUserFeedRequest"
       responses:
         "500":
           description: Internal error
@@ -268,10 +266,10 @@ components:
     GetUserPostsResponse:
       type: object
       properties:
-        posts:
+        post_ids:
           type: array
           items:
-            $ref: "#/components/schemas/Post"
+            type: string
 
     GetUserFeedRequest:
       type: object
@@ -279,10 +277,10 @@ components:
     GetUserFeedResponse:
       type: object
       properties:
-        posts:
+        post_ids:
           type: array
           items:
-            $ref: "#/components/schemas/Post"
+            type: string
 
     CreatePostRequest:
       type: object
