@@ -10,7 +10,7 @@ security:
 
 paths:
   /auth/signup:
-    get:
+    post:
       tags:
         - Authorization
       summary: Signup user
@@ -33,13 +33,11 @@ paths:
                 $ref: "#/components/schemas/SignupUserResponse"
 
   /auth/login:
-    get:
+    post:
       tags:
         - Authorization
       summary: Login user
       security: []
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       requestBody:
         content:
           application/json:
@@ -63,8 +61,6 @@ paths:
         - Authorization
       summary: Logout user
       security: []
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       responses:
         "500":
           description: Internal error
@@ -82,8 +78,6 @@ paths:
         - User
       summary: Get user data
       security: []
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       requestBody:
         description: On empty user_id returns information about currently authorized user if there's one
         content:
@@ -107,8 +101,6 @@ paths:
       tags:
         - User
       summary: Get user feed
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       requestBody:
         description: On empty user_id returns information about currently authorized user if there's one
         content:
@@ -131,8 +123,6 @@ paths:
       tags:
         - Post
       summary: Create new post
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       requestBody:
         content:
           application/json:
@@ -154,8 +144,6 @@ paths:
       tags:
         - Post
       summary: Delete post
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       requestBody:
         content:
           application/json:
@@ -200,8 +188,6 @@ paths:
       tags:
         - Post
       summary: Get post
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       requestBody:
         content:
           application/json:
@@ -219,14 +205,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/GetPostDataResponse"
 components:
-  parameters:
-    DefaultParameters:
-      in: header
-      name: X-Request-ID
-      schema:
-        type: string
-        format: uuid
-
   securitySchemes:
     CookieAuth:
       type: apiKey
@@ -274,7 +252,6 @@ components:
     GetPostRequest:
       type: object
 
-
     SignupUserRequest:
       type: object
       properties:
@@ -309,13 +286,11 @@ components:
     GetUserDataRequest:
       type: object
 
-
     GetUserDataResponse:
       $ref: "#/components/schemas/User"
 
     GetUserFeedRequest:
       type: object
-
 
     GetUserFeedResponse:
       type: object
