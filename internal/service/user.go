@@ -12,8 +12,9 @@ import (
 )
 
 type UserService interface {
-	GetUserData(ctx context.Context, UserID string) (*dto.GetUserDataResponse, error)
-	GetUserFeed(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error)
+	GetUserData(ctx context.Context, UserID string) (*dto.GetUserResponse, error)
+	GetUserPosts(ctx context.Context, UserID string) (*dto.GetUserPostsResponse, error)
+	GetFeed(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error)
 }
 
 type userServiceImpl struct {
@@ -21,15 +22,15 @@ type userServiceImpl struct {
 	db  *db.Repository
 }
 
-func (svc *userServiceImpl) GetUserData(ctx context.Context, UserID string) (*dto.GetUserDataResponse, error) {
+func (svc *userServiceImpl) GetUserData(ctx context.Context, UserID string) (*dto.GetUserResponse, error) {
 	user, err := svc.db.UserRepo.GetUserByID(ctx, UserID)
 	if err != nil {
 		return nil, err
 	}
-	return &dto.GetUserDataResponse{User: convert.User2DTO(user)}, nil
+	return &dto.GetUserResponse{User: convert.User2DTO(user)}, nil
 }
 
-func (svc *userServiceImpl) GetUserFeed(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error) {
+func (svc *userServiceImpl) GetUserPosts(ctx context.Context, UserID string) (*dto.GetUserPostsResponse, error) {
 	_, err := svc.db.UserRepo.GetUserByID(ctx, UserID)
 	if err != nil {
 		return nil, err
@@ -39,7 +40,22 @@ func (svc *userServiceImpl) GetUserFeed(ctx context.Context, UserID string) (*dt
 	if err != nil {
 		return nil, err
 	}
-	return &dto.GetUserFeedResponse{PostsID: posts}, nil
+
+	return &dto.GetUserPostsResponse{PostIDs: posts}, nil
+}
+
+func (svc *userServiceImpl) GetFeed(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error) {
+	_, err := svc.db.UserRepo.GetUserByID(ctx, UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	posts, err := svc.db.PostRepo.GetFeed(ctx, UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.GetUserFeedResponse{PostIDs: posts}, nil
 }
 
 func NewUserService(log *logrus.Entry, db *db.Repository) UserService {

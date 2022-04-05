@@ -2,12 +2,13 @@ package controllers
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
-	"net/http"
 )
 
 type PostController struct {
@@ -16,44 +17,14 @@ type PostController struct {
 }
 
 func (c *PostController) CreatePost(ctx echo.Context) error {
-	request := new(dto.GetPostDataRequest)
+	request := new(dto.CreatePostRequest)
 	if err := ctx.Bind(request); err != nil {
 		return err
 	}
 
-	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.PostService.CreatePost(context.Background(), request, UserID)
-	if err != nil {
-		return err
-	}
-
-	return ctx.JSON(http.StatusOK, response)
-}
-
-func (c *PostController) DeletePost(ctx echo.Context) error {
-	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	PostID := ctx.Param("post_id")
-
-	err := c.registry.PostService.DeletePost(context.Background(), UserID, PostID)
-	if err != nil {
-		return err
-	}
-
-	return ctx.JSON(http.StatusOK, &dto.BasicResponse{})
-}
-
-func (c *PostController) EditPost(ctx echo.Context) error {
-
-	request := new(dto.GetPostEditDataRequest)
-	if err := ctx.Bind(request); err != nil {
-		return err
-	}
-
-	PostID := ctx.Param("post_id")
-	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-
-	response, err := c.registry.PostService.EditPost(context.Background(), request, UserID, PostID)
+	response, err := c.registry.PostService.CreatePost(context.Background(), request, userID)
 	if err != nil {
 		return err
 	}
@@ -62,9 +33,42 @@ func (c *PostController) EditPost(ctx echo.Context) error {
 }
 
 func (c *PostController) GetPost(ctx echo.Context) error {
+	request := new(dto.GetPostRequest)
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
 
-	PostID := ctx.Param("post_id")
-	response, err := c.registry.PostService.GetPost(context.Background(), PostID)
+	response, err := c.registry.PostService.GetPost(context.Background(), request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (c *PostController) EditPost(ctx echo.Context) error {
+	request := new(dto.EditPostRequest)
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
+
+	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	response, err := c.registry.PostService.EditPost(context.Background(), request, userID)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (c *PostController) DeletePost(ctx echo.Context) error {
+	request := new(dto.DeletePostRequest)
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
+
+	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	response, err := c.registry.PostService.DeletePost(context.Background(), request, userID)
 	if err != nil {
 		return err
 	}

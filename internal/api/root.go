@@ -59,20 +59,24 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	api := svc.router.Group("/api")
 
 	authAPI := api.Group("/auth")
+
 	authAPI.POST("/signup", authCtrl.SignupUser)
 	authAPI.POST("/login", authCtrl.LoginUser)
 	authAPI.DELETE("/logout", authCtrl.LogoutUser)
 
 	userAPI := api.Group("/user", svc.AuthMiddleware())
-	userAPI.GET("/:user_id", userCtrl.GetUserData)
-	userAPI.GET("/get", userCtrl.GetMyUserData)
-	userAPI.GET("/:user_id/posts", userCtrl.GetUserFeed)
+
+	userAPI.GET("/get", userCtrl.GetUserData)
+	userAPI.GET("/posts", userCtrl.GetUserPosts)
+	userAPI.GET("/feed", userCtrl.GetFeed)
+
 	// Написать получение информации о юзере
 	userAPI.GET()
 	// Написать логина и пароля для входа
 	// Написать Изменение личной информации о юзере
 
 	friendsAPI := api.Group("/friends", svc.AuthMiddleware())
+
 	friendsAPI.POST("/request/:person_id", friendsCtrl.SendRequest)
 	friendsAPI.POST("/accept/:person_id", friendsCtrl.AcceptRequest)
 	friendsAPI.POST("/delete/:ex_friend_id", friendsCtrl.DeleteFriend)
@@ -81,10 +85,11 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	friendsAPI.GET("/requests", friendsCtrl.GetRequests)
 
 	postAPI := api.Group("/post", svc.AuthMiddleware())
-	postAPI.GET("/:post_id", postCtrl.GetPost)
+
 	postAPI.POST("/create", postCtrl.CreatePost)
-	postAPI.PUT("/edit/:post_id", postCtrl.EditPost)
-	postAPI.DELETE("/delete/:post_id", postCtrl.DeletePost)
+	postAPI.GET("/get", postCtrl.GetPost)
+	postAPI.PUT("/edit", postCtrl.EditPost)
+	postAPI.DELETE("/delete", postCtrl.DeletePost)
 
 	return svc, nil
 }

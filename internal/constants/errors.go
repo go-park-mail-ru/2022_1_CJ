@@ -31,6 +31,7 @@ var (
 
 	// Forbidden
 	ErrAuthTokenExpired = &CodedError{errors.New("authorization token is expired"), http.StatusForbidden}
+	ErrAuthorIDMismatch = &CodedError{errors.New("author id mismatch"), http.StatusForbidden}
 
 	// Bad Request
 	ErrBindRequest     = &CodedError{errors.New("failed to bind request"), http.StatusBadRequest}
