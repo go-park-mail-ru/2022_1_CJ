@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
@@ -79,12 +80,16 @@ func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostR
 }
 
 func (svc *postServiceImpl) DeletePost(ctx context.Context, request *dto.DeletePostRequest, userID string) (*dto.DeletePostResponse, error) {
-	post, err := svc.db.PostRepo.GetPostByID(ctx, userID)
+	post, err := svc.db.PostRepo.GetPostByID(ctx, request.PostID)
 	if err != nil {
 		return nil, err
 	}
 
-	err = svc.db.PostRepo.DeletePost(ctx, post)
+	if post.AuthorID != userID {
+		return nil, constants.ErrAuthorIDMismatch
+	}
+
+	err = svc.db.PostRepo.DeletePost(ctx, request.PostID)
 	if err != nil {
 		return nil, err
 	}

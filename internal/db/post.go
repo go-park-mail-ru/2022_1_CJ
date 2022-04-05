@@ -2,9 +2,10 @@ package db
 
 import (
 	"context"
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 
@@ -13,22 +14,15 @@ import (
 
 type PostRepository interface {
 	CreatePost(ctx context.Context, post *core.Post) (*core.Post, error)
+	GetPostByID(ctx context.Context, postID string) (*core.Post, error)
 	EditPost(ctx context.Context, post *core.Post) (*core.Post, error)
-	GetPostByID(ctx context.Context, ID string) (*core.Post, error)
-	DeletePost(ctx context.Context, post *core.Post) error
+	DeletePost(ctx context.Context, postID string) error
 	GetFeed(ctx context.Context, UserID string) ([]string, error)
 }
 
 type postRepositoryImpl struct {
 	db   *mongo.Database
 	coll *mongo.Collection
-}
-
-func (repo *postRepositoryImpl) GetPostByID(ctx context.Context, ID string) (*core.Post, error) {
-	post := new(core.Post)
-	filter := bson.M{"_id": ID}
-	err := repo.coll.FindOne(ctx, filter).Decode(post)
-	return post, wrapError(err)
 }
 
 func (repo *postRepositoryImpl) CreatePost(ctx context.Context, post *core.Post) (*core.Post, error) {
@@ -39,10 +33,23 @@ func (repo *postRepositoryImpl) CreatePost(ctx context.Context, post *core.Post)
 	return post, err
 }
 
+func (repo *postRepositoryImpl) GetPostByID(ctx context.Context, postID string) (*core.Post, error) {
+	post := new(core.Post)
+	filter := bson.M{"_id": postID}
+	err := repo.coll.FindOne(ctx, filter).Decode(post)
+	return post, wrapError(err)
+}
+
 func (repo *postRepositoryImpl) EditPost(ctx context.Context, post *core.Post) (*core.Post, error) {
 	filter := bson.M{"_id": post.ID}
 	_, err := repo.coll.ReplaceOne(ctx, filter, post)
 	return post, err
+}
+
+func (repo *postRepositoryImpl) DeletePost(ctx context.Context, postID string) error {
+	filter := bson.M{"_id": postID}
+	_, err := repo.coll.DeleteOne(ctx, filter)
+	return err
 }
 
 func (repo *postRepositoryImpl) GetFeed(ctx context.Context, UserID string) ([]string, error) {
@@ -61,12 +68,6 @@ func (repo *postRepositoryImpl) GetFeed(ctx context.Context, UserID string) ([]s
 	return res, err
 }
 
-func (repo *postRepositoryImpl) DeletePost(ctx context.Context, post *core.Post) error {
-	filter := bson.M{"_id": post.ID}
-	_, err := repo.coll.DeleteOne(ctx, filter)
-	return err
-}
-
 func NewPostRepository(db *mongo.Database) (*postRepositoryImpl, error) {
 	return &postRepositoryImpl{db: db, coll: db.Collection("posts")}, nil
 }
@@ -77,7 +78,6 @@ func (repo *postRepositoryImpl) InitPost(post *core.Post) error {
 		return err
 	}
 	post.ID = uid
-	post.AuthorID = post.AuthorID
 	post.CreatedAt = time.Now().Unix()
 	return nil
 }
