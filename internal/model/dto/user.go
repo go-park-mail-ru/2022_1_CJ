@@ -9,14 +9,24 @@ type User struct {
 	Name  common.UserName `json:"name"`
 }
 
-type GetUserDataRequest struct{}
+type GetUserDataRequest struct {
+	UserID string `query:"user_id"`
+}
 
 type GetUserDataResponse struct {
 	User User `json:"user"`
 }
 
+type GetUserPostsRequest struct {
+	UserID string `query:"user_id"`
+}
+
+type GetUserPostsResponse struct {
+	PostIDs []string `json:"post_ids"`
+}
+
 type GetUserFeedRequest struct{}
 
 type GetUserFeedResponse struct {
-	PostsID []string `json:"post_ids"`
+	PostIDs []string `json:"post_ids"`
 }

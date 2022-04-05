@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/labstack/echo"
@@ -15,21 +17,17 @@ type UserController struct {
 	registry *service.Registry
 }
 
-func (c *UserController) GetMyUserData(ctx echo.Context) error {
-	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-
-	response, err := c.registry.UserService.GetUserData(context.Background(), UserID)
-	if err != nil {
+func (c *UserController) GetUserData(ctx echo.Context) error {
+	request := new(dto.GetUserDataRequest)
+	if err := ctx.Bind(request); err != nil {
 		return err
 	}
 
-	return ctx.JSON(http.StatusOK, response)
-}
+	if len(request.UserID) == 0 {
+		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	}
 
-func (c *UserController) GetUserData(ctx echo.Context) error {
-	UserID := ctx.Param("user_id")
-
-	response, err := c.registry.UserService.GetUserData(context.Background(), UserID)
+	response, err := c.registry.UserService.GetUserData(context.Background(), request.UserID)
 	if err != nil {
 		return err
 	}
@@ -38,9 +36,16 @@ func (c *UserController) GetUserData(ctx echo.Context) error {
 }
 
 func (c *UserController) GetUserPosts(ctx echo.Context) error {
-	UserID := ctx.Param("user_id")
+	request := new(dto.GetUserPostsRequest)
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
 
-	response, err := c.registry.UserService.GetUserPosts(context.Background(), UserID)
+	if len(request.UserID) == 0 {
+		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	}
+
+	response, err := c.registry.UserService.GetUserPosts(context.Background(), request.UserID)
 	if err != nil {
 		return err
 	}

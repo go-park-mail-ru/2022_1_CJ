@@ -13,7 +13,7 @@ import (
 
 type UserService interface {
 	GetUserData(ctx context.Context, UserID string) (*dto.GetUserDataResponse, error)
-	GetUserPosts(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error)
+	GetUserPosts(ctx context.Context, UserID string) (*dto.GetUserPostsResponse, error)
 	GetFeed(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error)
 }
 
@@ -30,7 +30,7 @@ func (svc *userServiceImpl) GetUserData(ctx context.Context, UserID string) (*dt
 	return &dto.GetUserDataResponse{User: convert.User2DTO(user)}, nil
 }
 
-func (svc *userServiceImpl) GetUserPosts(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error) {
+func (svc *userServiceImpl) GetUserPosts(ctx context.Context, UserID string) (*dto.GetUserPostsResponse, error) {
 	_, err := svc.db.UserRepo.GetUserByID(ctx, UserID)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,8 @@ func (svc *userServiceImpl) GetUserPosts(ctx context.Context, UserID string) (*d
 	if err != nil {
 		return nil, err
 	}
-	return &dto.GetUserFeedResponse{PostsID: posts}, nil
+
+	return &dto.GetUserPostsResponse{PostIDs: posts}, nil
 }
 
 func (svc *userServiceImpl) GetFeed(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error) {
@@ -54,7 +55,7 @@ func (svc *userServiceImpl) GetFeed(ctx context.Context, UserID string) (*dto.Ge
 		return nil, err
 	}
 
-	return &dto.GetUserFeedResponse{PostsID: posts}, nil
+	return &dto.GetUserFeedResponse{PostIDs: posts}, nil
 }
 
 func NewUserService(log *logrus.Entry, db *db.Repository) UserService {
