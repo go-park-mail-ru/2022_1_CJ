@@ -212,7 +212,7 @@ components:
       name: AuthToken
 
   schemas:
-    # -------------------------------- Requests -------------------------------- #
+    # --------------------- Models --------------------- #
 
     SignupUserRequest:
       type: object
@@ -288,7 +288,7 @@ components:
     GetPostResponse:
       $ref: "#/components/schemas/Post"
 
-    # -------------------------------- Models -------------------------------- #
+    # --------------------- Models --------------------- #
 
     BasicResponse:
       type: object
@@ -296,13 +296,16 @@ components:
     User:
       type: object
       properties:
-        id:
-          type: string
-        name:
-          $ref: "#/components/schemas/UserName"
-        email:
-          type: string
-          example: mail@example.com
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              $ref: "#/components/schemas/UserName"
+            email:
+              type: string
+              example: mail@example.com
 
     UserName:
       type: object
@@ -317,13 +320,16 @@ components:
     Post:
       type: object
       properties:
-        author_id:
-          type: string
-        post_id:
-          type: string
-        message:
-          type: string
-        images:
-          type: array
-          items:
-            type: string
+        post:
+          type: object
+          properties:
+            author_id:
+              type: string
+            post_id:
+              type: string
+            message:
+              type: string
+            images:
+              type: array
+              items:
+                type: string
