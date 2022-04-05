@@ -12,7 +12,7 @@ import (
 )
 
 type UserService interface {
-	GetUserData(ctx context.Context, UserID string) (*dto.GetUserDataResponse, error)
+	GetUserData(ctx context.Context, UserID string) (*dto.GetUserResponse, error)
 	GetUserPosts(ctx context.Context, UserID string) (*dto.GetUserPostsResponse, error)
 	GetFeed(ctx context.Context, UserID string) (*dto.GetUserFeedResponse, error)
 }
@@ -22,12 +22,12 @@ type userServiceImpl struct {
 	db  *db.Repository
 }
 
-func (svc *userServiceImpl) GetUserData(ctx context.Context, UserID string) (*dto.GetUserDataResponse, error) {
+func (svc *userServiceImpl) GetUserData(ctx context.Context, UserID string) (*dto.GetUserResponse, error) {
 	user, err := svc.db.UserRepo.GetUserByID(ctx, UserID)
 	if err != nil {
 		return nil, err
 	}
-	return &dto.GetUserDataResponse{User: convert.User2DTO(user)}, nil
+	return &dto.GetUserResponse{User: convert.User2DTO(user)}, nil
 }
 
 func (svc *userServiceImpl) GetUserPosts(ctx context.Context, UserID string) (*dto.GetUserPostsResponse, error) {

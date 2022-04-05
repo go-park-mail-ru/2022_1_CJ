@@ -9,11 +9,11 @@ type User struct {
 	Name  common.UserName `json:"name"`
 }
 
-type GetUserDataRequest struct {
+type GetUserRequest struct {
 	UserID string `query:"user_id"`
 }
 
-type GetUserDataResponse struct {
+type GetUserResponse struct {
 	User User `json:"user"`
 }
 

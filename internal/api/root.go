@@ -77,7 +77,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	friendsAPI.GET("/requests", friendsCtrl.GetRequests)
 
 	postAPI := api.Group("/post", svc.AuthMiddleware())
-	postAPI.GET("/:post_id", postCtrl.GetPost)
+	postAPI.GET("/get", postCtrl.GetPost)
 	postAPI.POST("/create", postCtrl.CreatePost)
 	postAPI.PUT("/edit/:post_id", postCtrl.EditPost)
 	postAPI.DELETE("/delete/:post_id", postCtrl.DeletePost)

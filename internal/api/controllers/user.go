@@ -18,7 +18,7 @@ type UserController struct {
 }
 
 func (c *UserController) GetUserData(ctx echo.Context) error {
-	request := new(dto.GetUserDataRequest)
+	request := new(dto.GetUserRequest)
 	if err := ctx.Bind(request); err != nil {
 		return err
 	}
