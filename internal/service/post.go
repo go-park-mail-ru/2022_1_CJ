@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
@@ -10,10 +11,10 @@ import (
 )
 
 type PostService interface {
-	CreatePost(ctx context.Context, request *dto.GetPostDataRequest, UserID string) (*dto.GetPostDataResponse, error)
-	EditPost(ctx context.Context, request *dto.GetPostEditDataRequest, UserID string, PostID string) (*dto.GetPostDataResponse, error)
-	DeletePost(ctx context.Context, UserID string, PostID string) error
-	GetPost(ctx context.Context, PostID string) (*dto.GetPostDataResponse, error)
+	CreatePost(ctx context.Context, request *dto.CreatePostRequest, userID string) (*dto.CreatePostResponse, error)
+	GetPost(ctx context.Context, request *dto.GetPostRequest) (*dto.GetPostResponse, error)
+	EditPost(ctx context.Context, request *dto.EditPostRequest, userID string) (*dto.EditPostResponse, error)
+	DeletePost(ctx context.Context, request *dto.DeletePostRequest, userID string) (*dto.DeletePostResponse, error)
 }
 
 type postServiceImpl struct {
@@ -21,44 +22,51 @@ type postServiceImpl struct {
 	db  *db.Repository
 }
 
-func (svc *postServiceImpl) DeletePost(ctx context.Context, UserID string, PostID string) error {
-	post, err := svc.db.PostRepo.GetPostByID(ctx, PostID)
+func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.CreatePostRequest, userID string) (*dto.CreatePostResponse, error) {
+	post, err := svc.db.PostRepo.CreatePost(ctx, &core.Post{
+		AuthorID: userID,
+		Message:  request.Message,
+		Images:   request.Images,
+	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	err = svc.db.PostRepo.DeletePost(ctx, post)
+	err = svc.db.UserRepo.UserAddPost(ctx, userID, post.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	err = svc.db.UserRepo.UserDeletePost(ctx, UserID, PostID)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return &dto.CreatePostResponse{Post: convert.Post2DTO(post)}, nil
 }
 
-func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.GetPostEditDataRequest, UserID string, PostID string) (*dto.GetPostDataResponse, error) {
-	user, err := svc.db.UserRepo.GetUserByID(ctx, UserID)
+func (svc *postServiceImpl) GetPost(ctx context.Context, request *dto.GetPostRequest) (*dto.GetPostResponse, error) {
+	post, err := svc.db.PostRepo.GetPostByID(ctx, request.PostID)
+	if err != nil {
+		return nil, err
+	}
+	return &dto.GetPostResponse{Post: convert.Post2DTO(post)}, nil
+}
+
+func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostRequest, userID string) (*dto.EditPostResponse, error) {
+	user, err := svc.db.UserRepo.GetUserByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	err = svc.db.UserRepo.UserCheckPost(ctx, user, PostID)
+	err = svc.db.UserRepo.UserCheckPost(ctx, user, request.PostID)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = svc.db.PostRepo.GetPostByID(ctx, PostID)
+	_, err = svc.db.PostRepo.GetPostByID(ctx, request.PostID)
 	if err != nil {
 		return nil, err
 	}
 
 	post, err := svc.db.PostRepo.EditPost(ctx, &core.Post{
-		AuthorID: UserID,
-		ID:       PostID,
+		AuthorID: userID,
+		ID:       request.PostID,
 		Message:  request.Message,
 		Images:   request.Images,
 	})
@@ -67,35 +75,26 @@ func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.GetPostEd
 		return nil, err
 	}
 
-	return &dto.GetPostDataResponse{Post: convert.Post2DTO(post)}, nil
+	return &dto.EditPostResponse{Post: convert.Post2DTO(post)}, nil
 }
 
-func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.GetPostDataRequest, UserID string) (*dto.GetPostDataResponse, error) {
-	post, err := svc.db.PostRepo.CreatePost(ctx, &core.Post{
-		AuthorID: UserID,
-		Message:  request.Message,
-		Images:   request.Images,
-	})
+func (svc *postServiceImpl) DeletePost(ctx context.Context, request *dto.DeletePostRequest, userID string) (*dto.DeletePostResponse, error) {
+	post, err := svc.db.PostRepo.GetPostByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	err = svc.db.UserRepo.UserAddPost(ctx, UserID, post.ID)
+	err = svc.db.PostRepo.DeletePost(ctx, post)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dto.GetPostDataResponse{Post: convert.Post2DTO(post)}, nil
-}
-
-func (svc *postServiceImpl) GetPost(ctx context.Context, PostID string) (*dto.GetPostDataResponse, error) {
-
-	post, err := svc.db.PostRepo.GetPostByID(ctx, PostID)
+	err = svc.db.UserRepo.UserDeletePost(ctx, userID, request.PostID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dto.GetPostDataResponse{Post: convert.Post2DTO(post)}, nil
+	return &dto.DeletePostResponse{}, nil
 }
 
 func NewPostService(log *logrus.Entry, db *db.Repository) PostService {
