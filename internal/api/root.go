@@ -71,7 +71,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	userAPI.GET("/feed", userCtrl.GetFeed)
 
 	// Написать получение информации о юзере
-	userAPI.GET()
+	//userAPI.GET()
 	// Написать логина и пароля для входа
 	// Написать Изменение личной информации о юзере
 
