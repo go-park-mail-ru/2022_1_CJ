@@ -72,19 +72,14 @@ paths:
               schema:
                 $ref: "#/components/schemas/BasicResponse"
 
-  /user/:user_id:
+  /user/get:
     get:
       tags:
         - User
       summary: Get user data
       security: []
-      requestBody:
-        description: On empty user_id returns information about currently authorized user if there's one
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/GetUserDataRequest"
-        required: true
+      parameters:
+        - $ref: "#/components/parameters/userIDParam"
       responses:
         "500":
           description: Internal error
@@ -94,20 +89,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetUserDataResponse"
+                $ref: "#/components/schemas/GetUserResponse"
 
-  /user/user_id/posts:
+  /user/posts:
     get:
       tags:
         - User
-      summary: Get user feed
-      requestBody:
-        description: On empty user_id returns information about currently authorized user if there's one
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/GetUserFeedRequest"
-        required: true
+      summary: Get user's posts
+      parameters:
+        - $ref: "#/components/parameters/userIDParam"
       responses:
         "500":
           description: Internal error
@@ -117,7 +107,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetUserFeedResponse"
+                $ref: "#/components/schemas/GetUserPostsResponse"
+
   /post/create:
     post:
       tags:
@@ -127,7 +118,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/GetPostDataRequest"
+              $ref: "#/components/schemas/CreatePostRequest"
         required: true
       responses:
         "500":
@@ -138,18 +129,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetPostDataResponse"
-  /post/delete/:post_id:
+                $ref: "#/components/schemas/CreatePostResponse"
+
+  /post/delete:
     delete:
       tags:
         - Post
       summary: Delete post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/GetPostDeleteRequest"
-        required: true
+      parameters:
+        - $ref: "#/components/parameters/postIDParam"
       responses:
         "500":
           description: Internal error
@@ -160,18 +148,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BasicResponse"
-  /post/edit/:post_id:
+
+  /post/edit:
     put:
       tags:
         - Post
       summary: Edit post
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/GetPostEditRequest"
+              $ref: "#/components/schemas/PostEditRequest"
         required: true
       responses:
         "500":
@@ -182,18 +169,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetPostDataResponse"
-  /post/:post_id:
+                $ref: "#/components/schemas/PostEditResponse"
+
+  /post/get:
     get:
       tags:
         - Post
       summary: Get post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/GetPostRequest"
-        required: true
+      parameters:
+        - $ref: "#/components/parameters/postIDParam"
       responses:
         "500":
           description: Internal error
@@ -203,8 +187,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetPostDataResponse"
+                $ref: "#/components/schemas/GetPostResponse"
 components:
+  parameters:
+    userIDParam:
+      in: query
+      name: user_id
+      required: false
+      schema:
+        type: string
+      description: On empty user_id currently authorized user's id is used
+
+    postIDParam:
+      in: query
+      name: post_id
+      required: true
+      schema:
+        type: string
+
   securitySchemes:
     CookieAuth:
       type: apiKey
@@ -212,45 +212,7 @@ components:
       name: AuthToken
 
   schemas:
-    UserName:
-      type: object
-      properties:
-        first:
-          type: string
-          example: John
-        last:
-          type: string
-          example: Doe
-
-    GetPostDataRequest:
-      type: object
-      properties:
-        message:
-          type: string
-          example: This is my new post
-        images:
-          type: array
-          items:
-            type: string
-            example: src/image.jpg
-
-    GetPostEditRequest:
-      type: object
-      properties:
-        message:
-          type: string
-          example: This is my new post
-        images:
-          type: array
-          items:
-            type: string
-            example: src/image.jpg
-
-    GetPostDeleteRequest:
-      type: object
-
-    GetPostRequest:
-      type: object
+    # -------------------------------- Requests -------------------------------- #
 
     SignupUserRequest:
       type: object
@@ -263,9 +225,6 @@ components:
         password:
           type: string
           example: password
-
-    GetPostDataResponse:
-      $ref: "#/components/schemas/Post"
 
     SignupUserResponse:
       $ref: "#/components/schemas/BasicResponse"
@@ -283,22 +242,53 @@ components:
     LoginUserResponse:
       $ref: "#/components/schemas/BasicResponse"
 
-    GetUserDataRequest:
-      type: object
-
-    GetUserDataResponse:
+    GetUserResponse:
       $ref: "#/components/schemas/User"
 
-    GetUserFeedRequest:
-      type: object
-
-    GetUserFeedResponse:
+    GetUserPostsResponse:
       type: object
       properties:
         posts:
           type: array
           items:
             $ref: "#/components/schemas/Post"
+
+    CreatePostRequest:
+      type: object
+      properties:
+        message:
+          type: string
+          example: This is my new post
+        images:
+          type: array
+          items:
+            type: string
+            example: src/image.jpg
+
+    CreatePostResponse:
+      $ref: "#/components/schemas/Post"
+
+    PostEditRequest:
+      type: object
+      properties:
+        post_id:
+          type: string
+        message:
+          type: string
+          example: This is my new post
+        images:
+          type: array
+          items:
+            type: string
+            example: src/image.jpg
+
+    PostEditResponse:
+      $ref: "#/components/schemas/Post"
+
+    GetPostResponse:
+      $ref: "#/components/schemas/Post"
+
+    # -------------------------------- Models -------------------------------- #
 
     BasicResponse:
       type: object
@@ -313,6 +303,16 @@ components:
         email:
           type: string
           example: mail@example.com
+
+    UserName:
+      type: object
+      properties:
+        first:
+          type: string
+          example: John
+        last:
+          type: string
+          example: Doe
 
     Post:
       type: object
