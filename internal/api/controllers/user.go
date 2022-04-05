@@ -54,9 +54,9 @@ func (c *UserController) GetUserPosts(ctx echo.Context) error {
 }
 
 func (c *UserController) GetFeed(ctx echo.Context) error {
-	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.UserService.GetFeed(context.Background(), UserID)
+	response, err := c.registry.UserService.GetFeed(context.Background(), userID)
 	if err != nil {
 		return err
 	}

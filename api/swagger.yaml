@@ -109,6 +109,24 @@ paths:
               schema:
                 $ref: "#/components/schemas/GetUserPostsResponse"
 
+  /user/feed:
+    get:
+      tags:
+        - User
+      summary: Get feed
+      parameters:
+        - $ref: "#/components/parameters/GetUserFeedRequest"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserFeedResponse"
+
   /post/create:
     post:
       tags:
@@ -188,6 +206,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetPostResponse"
+
+
 components:
   parameters:
     userIDParam:
@@ -246,6 +266,17 @@ components:
       $ref: "#/components/schemas/User"
 
     GetUserPostsResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+
+    GetUserFeedRequest:
+      type: object
+
+    GetUserFeedResponse:
       type: object
       properties:
         posts:
