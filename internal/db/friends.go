@@ -8,7 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// Скорее всего Update by id не будет работать
 type FriendsRepository interface {
 	CreateFriends(ctx context.Context, FriendsID string, UserID string) error
 	IsUniqRequest(ctx context.Context, UserID string, PersonID string) error
@@ -49,7 +48,6 @@ func (repo *friendsRepositoryImpl) IsUniqRequest(ctx context.Context, UserID str
 
 func (repo *friendsRepositoryImpl) IsNotFriend(ctx context.Context, UserID string, PersonID string) error {
 	filter := bson.M{"user_id": UserID, "friends": PersonID}
-	//"friends": bson.M{"$in": PersonID}}
 
 	if err := repo.coll.FindOne(ctx, filter).Err(); err != mongo.ErrNoDocuments {
 		if err == nil {

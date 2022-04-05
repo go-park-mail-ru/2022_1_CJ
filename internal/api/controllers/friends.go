@@ -16,10 +16,13 @@ type FriendsController struct {
 }
 
 func (c *FriendsController) SendRequest(ctx echo.Context) error {
-	PersonID := ctx.Param("person_id")
+	request := new(dto.ReqSendRequest)
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
 	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.FriendsService.SendRequest(context.Background(), UserID, PersonID)
+	response, err := c.registry.FriendsService.SendRequest(context.Background(), request, UserID)
 	if err != nil {
 		return err
 	}
@@ -32,11 +35,9 @@ func (c *FriendsController) AcceptRequest(ctx echo.Context) error {
 	if err := ctx.Bind(request); err != nil {
 		return err
 	}
-
-	PersonID := ctx.Param("person_id")
 	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.FriendsService.AcceptRequest(context.Background(), request, UserID, PersonID)
+	response, err := c.registry.FriendsService.AcceptRequest(context.Background(), request, UserID)
 	if err != nil {
 		return err
 	}
@@ -45,11 +46,14 @@ func (c *FriendsController) AcceptRequest(ctx echo.Context) error {
 }
 
 func (c *FriendsController) DeleteFriend(ctx echo.Context) error {
-	ExFriendID := ctx.Param("ex_friend_id")
+	request := new(dto.DeleteFriendRequest)
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
 	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
 	// Можно обернуть ctx в Context(ctx), чтобы передавать UserID в котексте го
-	response, err := c.registry.FriendsService.DeleteFriend(context.Background(), UserID, ExFriendID)
+	response, err := c.registry.FriendsService.DeleteFriend(context.Background(), request, UserID)
 	if err != nil {
 		return err
 	}
