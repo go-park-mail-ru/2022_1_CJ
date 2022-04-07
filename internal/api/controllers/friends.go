@@ -61,10 +61,10 @@ func (c *FriendsController) DeleteFriend(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (c *FriendsController) GetFriends(ctx echo.Context) error {
+func (c *FriendsController) GetFriendsByUserID(ctx echo.Context) error {
 	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.FriendsService.GetFriends(context.Background(), UserID)
+	response, err := c.registry.FriendsService.GetFriendsByUserID(context.Background(), UserID)
 	if err != nil {
 		return err
 	}
@@ -72,10 +72,10 @@ func (c *FriendsController) GetFriends(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (c *FriendsController) GetRequests(ctx echo.Context) error {
+func (c *FriendsController) GetRequestsByUserID(ctx echo.Context) error {
 	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.FriendsService.GetRequests(context.Background(), UserID)
+	response, err := c.registry.FriendsService.GetRequestsByUserID(context.Background(), UserID)
 	if err != nil {
 		return err
 	}

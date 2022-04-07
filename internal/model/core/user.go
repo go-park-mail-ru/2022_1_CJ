@@ -21,10 +21,20 @@ type User struct {
 	Image     string          `bson:"images"`
 	Email     string          `bson:"email"`
 	Phone     string          `bson:"phone"`
+	Location  string          `bson:"location"`
+	BirthDay  string          `bson:"birth_day"`
 	CreatedAt int64           `bson:"created_at"` // unix timestamp
 	Password  UserPassword    `bson:"password"`
 	Posts     []string        `bson:"posts,omitempty"`
-	FriendsID string 		  `bson:"friends_id"`
+	FriendsID string          `bson:"friends_id"`
+}
+
+type EditInfo struct {
+	Name     common.UserName `bson:"name"`
+	Avatar   string          `bson:"avatar"`
+	Phone    string          `bson:"phone"`
+	Location string          `bson:"location"`
+	BirthDay string          `bson:"birth_day"`
 }
 
 // Init generates salt and hash with given password and fills corresponding fields.

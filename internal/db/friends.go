@@ -21,6 +21,8 @@ type FriendsRepository interface {
 
 	GetRequestsByUserID(ctx context.Context, UserID string) ([]string, error)
 	GetFriendsByUserID(ctx context.Context, UserID string) ([]string, error)
+
+	GetFriendsByID(ctx context.Context, FriendsID string) ([]string, error)
 }
 
 func (repo *friendsRepositoryImpl) CreateFriends(ctx context.Context, FriendsID string, UserID string) error {
@@ -35,7 +37,6 @@ func (repo *friendsRepositoryImpl) CreateFriends(ctx context.Context, FriendsID 
 // --------------REQUESTS
 func (repo *friendsRepositoryImpl) IsUniqRequest(ctx context.Context, UserID string, PersonID string) error {
 	filter := bson.M{"user_id": UserID, "requests": PersonID}
-	//PersonID: bson.M{"$in": "requests"}}
 	if err := repo.coll.FindOne(ctx, filter).Err(); err != mongo.ErrNoDocuments {
 		if err == nil {
 			return constants.ErrRequestAlreadyExist
@@ -124,6 +125,13 @@ func (repo *friendsRepositoryImpl) GetRequestsByUserID(ctx context.Context, User
 func (repo *friendsRepositoryImpl) GetFriendsByUserID(ctx context.Context, UserID string) ([]string, error) {
 	friends := new(core.Friends)
 	filter := bson.M{"user_id": UserID}
+	err := repo.coll.FindOne(ctx, filter).Decode(friends)
+	return friends.Friends, wrapError(err)
+}
+
+func (repo *friendsRepositoryImpl) GetFriendsByID(ctx context.Context, FriendsID string) ([]string, error) {
+	friends := new(core.Friends)
+	filter := bson.M{"user_id": FriendsID}
 	err := repo.coll.FindOne(ctx, filter).Decode(friends)
 	return friends.Friends, wrapError(err)
 }

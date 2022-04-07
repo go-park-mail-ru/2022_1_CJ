@@ -70,20 +70,16 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	userAPI.GET("/posts", userCtrl.GetUserPosts)
 	userAPI.GET("/feed", userCtrl.GetFeed)
 
-	// TODO: убрать id пользователей в dto
-	// TODO: Написать получение информации о юзере
-	// userAPI.GET()
-	// Написать логина и пароля для входа
-	// Написать Изменение личной информации о юзере
+	userAPI.GET("/profile", userCtrl.GetProfile)
+	userAPI.POST("/profile/edit", userCtrl.EditProfile)
 
 	friendsAPI := api.Group("/friends", svc.AuthMiddleware())
 
 	friendsAPI.POST("/request", friendsCtrl.SendRequest)
 	friendsAPI.POST("/accept", friendsCtrl.AcceptRequest)
 	friendsAPI.POST("/delete", friendsCtrl.DeleteFriend)
-	friendsAPI.GET("/get", friendsCtrl.GetFriends)
-	// Лучше вынести в отдельную модель
-	friendsAPI.GET("/requests", friendsCtrl.GetRequests)
+	friendsAPI.GET("/get", friendsCtrl.GetFriendsByUserID)
+	friendsAPI.GET("/requests", friendsCtrl.GetRequestsByUserID)
 
 	postAPI := api.Group("/post", svc.AuthMiddleware())
 

@@ -15,6 +15,8 @@ type UserService interface {
 	GetUserData(ctx context.Context, userID string) (*dto.GetUserResponse, error)
 	GetUserPosts(ctx context.Context, userID string) (*dto.GetUserPostsResponse, error)
 	GetFeed(ctx context.Context, userID string) (*dto.GetUserFeedResponse, error)
+	GetProfile(ctx context.Context, request *dto.GetProfileRequest) (*dto.GetProfileResponse, error)
+	EditProfile(ctx context.Context, request *dto.EditProfileRequest, userID string) (*dto.EditProfileResponse, error)
 }
 
 type userServiceImpl struct {
@@ -56,6 +58,36 @@ func (svc *userServiceImpl) GetFeed(ctx context.Context, userID string) (*dto.Ge
 	}
 
 	return &dto.GetUserFeedResponse{PostIDs: posts}, nil
+}
+
+func (svc *userServiceImpl) GetProfile(ctx context.Context, request *dto.GetProfileRequest) (*dto.GetProfileResponse, error) {
+	user, err := svc.db.UserRepo.GetUserByID(ctx, request.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	friends, err := svc.db.FriendsRepo.GetFriendsByID(ctx, user.FriendsID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.GetProfileResponse{UserProfile: convert.Profile2DTO(user, friends)}, nil
+}
+
+func (svc *userServiceImpl) EditProfile(ctx context.Context, request *dto.EditProfileRequest, userID string) (*dto.EditProfileResponse, error) {
+	newUserInfo := convert.EditProfile2Core(&request.NewInfo)
+
+	user, err := svc.db.UserRepo.EditInfo(ctx, newUserInfo, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	friends, err := svc.db.FriendsRepo.GetFriendsByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.EditProfileResponse{UserProfile: convert.Profile2DTO(user, friends)}, nil
 }
 
 func NewUserService(log *logrus.Entry, db *db.Repository) UserService {

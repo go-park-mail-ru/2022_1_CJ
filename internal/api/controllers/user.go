@@ -64,6 +64,40 @@ func (c *UserController) GetFeed(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
+func (c *UserController) GetProfile(ctx echo.Context) error {
+	request := new(dto.GetProfileRequest)
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
+
+	if len(request.UserID) == 0 {
+		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	}
+
+	response, err := c.registry.UserService.GetProfile(context.Background(), request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (c *UserController) EditProfile(ctx echo.Context) error {
+	request := new(dto.EditProfileRequest)
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
+
+	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+
+	response, err := c.registry.UserService.EditProfile(context.Background(), request, userID)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
 func NewUserController(log *logrus.Entry, registry *service.Registry) *UserController {
 	return &UserController{log: log, registry: registry}
 }
