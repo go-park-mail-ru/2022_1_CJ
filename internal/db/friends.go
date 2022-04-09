@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"go.mongodb.org/mongo-driver/bson"
@@ -62,7 +63,7 @@ func (repo *friendsRepositoryImpl) IsNotFriend(ctx context.Context, UserID strin
 
 func (repo *friendsRepositoryImpl) MakeRequest(ctx context.Context, UserID string, PersonID string) error {
 	filter := bson.M{"user_id": UserID}
-	update := bson.M{"$push": bson.D{{"requests", PersonID}}}
+	update := bson.M{"$push": bson.D{{Key: "requests", Value: PersonID}}}
 
 	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
 		return err
@@ -73,14 +74,14 @@ func (repo *friendsRepositoryImpl) MakeRequest(ctx context.Context, UserID strin
 func (repo *friendsRepositoryImpl) MakeFriends(ctx context.Context, UserID string, PersonID string) error {
 	// first friend
 	filter := bson.M{"user_id": UserID}
-	update := bson.M{"$push": bson.D{{"friends", PersonID}}}
+	update := bson.M{"$push": bson.D{{Key: "friends", Value: PersonID}}}
 	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
 		return err
 	}
 
 	// second friend
 	filter = bson.M{"user_id": PersonID}
-	update = bson.M{"$push": bson.D{{"friends", UserID}}}
+	update = bson.M{"$push": bson.D{{Key: "friends", Value: UserID}}}
 	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
 		return err
 	}

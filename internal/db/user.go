@@ -94,7 +94,7 @@ func (repo *userRepositoryImpl) UpdateUser(ctx context.Context, user *core.User)
 
 // UserAddPost Add new user post
 func (repo *userRepositoryImpl) UserAddPost(ctx context.Context, userID string, postID string) error {
-	if _, err := repo.coll.UpdateByID(ctx, userID, bson.M{"$push": bson.D{{"posts", postID}}}); err != nil {
+	if _, err := repo.coll.UpdateByID(ctx, userID, bson.M{"$push": bson.D{{Key: "posts", Value: postID}}}); err != nil {
 		return err
 	}
 	return nil

@@ -17,7 +17,7 @@ type PostRepository interface {
 	GetPostByID(ctx context.Context, postID string) (*core.Post, error)
 	EditPost(ctx context.Context, post *core.Post) (*core.Post, error)
 	DeletePost(ctx context.Context, postID string) error
-	GetFeed(ctx context.Context, UserID string) ([]string, error)
+	GetFeed(ctx context.Context, userID string) ([]string, error)
 }
 
 type postRepositoryImpl struct {
@@ -52,20 +52,24 @@ func (repo *postRepositoryImpl) DeletePost(ctx context.Context, postID string) e
 	return err
 }
 
-func (repo *postRepositoryImpl) GetFeed(ctx context.Context, UserID string) ([]string, error) {
-	filter := bson.D{}
-	opts := options.Find().SetSort(bson.D{{"created_at", -1}})
-	cursor, err := repo.coll.Find(ctx, filter, opts)
-	var results []bson.M
+// TODO: refactor
+func (repo *postRepositoryImpl) GetFeed(ctx context.Context, userID string) ([]string, error) {
+	opts := options.Find()
+	opts.SetSort(bson.D{{Key: "created_at", Value: -1}})
+	opts.SetProjection(bson.D{{Key: "_id", Value: 1}})
+	cursor, err := repo.coll.Find(ctx, bson.M{}, opts)
+
+	results := []bson.M{}
 	if err = cursor.All(ctx, &results); err != nil {
 		return nil, err
 	}
-	var res []string
 
+	postIDs := []string{}
 	for _, result := range results {
-		res = append(res, result["created_at"].(string))
+		postIDs = append(postIDs, result["_id"].(string))
 	}
-	return res, err
+
+	return postIDs, err
 }
 
 func NewPostRepository(db *mongo.Database) (*postRepositoryImpl, error) {
