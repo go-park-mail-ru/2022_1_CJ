@@ -49,7 +49,7 @@ type GetUserFeedResponse struct {
 }
 
 type GetProfileRequest struct {
-	UserID string `json:"user_id"`
+	UserID string `query:"user_id"`
 }
 
 type GetProfileResponse struct {
