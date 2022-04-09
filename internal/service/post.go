@@ -30,40 +30,50 @@ func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.CreateP
 		Images:   request.Images,
 	})
 	if err != nil {
+		svc.log.Errorf("CreatePost error: %s", err)
 		return nil, err
 	}
+	svc.log.Debug("CreatePost success")
 
 	err = svc.db.UserRepo.UserAddPost(ctx, userID, post.ID)
 	if err != nil {
+		svc.log.Errorf("UserAddPost error: %s", err)
 		return nil, err
 	}
 
+	svc.log.Debugf("UserAddPost success \n Current post ID: %s", post.ID)
 	return &dto.CreatePostResponse{Post: convert.Post2DTO(post)}, nil
 }
 
 func (svc *postServiceImpl) GetPost(ctx context.Context, request *dto.GetPostRequest) (*dto.GetPostResponse, error) {
 	post, err := svc.db.PostRepo.GetPostByID(ctx, request.PostID)
 	if err != nil {
+		svc.log.Errorf("GetPostByID error: %s", err)
 		return nil, err
 	}
+	svc.log.Debug("GetPostByID success")
 	return &dto.GetPostResponse{Post: convert.Post2DTO(post)}, nil
 }
 
 func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostRequest, userID string) (*dto.EditPostResponse, error) {
 	user, err := svc.db.UserRepo.GetUserByID(ctx, userID)
 	if err != nil {
+		svc.log.Errorf("GetUserByID error: %s", err)
 		return nil, err
 	}
 
 	err = svc.db.UserRepo.UserCheckPost(ctx, user, request.PostID)
 	if err != nil {
+		svc.log.Errorf("UserCheckPost error: %s", err)
 		return nil, err
 	}
 
-	_, err = svc.db.PostRepo.GetPostByID(ctx, request.PostID)
+	postBefore, err := svc.db.PostRepo.GetPostByID(ctx, request.PostID)
 	if err != nil {
+		svc.log.Errorf("GetPostByID error: %s", err)
 		return nil, err
 	}
+	svc.log.Debugf("Post data befor edit:\n Message: %s \n Images paths: %v", postBefore.Message, postBefore.Images)
 
 	post, err := svc.db.PostRepo.EditPost(ctx, &core.Post{
 		AuthorID: userID,
@@ -71,10 +81,12 @@ func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostR
 		Message:  request.Message,
 		Images:   request.Images,
 	})
-
 	if err != nil {
+		svc.log.Errorf("EditPost error: %s", err)
 		return nil, err
 	}
+
+	svc.log.Debugf("Post data after edit:\n Message: %s \n Images paths: %v", post.Message, post.Images)
 
 	return &dto.EditPostResponse{Post: convert.Post2DTO(post)}, nil
 }
@@ -82,23 +94,27 @@ func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostR
 func (svc *postServiceImpl) DeletePost(ctx context.Context, request *dto.DeletePostRequest, userID string) (*dto.DeletePostResponse, error) {
 	post, err := svc.db.PostRepo.GetPostByID(ctx, request.PostID)
 	if err != nil {
+		svc.log.Errorf("GetPostByID error: %s", err)
 		return nil, err
 	}
 
 	if post.AuthorID != userID {
+		svc.log.Errorf("Not author error: %s", constants.ErrAuthorIDMismatch)
 		return nil, constants.ErrAuthorIDMismatch
 	}
 
 	err = svc.db.PostRepo.DeletePost(ctx, request.PostID)
 	if err != nil {
+		svc.log.Errorf("DeletePost error: %s", err)
 		return nil, err
 	}
-
+	svc.log.Debug("DeletePost success")
 	err = svc.db.UserRepo.UserDeletePost(ctx, userID, request.PostID)
 	if err != nil {
+		svc.log.Errorf("UserDeletePost error: %s", err)
 		return nil, err
 	}
-
+	svc.log.Debug("UserDeletePost success")
 	return &dto.DeletePostResponse{}, nil
 }
 

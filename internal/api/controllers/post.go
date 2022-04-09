@@ -19,6 +19,7 @@ type PostController struct {
 func (c *PostController) CreatePost(ctx echo.Context) error {
 	request := new(dto.CreatePostRequest)
 	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 
@@ -35,6 +36,7 @@ func (c *PostController) CreatePost(ctx echo.Context) error {
 func (c *PostController) GetPost(ctx echo.Context) error {
 	request := new(dto.GetPostRequest)
 	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 
@@ -49,6 +51,7 @@ func (c *PostController) GetPost(ctx echo.Context) error {
 func (c *PostController) EditPost(ctx echo.Context) error {
 	request := new(dto.EditPostRequest)
 	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 
@@ -64,6 +67,7 @@ func (c *PostController) EditPost(ctx echo.Context) error {
 func (c *PostController) DeletePost(ctx echo.Context) error {
 	request := new(dto.DeletePostRequest)
 	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 
