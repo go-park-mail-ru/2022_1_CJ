@@ -25,10 +25,10 @@ type AuthServiceImpl struct {
 
 func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupUserRequest) (*dto.SignupUserResponse, error) {
 	if exists, err := svc.db.UserRepo.CheckUserEmailExistence(ctx, request.Email); err != nil {
-		svc.log.Errorf("Email error: %s", err)
+		svc.log.Errorf("CheckUserEmailExistence error: %s", err)
 		return nil, err
 	} else if exists {
-		svc.log.Errorf("Email error: %s", constants.ErrEmailAlreadyTaken)
+		svc.log.Errorf("CheckUserEmailExistence error: %s", constants.ErrEmailAlreadyTaken)
 		return nil, constants.ErrEmailAlreadyTaken
 	}
 	user := &core.User{
@@ -42,19 +42,19 @@ func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupU
 	}
 
 	if err := svc.db.UserRepo.CreateUser(ctx, user); err != nil {
-		svc.log.Errorf("Create user error: %s", err)
+		svc.log.Errorf("CreateUser error: %s", err)
 		return nil, err
 	}
 
 	if err := svc.db.FriendsRepo.CreateFriends(ctx, user.FriendsID, user.ID); err != nil {
-		svc.log.Errorf("Create table friends error: %s", err)
+		svc.log.Errorf("CreateFriends error: %s", err)
 		return nil, err
 	}
 	svc.log.Debug("Create user success")
 
 	authToken, err := utils.GenerateAuthToken(&utils.AuthTokenWrapper{UserID: user.ID})
 	if err != nil {
-		svc.log.Errorf("Generate auth token error: %s", err)
+		svc.log.Errorf("GenerateAuthToken error: %s", err)
 		return nil, err
 	}
 	svc.log.Debugf("Generate auth token success\n Token: %s", authToken)
@@ -65,7 +65,7 @@ func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupU
 func (svc *AuthServiceImpl) LoginUser(ctx context.Context, request *dto.LoginUserRequest) (*dto.LoginUserResponse, error) {
 	user, err := svc.db.UserRepo.GetUserByEmail(ctx, request.Email)
 	if err != nil {
-		svc.log.Errorf("LoginUser error: %s", err)
+		svc.log.Errorf("GetUserByEmail error: %s", err)
 		return nil, err
 	}
 
@@ -78,7 +78,7 @@ func (svc *AuthServiceImpl) LoginUser(ctx context.Context, request *dto.LoginUse
 
 	authToken, err := utils.GenerateAuthToken(&utils.AuthTokenWrapper{UserID: user.ID})
 	if err != nil {
-		svc.log.Errorf("Generate auth token error: %s", err)
+		svc.log.Errorf("GenerateAuthToken error: %s", err)
 		return nil, err
 	}
 	svc.log.Debugf("Generate auth token success\n Token: %s", authToken)
