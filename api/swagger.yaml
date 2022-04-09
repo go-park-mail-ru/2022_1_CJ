@@ -210,7 +210,7 @@ paths:
                 $ref: "#/components/schemas/AcceptResponse"
 
   /friends/delete:
-    delete:
+    put:
       tags:
         - Friends
       summary: Delete friend
