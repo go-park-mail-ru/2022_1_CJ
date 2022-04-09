@@ -3,7 +3,6 @@ package service
 
 import (
 	"context"
-
 	"github.com/sirupsen/logrus"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
