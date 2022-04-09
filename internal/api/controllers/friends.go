@@ -18,6 +18,7 @@ type FriendsController struct {
 func (c *FriendsController) SendRequest(ctx echo.Context) error {
 	request := new(dto.ReqSendRequest)
 	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
@@ -33,6 +34,7 @@ func (c *FriendsController) SendRequest(ctx echo.Context) error {
 func (c *FriendsController) AcceptRequest(ctx echo.Context) error {
 	request := new(dto.AcceptRequest)
 	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
@@ -48,6 +50,7 @@ func (c *FriendsController) AcceptRequest(ctx echo.Context) error {
 func (c *FriendsController) DeleteFriend(ctx echo.Context) error {
 	request := new(dto.DeleteFriendRequest)
 	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
