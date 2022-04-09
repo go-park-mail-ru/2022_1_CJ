@@ -20,6 +20,7 @@ type UserController struct {
 func (c *UserController) GetUserData(ctx echo.Context) error {
 	request := new(dto.GetUserRequest)
 	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 
@@ -38,6 +39,7 @@ func (c *UserController) GetUserData(ctx echo.Context) error {
 func (c *UserController) GetUserPosts(ctx echo.Context) error {
 	request := new(dto.GetUserPostsRequest)
 	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 
@@ -67,6 +69,7 @@ func (c *UserController) GetFeed(ctx echo.Context) error {
 func (c *UserController) GetProfile(ctx echo.Context) error {
 	request := new(dto.GetProfileRequest)
 	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 
@@ -85,6 +88,7 @@ func (c *UserController) GetProfile(ctx echo.Context) error {
 func (c *UserController) EditProfile(ctx echo.Context) error {
 	request := new(dto.EditProfileRequest)
 	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 

@@ -26,50 +26,58 @@ type userServiceImpl struct {
 func (svc *userServiceImpl) GetUserData(ctx context.Context, userID string) (*dto.GetUserResponse, error) {
 	user, err := svc.db.UserRepo.GetUserByID(ctx, userID)
 	if err != nil {
+		svc.log.Errorf("GetUserByID error: %s", err)
 		return nil, err
 	}
+	svc.log.Debug("GetUserData success")
 	return &dto.GetUserResponse{User: convert.User2DTO(user)}, nil
 }
 
 func (svc *userServiceImpl) GetUserPosts(ctx context.Context, userID string) (*dto.GetUserPostsResponse, error) {
 	_, err := svc.db.UserRepo.GetUserByID(ctx, userID)
 	if err != nil {
+		svc.log.Errorf("GetUserByID error: %s", err)
 		return nil, err
 	}
 
 	posts, err := svc.db.UserRepo.GetPostsByUser(ctx, userID)
 	if err != nil {
+		svc.log.Errorf("GetPostsByUser error: %s", err)
 		return nil, err
 	}
-
+	svc.log.Debug("GetUserPosts success")
 	return &dto.GetUserPostsResponse{PostIDs: posts}, nil
 }
 
 func (svc *userServiceImpl) GetFeed(ctx context.Context, userID string) (*dto.GetUserFeedResponse, error) {
 	_, err := svc.db.UserRepo.GetUserByID(ctx, userID)
 	if err != nil {
+		svc.log.Errorf("GetUserByID error: %s", err)
 		return nil, err
 	}
 
 	posts, err := svc.db.PostRepo.GetFeed(ctx, userID)
 	if err != nil {
+		svc.log.Errorf("GetFeed error: %s", err)
 		return nil, err
 	}
-
+	svc.log.Debug("GetFeed success")
 	return &dto.GetUserFeedResponse{PostIDs: posts}, nil
 }
 
 func (svc *userServiceImpl) GetProfile(ctx context.Context, request *dto.GetProfileRequest) (*dto.GetProfileResponse, error) {
 	user, err := svc.db.UserRepo.GetUserByID(ctx, request.UserID)
 	if err != nil {
+		svc.log.Errorf("GetUserByID error: %s", err)
 		return nil, err
 	}
 
 	friends, err := svc.db.FriendsRepo.GetFriendsByID(ctx, user.FriendsID)
 	if err != nil {
+		svc.log.Errorf("GetFriendsByID error: %s", err)
 		return nil, err
 	}
-
+	svc.log.Debug("GetProfile success")
 	return &dto.GetProfileResponse{UserProfile: convert.Profile2DTO(user, friends)}, nil
 }
 
@@ -78,14 +86,19 @@ func (svc *userServiceImpl) EditProfile(ctx context.Context, request *dto.EditPr
 
 	user, err := svc.db.UserRepo.EditInfo(ctx, newUserInfo, userID)
 	if err != nil {
+		svc.log.Errorf("EditInfo error: %s", err)
 		return nil, err
 	}
+
+	svc.log.Debugf("User data after edit: Name: %s; Location: %s; BirthDay: %s; Phone: %s",
+		user.Name.Full(), user.Location, user.BirthDay, user.Phone)
 
 	friends, err := svc.db.FriendsRepo.GetFriendsByUserID(ctx, userID)
 	if err != nil {
+		svc.log.Errorf("GetFriendsByUserID error: %s", err)
 		return nil, err
 	}
-
+	svc.log.Debug("EditProfile success")
 	return &dto.EditProfileResponse{UserProfile: convert.Profile2DTO(user, friends)}, nil
 }
 
