@@ -57,7 +57,7 @@ func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupU
 		svc.log.Errorf("GenerateAuthToken error: %s", err)
 		return nil, err
 	}
-	svc.log.Debugf("Generate auth token success\n Token: %s", authToken)
+	svc.log.Debugf("Generate auth token success; Token: %s", authToken)
 
 	return &dto.SignupUserResponse{AuthToken: authToken}, nil
 }
@@ -81,7 +81,7 @@ func (svc *AuthServiceImpl) LoginUser(ctx context.Context, request *dto.LoginUse
 		svc.log.Errorf("GenerateAuthToken error: %s", err)
 		return nil, err
 	}
-	svc.log.Debugf("Generate auth token success\n Token: %s", authToken)
+	svc.log.Debugf("Generate auth token success; Token: %s", authToken)
 
 	return &dto.LoginUserResponse{AuthToken: authToken}, nil
 }

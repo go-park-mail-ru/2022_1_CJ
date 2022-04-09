@@ -25,7 +25,7 @@ func (c *AuthController) SignupUser(ctx echo.Context) error {
 		return err
 	}
 
-	c.log.Debugf("Name: %s;\nEmail: %s;\n Password:%s", request.Name.Full(), request.Name, request.Password)
+	c.log.Debugf("Name: %s; Email: %s; Password:%s", request.Name.Full(), request.Name, request.Password)
 
 	response, err := c.registry.AuthService.SignupUser(context.Background(), request)
 	if err != nil {

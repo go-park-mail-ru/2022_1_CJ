@@ -41,7 +41,7 @@ func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.CreateP
 		return nil, err
 	}
 
-	svc.log.Debugf("UserAddPost success \n Current post ID: %s", post.ID)
+	svc.log.Debugf("UserAddPost success; Current post ID: %s", post.ID)
 	return &dto.CreatePostResponse{Post: convert.Post2DTO(post)}, nil
 }
 
@@ -73,7 +73,7 @@ func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostR
 		svc.log.Errorf("GetPostByID error: %s", err)
 		return nil, err
 	}
-	svc.log.Debugf("Post data befor edit:\n Message: %s \n Images paths: %v", postBefore.Message, postBefore.Images)
+	svc.log.Debugf("Post data befor edit: Message: %s; Images paths: %v", postBefore.Message, postBefore.Images)
 
 	post, err := svc.db.PostRepo.EditPost(ctx, &core.Post{
 		AuthorID: userID,
@@ -86,7 +86,7 @@ func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostR
 		return nil, err
 	}
 
-	svc.log.Debugf("Post data after edit:\n Message: %s \n Images paths: %v", post.Message, post.Images)
+	svc.log.Debugf("Post data after edit: Message: %s; Images paths: %v", post.Message, post.Images)
 
 	return &dto.EditPostResponse{Post: convert.Post2DTO(post)}, nil
 }
