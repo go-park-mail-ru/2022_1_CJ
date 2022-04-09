@@ -165,6 +165,100 @@ paths:
               schema:
                 $ref: "#/components/schemas/EditUserProfileResponse"
 
+  /friends/request:
+    post:
+      tags:
+        - Friends
+      summary: Send a friend request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReqSendRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReqSendResponse"
+
+  /friends/accept:
+    post:
+      tags:
+        - Friends
+      summary: Accept friend request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcceptResponse"
+
+  /friends/delete:
+    delete:
+      tags:
+        - Friends
+      summary: Delete friend
+      parameters:
+        - $ref: "#/components/parameters/exFriendIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteFriendResponse"
+
+  /friends/get:
+    get:
+      tags:
+        - Friends
+      summary: Get my friends
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetFriendsResponse"
+
+  /friends/requests:
+    get:
+      tags:
+        - Friends
+      summary: Get my requests
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetRequestsResponse"
+
   /post/create:
     post:
       tags:
@@ -256,6 +350,13 @@ components:
         type: string
       description: On empty user_id currently authorized user's id is used
 
+    exFriendIDParam:
+      in: query
+      name: ex_friend_id
+      required: true
+      schema:
+        type: string
+
     postIDParam:
       in: query
       name: post_id
@@ -339,8 +440,37 @@ components:
     EditUserProfileResponse:
       $ref: "#/components/schemas/UserProfile"
 
-    GetUserFeedRequest:
+    ReqSendRequest:
       type: object
+      properties:
+        person_id:
+          type: string
+          example: 123-oe-rtey
+
+    ReqSendResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    AcceptRequest:
+      type: object
+      properties:
+        person_id:
+          type: string
+          example: 123-oe-rtey
+        is_accepted:
+          type: boolean
+          example: true
+
+    AcceptResponse:
+      $ref: "#/components/schemas/Requests"
+
+    DeleteFriendResponse:
+      $ref: "#/components/schemas/Friends"
+
+    GetFriendsResponse:
+      $ref: "#/components/schemas/Friends"
+
+    GetRequestsResponse:
+      $ref: "#/components/schemas/Requests"
 
     GetUserFeedResponse:
       type: object
@@ -438,12 +568,30 @@ components:
               type: array
               items:
                 type: string
-              example: friend_id1, friend_id2
+              example: [friend_id1, friend_id2]
             post_ids:
               type: array
               items:
                 type: string
-              example: post_id1, post_id2
+              example: [post_id1, post_id2]
+
+    Requests:
+      type: object
+      properties:
+        requests_id:
+          type: array
+          items:
+            type: string
+          example: [123-oe-rtey, 5933-owe-rdsatey]
+
+    Friends:
+      type: object
+      properties:
+        friends_id:
+          type: array
+          items:
+            type: string
+          example: [123-oe-rtey, 5933-owe-rdsatey]
 
     Post:
       type: object
