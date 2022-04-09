@@ -6,9 +6,9 @@ import (
 )
 
 type Registry struct {
-	AuthService AuthService
-	UserService UserService
-	PostService PostService
+	AuthService    AuthService
+	UserService    UserService
+	PostService    PostService
 	FriendsService FriendsService
 }
 
