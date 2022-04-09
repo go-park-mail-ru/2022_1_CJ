@@ -21,8 +21,11 @@ type AuthController struct {
 func (c *AuthController) SignupUser(ctx echo.Context) error {
 	request := new(dto.SignupUserRequest)
 	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
+
+	c.log.Debugf("Name: %s;\nEmail: %s;\n Password:%s", request.Name.Full(), request.Name, request.Password)
 
 	response, err := c.registry.AuthService.SignupUser(context.Background(), request)
 	if err != nil {
@@ -37,9 +40,11 @@ func (c *AuthController) SignupUser(ctx echo.Context) error {
 func (c *AuthController) LoginUser(ctx echo.Context) error {
 	request := new(dto.LoginUserRequest)
 	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 
+	c.log.Debugf("Email: %s;\n Password:%s", request.Email, request.Password)
 	response, err := c.registry.AuthService.LoginUser(context.Background(), request)
 	if err != nil {
 		return err
