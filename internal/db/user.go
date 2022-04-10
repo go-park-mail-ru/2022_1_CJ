@@ -26,7 +26,6 @@ type UserRepository interface {
 	UserAddPost(ctx context.Context, userID string, postID string) error
 	UserCheckPost(ctx context.Context, user *core.User, postID string) error
 	UserDeletePost(ctx context.Context, userID string, postID string) error
-	GetPostsByUser(ctx context.Context, UserID string) ([]string, error)
 
 	EditInfo(ctx context.Context, NewInfo core.EditInfo, UserID string) (*core.User, error)
 }
@@ -133,13 +132,6 @@ func NewUserRepository(db *mongo.Database) (*userRepositoryImpl, error) {
 	return &userRepositoryImpl{db: db, coll: db.Collection("users")}, nil
 }
 
-func (repo *userRepositoryImpl) GetPostsByUser(ctx context.Context, UserID string) ([]string, error) {
-	user := new(core.User)
-	filter := bson.M{"_id": UserID}
-	err := repo.coll.FindOne(ctx, filter).Decode(user)
-	return user.Posts, err
-}
-
 func (repo *userRepositoryImpl) EditInfo(ctx context.Context, NewInfo core.EditInfo, UserID string) (*core.User, error) {
 	user := new(core.User)
 	filter := bson.M{"_id": UserID}
@@ -184,13 +176,6 @@ func (repo *userRepositoryImpl) InitUser(user *core.User) error {
 		return err
 	}
 	user.ID = uid
-
-	friendsID, err := core.GenUUID()
-	if err != nil {
-		return err
-	}
-	user.FriendsID = friendsID
-
 	user.CreatedAt = time.Now().Unix()
 	return nil
 }

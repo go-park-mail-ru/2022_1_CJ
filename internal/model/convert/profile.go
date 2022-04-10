@@ -7,15 +7,14 @@ import (
 
 func Profile2DTO(user *core.User, friendIDs []string) dto.UserProfile {
 	return dto.UserProfile{
-		UserInfo: dto.User{ID: user.ID,
-			Email: user.Email,
-			Name:  user.Name},
+		ID:        user.ID,
+		Email:     user.Email,
+		Name:      user.Name,
 		Avatar:    user.Image,
 		Phone:     user.Phone,
 		Location:  user.Location,
 		BirthDay:  user.BirthDay,
 		FriendIDs: friendIDs,
-		PostIDs:   user.Posts,
 	}
 }
 

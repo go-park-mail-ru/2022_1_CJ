@@ -46,7 +46,7 @@ func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupU
 		return nil, err
 	}
 
-	if err := svc.db.FriendsRepo.CreateFriends(ctx, user.FriendsID, user.ID); err != nil {
+	if err := svc.db.FriendsRepo.CreateFriends(ctx, user.ID); err != nil {
 		svc.log.Errorf("CreateFriends error: %s", err)
 		return nil, err
 	}

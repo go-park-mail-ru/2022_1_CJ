@@ -3,6 +3,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
@@ -40,13 +41,19 @@ func (svc *userServiceImpl) GetUserPosts(ctx context.Context, userID string) (*d
 		return nil, err
 	}
 
-	posts, err := svc.db.UserRepo.GetPostsByUser(ctx, userID)
+	postsCore, err := svc.db.PostRepo.GetPostsByUserID(ctx, userID)
 	if err != nil {
 		svc.log.Errorf("GetPostsByUser error: %s", err)
 		return nil, err
 	}
 	svc.log.Debug("GetUserPosts success")
-	return &dto.GetUserPostsResponse{PostIDs: posts}, nil
+
+	posts := []dto.Post{}
+	for _, postCore := range postsCore {
+		posts = append(posts, convert.Post2DTO(&postCore))
+	}
+
+	return &dto.GetUserPostsResponse{Posts: posts}, nil
 }
 
 func (svc *userServiceImpl) GetFeed(ctx context.Context, userID string) (*dto.GetUserFeedResponse, error) {
@@ -56,13 +63,19 @@ func (svc *userServiceImpl) GetFeed(ctx context.Context, userID string) (*dto.Ge
 		return nil, err
 	}
 
-	posts, err := svc.db.PostRepo.GetFeed(ctx, userID)
+	postsCore, err := svc.db.PostRepo.GetFeed(ctx, userID)
 	if err != nil {
 		svc.log.Errorf("GetFeed error: %s", err)
 		return nil, err
 	}
 	svc.log.Debug("GetFeed success")
-	return &dto.GetUserFeedResponse{PostIDs: posts}, nil
+
+	posts := []dto.Post{}
+	for _, postCore := range postsCore {
+		posts = append(posts, convert.Post2DTO(&postCore))
+	}
+
+	return &dto.GetUserFeedResponse{Posts: posts}, nil
 }
 
 func (svc *userServiceImpl) GetProfile(ctx context.Context, request *dto.GetProfileRequest) (*dto.GetProfileResponse, error) {
@@ -72,7 +85,7 @@ func (svc *userServiceImpl) GetProfile(ctx context.Context, request *dto.GetProf
 		return nil, err
 	}
 
-	friends, err := svc.db.FriendsRepo.GetFriendsByID(ctx, user.FriendsID)
+	friends, err := svc.db.FriendsRepo.GetFriendsByID(ctx, user.ID)
 	if err != nil {
 		svc.log.Errorf("GetFriendsByID error: %s", err)
 		return nil, err

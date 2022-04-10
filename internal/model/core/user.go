@@ -25,8 +25,6 @@ type User struct {
 	BirthDay  string          `bson:"birth_day"`
 	CreatedAt int64           `bson:"created_at"` // unix timestamp
 	Password  UserPassword    `bson:"password"`
-	Posts     []string        `bson:"posts,omitempty"`
-	FriendsID string          `bson:"friends_id"`
 }
 
 type EditInfo struct {

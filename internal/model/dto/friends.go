@@ -1,17 +1,17 @@
 package dto
 
-type ReqSendRequest struct {
-	PersonID string `json:"person_id"`
+type SendFriendRequestRequest struct {
+	UserID string `json:"user_id"`
 }
 
-type ReqSendResponse struct{}
+type SendFriendRequestResponse BasicResponse
 
-type AcceptRequest struct {
-	PersonID   string `json:"person_id"`
-	IsAccepted bool   `json:"is_accepted" binding:"required"`
+type AcceptFriendRequestRequest struct {
+	UserID     string `json:"user_id"`
+	IsAccepted bool   `json:"is_accepted"`
 }
 
-type AcceptResponse struct {
+type AcceptFriendRequestResponse struct {
 	RequestsID []string `json:"requests_id"`
 }
 
@@ -32,5 +32,5 @@ type GetFriendsResponse struct {
 type GetRequestsRequests struct{}
 
 type GetRequestsResponse struct {
-	RequestsID []string `json:"requests_id"`
+	RequestIDs []string `json:"request_ids"`
 }

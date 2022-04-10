@@ -1,8 +1,8 @@
 package dto
 
 type Post struct {
+	ID       string   `json:"id"`
 	AuthorID string   `json:"author_id"`
-	PostID   string   `json:"post_id"`
 	Message  string   `json:"message"`
 	Images   []string `json:"images,omitempty"`
 }

@@ -7,8 +7,8 @@ import (
 
 func Post2Core(post *dto.Post) core.Post {
 	return core.Post{
+		ID:       post.ID,
 		AuthorID: post.AuthorID,
-		ID:       post.PostID,
 		Message:  post.Message,
 		Images:   post.Images,
 	}
@@ -16,8 +16,8 @@ func Post2Core(post *dto.Post) core.Post {
 
 func Post2DTO(post *core.Post) dto.Post {
 	return dto.Post{
+		ID:       post.ID,
 		AuthorID: post.AuthorID,
-		PostID:   post.ID,
 		Message:  post.Message,
 		Images:   post.Images,
 	}
