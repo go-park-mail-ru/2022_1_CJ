@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: CJ
   description: "Social Network VK"
-  version: 0.0.1
+  version: 1.0.0-oas3
 servers:
   - url: /api
 security:
@@ -214,8 +214,12 @@ paths:
       tags:
         - Friends
       summary: Delete friend
-      parameters:
-        - $ref: "#/components/parameters/exFriendIDParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteFriendRequest"
+        required: true
       responses:
         "500":
           description: Internal error
@@ -462,6 +466,13 @@ components:
 
     AcceptResponse:
       $ref: "#/components/schemas/Requests"
+
+    DeleteFriendRequest:
+      type: object
+      properties:
+        ex_friend_id:
+          type: string
+          example: 123-oe-rtey
 
     DeleteFriendResponse:
       $ref: "#/components/schemas/Friends"
