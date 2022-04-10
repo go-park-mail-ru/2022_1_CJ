@@ -413,26 +413,21 @@ components:
     EditUserProfileRequest:
       type: object
       properties:
-        new_info:
-          type: object
-          properties:
-            name:
-              $ref: "#/components/schemas/UserName"
-            avatar:
-              type: string
-              example: fmt/img/avatar.jpg
-            phone:
-              type: string
-              example: +8(800)-555-35-35
-            location:
-              type: string
-              example: Moscow
-            birth_day:
-              type: string
-              example: 01.02.2018
+        name:
+          $ref: "#/components/schemas/UserName"
+        avatar:
+          type: string
+          example: fmt/img/avatar.jpg
+        phone:
+          type: string
+        location:
+          type: string
+          example: Moscow
+        birth_day:
+          type: string
 
     EditUserProfileResponse:
-      $ref: "#/components/schemas/UserProfile"
+      $ref: "#/components/schemas/BasicResponse"
 
     SendFriendRequestRequest:
       type: object
@@ -489,7 +484,7 @@ components:
             example: src/image.jpg
 
     CreatePostResponse:
-      $ref: "#/components/schemas/BasicResponse"
+      $ref: "#/components/schemas/Post"
 
     PostEditRequest:
       type: object
@@ -506,7 +501,7 @@ components:
             example: src/image.jpg
 
     PostEditResponse:
-      $ref: "#/components/schemas/BasicResponse"
+      $ref: "#/components/schemas/Post"
 
     GetPostResponse:
       $ref: "#/components/schemas/Post"

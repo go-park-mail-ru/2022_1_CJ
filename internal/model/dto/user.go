@@ -7,6 +7,7 @@ type User struct {
 	ID    string          `json:"id"`
 	Email string          `json:"email"`
 	Name  common.UserName `json:"name"`
+	Image string          `json:"image"`
 }
 
 // Add status
@@ -61,9 +62,17 @@ type GetProfileResponse struct {
 }
 
 type EditProfileRequest struct {
-	NewInfo EditProfile `json:"new_info"`
+	Name     common.UserName `json:"name"`
+	Avatar   string          `json:"avatar"`
+	Phone    string          `json:"phone"`
+	Location string          `json:"location"`
+	BirthDay string          `json:"birth_day"`
 }
 
-type EditProfileResponse struct {
-	UserProfile UserProfile `json:"user_profile"`
+type EditProfileResponse BasicResponse
+
+type UpdatePhotoRequest struct{}
+
+type UpdatePhotoResponse struct {
+	URL string `json:"url"`
 }

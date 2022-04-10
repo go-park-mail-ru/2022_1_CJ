@@ -10,6 +10,7 @@ type Registry struct {
 	UserService    UserService
 	PostService    PostService
 	FriendsService FriendsService
+	StaticService  StaticService
 }
 
 func NewRegistry(log *logrus.Entry, repository *db.Repository) *Registry {
@@ -19,6 +20,7 @@ func NewRegistry(log *logrus.Entry, repository *db.Repository) *Registry {
 	registry.UserService = NewUserService(log, repository)
 	registry.FriendsService = NewFriendsService(log, repository)
 	registry.PostService = NewPostService(log, repository)
+	registry.StaticService = NewStaticService(log, repository)
 
 	return registry
 }

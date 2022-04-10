@@ -17,13 +17,3 @@ func Profile2DTO(user *core.User, friendIDs []string) dto.UserProfile {
 		FriendIDs: friendIDs,
 	}
 }
-
-func EditProfile2Core(newProfile *dto.EditProfile) core.EditInfo {
-	return core.EditInfo{
-		Name:     newProfile.Name,
-		Avatar:   newProfile.Avatar,
-		Phone:    newProfile.Phone,
-		Location: newProfile.Location,
-		BirthDay: newProfile.BirthDay,
-	}
-}

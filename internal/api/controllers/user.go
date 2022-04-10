@@ -102,6 +102,26 @@ func (c *UserController) EditProfile(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
+func (c *UserController) UpdatePhoto(ctx echo.Context) error {
+	image, err := ctx.FormFile("photo")
+	if err != nil {
+		return err
+	}
+
+	url, err := c.registry.StaticService.UploadImage(context.Background(), image)
+	if err != nil {
+		return err
+	}
+
+	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	response, err := c.registry.UserService.UpdatePhoto(context.Background(), url, userID)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
 func NewUserController(log *logrus.Entry, registry *service.Registry) *UserController {
 	return &UserController{log: log, registry: registry}
 }

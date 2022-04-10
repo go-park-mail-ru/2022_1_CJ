@@ -52,6 +52,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	userCtrl := controllers.NewUserController(log, registry)
 	friendsCtrl := controllers.NewFriendsController(log, registry)
 	postCtrl := controllers.NewPostController(log, registry)
+	staticCtrl := controllers.NewStaticController(log, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
 	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware())
@@ -70,6 +71,8 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	userAPI.GET("/posts", userCtrl.GetUserPosts)
 	userAPI.GET("/feed", userCtrl.GetFeed)
 
+	userAPI.POST("/update_photo", userCtrl.UpdatePhoto)
+
 	userAPI.GET("/profile", userCtrl.GetProfile)
 	userAPI.POST("/profile/edit", userCtrl.EditProfile)
 
@@ -87,6 +90,10 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	postAPI.GET("/get", postCtrl.GetPost)
 	postAPI.PUT("/edit", postCtrl.EditPost)
 	postAPI.DELETE("/delete", postCtrl.DeletePost)
+
+	static := api.Group("/static")
+
+	static.POST("/upload", staticCtrl.UploadImage, svc.AuthMiddleware())
 
 	return svc, nil
 }

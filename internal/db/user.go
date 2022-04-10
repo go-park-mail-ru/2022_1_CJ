@@ -26,8 +26,6 @@ type UserRepository interface {
 	UserAddPost(ctx context.Context, userID string, postID string) error
 	UserCheckPost(ctx context.Context, user *core.User, postID string) error
 	UserDeletePost(ctx context.Context, userID string, postID string) error
-
-	EditInfo(ctx context.Context, NewInfo core.EditInfo, UserID string) (*core.User, error)
 }
 
 type userRepositoryImpl struct {
@@ -130,44 +128,6 @@ func (repo *userRepositoryImpl) DeleteUser(ctx context.Context, user *core.User)
 // NewUserRepository creates a new instance of userRepositoryImpl
 func NewUserRepository(db *mongo.Database) (*userRepositoryImpl, error) {
 	return &userRepositoryImpl{db: db, coll: db.Collection("users")}, nil
-}
-
-func (repo *userRepositoryImpl) EditInfo(ctx context.Context, NewInfo core.EditInfo, UserID string) (*core.User, error) {
-	user := new(core.User)
-	filter := bson.M{"_id": UserID}
-	err := repo.coll.FindOne(ctx, filter).Decode(user)
-	if err != nil {
-		return nil, wrapError(err)
-	}
-
-	// Поумнее бы сделать
-	if len(NewInfo.BirthDay) != 0 {
-		user.BirthDay = NewInfo.BirthDay
-	}
-
-	if len(NewInfo.Phone) != 0 {
-		user.Phone = NewInfo.Phone
-	}
-
-	if len(NewInfo.Location) != 0 {
-		user.Location = NewInfo.Location
-	}
-
-	if len(NewInfo.Avatar) != 0 {
-		user.Image = NewInfo.Avatar
-	}
-
-	if len(NewInfo.Name.First) != 0 {
-		user.Name.First = NewInfo.Name.First
-	}
-
-	if len(NewInfo.Name.Last) != 0 {
-		user.Name.Last = NewInfo.Name.Last
-	}
-
-	_, err = repo.coll.ReplaceOne(ctx, filter, user)
-
-	return user, wrapError(err)
 }
 
 func (repo *userRepositoryImpl) InitUser(user *core.User) error {

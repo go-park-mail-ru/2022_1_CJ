@@ -26,7 +26,7 @@ build-debug:
 	${DOCKER_BUILD_KIT} docker-compose build --build-arg CONFIG=${CONFIG}
 
 up:
-	docker-compose -f ${DCOMPOSE} up -d --remove-orphans
+	docker-compose -f ${DCOMPOSE} up -d --compatibility --remove-orphans
 
 up-debug:
 	docker-compose -f ${DCOMPOSE} up --remove-orphans

@@ -17,6 +17,7 @@ type UserService interface {
 	GetFeed(ctx context.Context, userID string) (*dto.GetUserFeedResponse, error)
 	GetProfile(ctx context.Context, request *dto.GetProfileRequest) (*dto.GetProfileResponse, error)
 	EditProfile(ctx context.Context, request *dto.EditProfileRequest, userID string) (*dto.EditProfileResponse, error)
+	UpdatePhoto(ctx context.Context, url string, userID string) (*dto.UpdatePhotoResponse, error)
 }
 
 type userServiceImpl struct {
@@ -99,24 +100,54 @@ func (svc *userServiceImpl) GetProfile(ctx context.Context, request *dto.GetProf
 }
 
 func (svc *userServiceImpl) EditProfile(ctx context.Context, request *dto.EditProfileRequest, userID string) (*dto.EditProfileResponse, error) {
-	newUserInfo := convert.EditProfile2Core(&request.NewInfo)
-
-	user, err := svc.db.UserRepo.EditInfo(ctx, newUserInfo, userID)
+	user, err := svc.db.UserRepo.GetUserByID(ctx, userID)
 	if err != nil {
-		svc.log.Errorf("EditInfo error: %s", err)
 		return nil, err
 	}
 
-	svc.log.Debugf("User data after edit: Name: %s; Location: %s; BirthDay: %s; Phone: %s",
-		user.Name.Full(), user.Location, user.BirthDay, user.Phone)
+	if len(request.BirthDay) != 0 {
+		user.BirthDay = request.BirthDay
+	}
 
-	friends, err := svc.db.FriendsRepo.GetFriendsByUserID(ctx, userID)
-	if err != nil {
-		svc.log.Errorf("GetFriendsByUserID error: %s", err)
+	if len(request.Phone) != 0 {
+		user.Phone = request.Phone
+	}
+
+	if len(request.Location) != 0 {
+		user.Location = request.Location
+	}
+
+	if len(request.Avatar) != 0 {
+		user.Image = request.Avatar
+	}
+
+	if len(request.Name.First) != 0 {
+		user.Name.First = request.Name.First
+	}
+
+	if len(request.Name.Last) != 0 {
+		user.Name.Last = request.Name.Last
+	}
+
+	if err = svc.db.UserRepo.UpdateUser(ctx, user); err != nil {
 		return nil, err
 	}
-	svc.log.Debug("EditProfile success")
-	return &dto.EditProfileResponse{UserProfile: convert.Profile2DTO(user, friends)}, nil
+
+	return &dto.EditProfileResponse{}, nil
+}
+
+func (svc *userServiceImpl) UpdatePhoto(ctx context.Context, url string, userID string) (*dto.UpdatePhotoResponse, error) {
+	user, err := svc.db.UserRepo.GetUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	user.Image = url
+	if err = svc.db.UserRepo.UpdateUser(ctx, user); err != nil {
+		return nil, err
+	}
+
+	return &dto.UpdatePhotoResponse{URL: url}, nil
 }
 
 func NewUserService(log *logrus.Entry, db *db.Repository) UserService {

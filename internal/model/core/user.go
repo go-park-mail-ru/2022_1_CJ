@@ -27,14 +27,6 @@ type User struct {
 	Password  UserPassword    `bson:"password"`
 }
 
-type EditInfo struct {
-	Name     common.UserName `bson:"name"`
-	Avatar   string          `bson:"avatar"`
-	Phone    string          `bson:"phone"`
-	Location string          `bson:"location"`
-	BirthDay string          `bson:"birth_day"`
-}
-
 // Init generates salt and hash with given password and fills corresponding fields.
 func (up *UserPassword) Init(password string) error {
 	salt, err := common.GetSalt()
