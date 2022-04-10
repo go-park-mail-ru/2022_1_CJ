@@ -8,17 +8,17 @@ import (
 func Post2Core(post *dto.Post) core.Post {
 	return core.Post{
 		ID:       post.ID,
-		AuthorID: post.AuthorID,
+		AuthorID: post.Author.ID,
 		Message:  post.Message,
 		Images:   post.Images,
 	}
 }
 
-func Post2DTO(post *core.Post) dto.Post {
+func Post2DTO(post *core.Post, author *core.User) dto.Post {
 	return dto.Post{
-		ID:       post.ID,
-		AuthorID: post.AuthorID,
-		Message:  post.Message,
-		Images:   post.Images,
+		ID:      post.ID,
+		Author:  User2DTO(author),
+		Message: post.Message,
+		Images:  post.Images,
 	}
 }

@@ -489,7 +489,7 @@ components:
             example: src/image.jpg
 
     CreatePostResponse:
-      $ref: "#/components/schemas/Post"
+      $ref: "#/components/schemas/BasicResponse"
 
     PostEditRequest:
       type: object
@@ -506,7 +506,7 @@ components:
             example: src/image.jpg
 
     PostEditResponse:
-      $ref: "#/components/schemas/Post"
+      $ref: "#/components/schemas/BasicResponse"
 
     GetPostResponse:
       $ref: "#/components/schemas/Post"

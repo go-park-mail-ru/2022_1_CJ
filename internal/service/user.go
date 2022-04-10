@@ -35,7 +35,7 @@ func (svc *userServiceImpl) GetUserData(ctx context.Context, userID string) (*dt
 }
 
 func (svc *userServiceImpl) GetUserPosts(ctx context.Context, userID string) (*dto.GetUserPostsResponse, error) {
-	_, err := svc.db.UserRepo.GetUserByID(ctx, userID)
+	user, err := svc.db.UserRepo.GetUserByID(ctx, userID)
 	if err != nil {
 		svc.log.Errorf("GetUserByID error: %s", err)
 		return nil, err
@@ -50,7 +50,7 @@ func (svc *userServiceImpl) GetUserPosts(ctx context.Context, userID string) (*d
 
 	posts := []dto.Post{}
 	for _, postCore := range postsCore {
-		posts = append(posts, convert.Post2DTO(&postCore))
+		posts = append(posts, convert.Post2DTO(&postCore, user))
 	}
 
 	return &dto.GetUserPostsResponse{Posts: posts}, nil
@@ -72,7 +72,11 @@ func (svc *userServiceImpl) GetFeed(ctx context.Context, userID string) (*dto.Ge
 
 	posts := []dto.Post{}
 	for _, postCore := range postsCore {
-		posts = append(posts, convert.Post2DTO(&postCore))
+		author, err := svc.db.UserRepo.GetUserByID(ctx, postCore.AuthorID)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, convert.Post2DTO(&postCore, author))
 	}
 
 	return &dto.GetUserFeedResponse{Posts: posts}, nil

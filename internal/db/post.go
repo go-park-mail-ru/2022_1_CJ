@@ -47,7 +47,7 @@ func (repo *postRepositoryImpl) GetPostByID(ctx context.Context, postID string) 
 // TODO: add pagination
 func (repo *postRepositoryImpl) GetPostsByUserID(ctx context.Context, userID string) ([]core.Post, error) {
 	var posts []core.Post
-	filter := bson.M{"_id": userID}
+	filter := bson.M{"author_id": userID}
 	cursor, err := repo.coll.Find(ctx, filter)
 	if err != nil {
 		return posts, err
