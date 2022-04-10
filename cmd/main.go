@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/api"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 )
 
 const (
@@ -77,6 +78,11 @@ func main() {
 
 	log.Info("connected to MongoDB")
 	mongoDB := client.Database(viper.GetString("db.database"))
+
+	// -------------------- Hub for WebSocket -------------------- //
+
+	hub := core.NewHub()
+	go hub.Run()
 
 	// -------------------- Set up service -------------------- //
 
