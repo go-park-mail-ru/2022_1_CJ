@@ -402,10 +402,10 @@ components:
     GetUserPostsResponse:
       type: object
       properties:
-        post_ids:
+        posts:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Post"
 
     GetUserProfileResponse:
       $ref: "#/components/schemas/UserProfile"
@@ -457,13 +457,6 @@ components:
       items:
         $ref: "#/components/schemas/FriendRequest"
 
-    DeleteFriendRequest:
-      type: object
-      properties:
-        ex_friend_id:
-          type: string
-          example: 123-oe-rtey
-
     DeleteFriendResponse:
       $ref: "#/components/schemas/BasicResponse"
 
@@ -478,10 +471,10 @@ components:
     GetUserFeedResponse:
       type: object
       properties:
-        post_ids:
+        posts:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/Post"
 
     CreatePostRequest:
       type: object
