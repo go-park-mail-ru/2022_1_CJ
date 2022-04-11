@@ -2,7 +2,9 @@ package chat
 
 import (
 	"encoding/json"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
+	"github.com/sirupsen/logrus"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -19,13 +21,18 @@ type Client struct {
 	ID   string
 	hub  *Hub
 	conn *websocket.Conn
+	log  *logrus.Entry
+	db   *db.Repository
 	send chan common.MessageInfo
 }
 
-func NewClient(hub *Hub, conn *websocket.Conn, userID string) *Client {
+func NewClient(hub *Hub, conn *websocket.Conn, log *logrus.Entry,
+	repo *db.Repository, userID string) *Client {
 	return &Client{ID: userID,
 		hub:  hub,
 		conn: conn,
+		log:  log,
+		db:   repo,
 		send: make(chan common.MessageInfo, 256),
 	}
 }

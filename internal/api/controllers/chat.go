@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core/chat"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
@@ -16,6 +17,7 @@ type ChatController struct {
 	hub      *chat.Hub
 	log      *logrus.Entry
 	registry *service.Registry
+	db       *db.Repository
 }
 
 var upgrader = websocket.Upgrader{
@@ -50,10 +52,10 @@ func (c *ChatController) WsHandler(ctx echo.Context) error {
 	defer conn.Close()
 	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	c.hub.NewClientConnectWS(context.Background(), conn, UserID)
+	c.hub.NewClientConnectWS(context.Background(), conn, c.log, c.db, UserID)
 	return nil
 }
 
-func NewChatController(hub *chat.Hub, log *logrus.Entry, registry *service.Registry) *ChatController {
-	return &ChatController{hub: hub, log: log, registry: registry}
+func NewChatController(hub *chat.Hub, log *logrus.Entry, repo *db.Repository, registry *service.Registry) *ChatController {
+	return &ChatController{hub: hub, log: log, db: repo, registry: registry}
 }

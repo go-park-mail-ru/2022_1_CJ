@@ -2,7 +2,9 @@ package chat
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/gorilla/websocket"
+	"github.com/sirupsen/logrus"
 )
 
 type Hub struct {
@@ -33,8 +35,9 @@ func (h *Hub) Run() {
 	}
 }
 
-func (h *Hub) NewClientConnectWS(ctx context.Context, conn *websocket.Conn, userID string) {
-	client := NewClient(h, conn, userID)
+func (h *Hub) NewClientConnectWS(ctx context.Context, conn *websocket.Conn,
+	log *logrus.Entry, repo *db.Repository, userID string) {
+	client := NewClient(h, conn, log, repo, userID)
 	client.hub.Register <- client
 
 	go client.WritePump()

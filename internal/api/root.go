@@ -53,7 +53,7 @@ func NewAPIService(hub *chat.Hub, log *logrus.Entry, dbConn *mongo.Database, deb
 	userCtrl := controllers.NewUserController(log, registry)
 	friendsCtrl := controllers.NewFriendsController(log, registry)
 	postCtrl := controllers.NewPostController(log, registry)
-	chatCtrl := controllers.NewChatController(hub, log, registry)
+	chatCtrl := controllers.NewChatController(hub, log, repository, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
 	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware())
