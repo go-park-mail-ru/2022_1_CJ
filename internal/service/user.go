@@ -84,7 +84,7 @@ func (svc *userServiceImpl) GetProfile(ctx context.Context, request *dto.GetProf
 func (svc *userServiceImpl) EditProfile(ctx context.Context, request *dto.EditProfileRequest, userID string) (*dto.EditProfileResponse, error) {
 	newUserInfo := convert.EditProfile2Core(&request.NewInfo)
 
-	user, err := svc.db.UserRepo.EditInfo(ctx, newUserInfo, userID)
+	user, err := svc.db.UserRepo.EditInfo(ctx, &newUserInfo, userID)
 	if err != nil {
 		svc.log.Errorf("EditInfo error: %s", err)
 		return nil, err

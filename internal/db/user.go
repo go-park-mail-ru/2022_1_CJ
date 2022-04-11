@@ -26,12 +26,12 @@ type UserRepository interface {
 	UserAddPost(ctx context.Context, userID string, postID string) error
 	UserCheckPost(ctx context.Context, user *core.User, postID string) error
 	UserDeletePost(ctx context.Context, userID string, postID string) error
-	GetPostsByUser(ctx context.Context, UserID string) ([]string, error)
+	GetPostsByUser(ctx context.Context, userID string) ([]string, error)
 
-	EditInfo(ctx context.Context, NewInfo core.EditInfo, UserID string) (*core.User, error)
+	EditInfo(ctx context.Context, newInfo *core.EditInfo, userID string) (*core.User, error)
 
-	AddDialog(ctx context.Context, DialogID string, UserID string) error
-	GetUserDialogs(ctx context.Context, UserID string) ([]string, error)
+	AddDialog(ctx context.Context, dialogID string, UserID string) error
+	GetUserDialogs(ctx context.Context, userID string) ([]string, error)
 }
 
 type userRepositoryImpl struct {
@@ -136,14 +136,14 @@ func NewUserRepository(db *mongo.Database) (*userRepositoryImpl, error) {
 	return &userRepositoryImpl{db: db, coll: db.Collection("users")}, nil
 }
 
-func (repo *userRepositoryImpl) GetPostsByUser(ctx context.Context, UserID string) ([]string, error) {
+func (repo *userRepositoryImpl) GetPostsByUser(ctx context.Context, userID string) ([]string, error) {
 	user := new(core.User)
-	filter := bson.M{"_id": UserID}
+	filter := bson.M{"_id": userID}
 	err := repo.coll.FindOne(ctx, filter).Decode(user)
 	return user.Posts, err
 }
 
-func (repo *userRepositoryImpl) EditInfo(ctx context.Context, NewInfo core.EditInfo, UserID string) (*core.User, error) {
+func (repo *userRepositoryImpl) EditInfo(ctx context.Context, newInfo *core.EditInfo, UserID string) (*core.User, error) {
 	user := new(core.User)
 	filter := bson.M{"_id": UserID}
 	err := repo.coll.FindOne(ctx, filter).Decode(user)
@@ -152,28 +152,28 @@ func (repo *userRepositoryImpl) EditInfo(ctx context.Context, NewInfo core.EditI
 	}
 
 	// Поумнее бы сделать
-	if len(NewInfo.BirthDay) != 0 {
-		user.BirthDay = NewInfo.BirthDay
+	if len(newInfo.BirthDay) != 0 {
+		user.BirthDay = newInfo.BirthDay
 	}
 
-	if len(NewInfo.Phone) != 0 {
-		user.Phone = NewInfo.Phone
+	if len(newInfo.Phone) != 0 {
+		user.Phone = newInfo.Phone
 	}
 
-	if len(NewInfo.Location) != 0 {
-		user.Location = NewInfo.Location
+	if len(newInfo.Location) != 0 {
+		user.Location = newInfo.Location
 	}
 
-	if len(NewInfo.Avatar) != 0 {
-		user.Image = NewInfo.Avatar
+	if len(newInfo.Avatar) != 0 {
+		user.Image = newInfo.Avatar
 	}
 
-	if len(NewInfo.Name.First) != 0 {
-		user.Name.First = NewInfo.Name.First
+	if len(newInfo.Name.First) != 0 {
+		user.Name.First = newInfo.Name.First
 	}
 
-	if len(NewInfo.Name.Last) != 0 {
-		user.Name.Last = NewInfo.Name.Last
+	if len(newInfo.Name.Last) != 0 {
+		user.Name.Last = newInfo.Name.Last
 	}
 
 	_, err = repo.coll.ReplaceOne(ctx, filter, user)
@@ -181,16 +181,16 @@ func (repo *userRepositoryImpl) EditInfo(ctx context.Context, NewInfo core.EditI
 	return user, wrapError(err)
 }
 
-func (repo *userRepositoryImpl) AddDialog(ctx context.Context, DialogID string, UserID string) error {
-	if _, err := repo.coll.UpdateByID(ctx, UserID, bson.M{"$push": bson.D{{Key: "dialog_ids", Value: DialogID}}}); err != nil {
+func (repo *userRepositoryImpl) AddDialog(ctx context.Context, dialogID string, userID string) error {
+	if _, err := repo.coll.UpdateByID(ctx, userID, bson.M{"$push": bson.D{{Key: "dialog_ids", Value: dialogID}}}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (repo *userRepositoryImpl) GetUserDialogs(ctx context.Context, UserID string) ([]string, error) {
+func (repo *userRepositoryImpl) GetUserDialogs(ctx context.Context, userID string) ([]string, error) {
 	user := new(core.User)
-	filter := bson.M{"_id": UserID}
+	filter := bson.M{"_id": userID}
 	err := repo.coll.FindOne(ctx, filter).Decode(user)
 	return user.DialogIDs, wrapError(err)
 }

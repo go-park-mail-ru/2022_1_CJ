@@ -34,4 +34,13 @@ up-debug:
 # Vendoring is useful for local debugging since you don't have to
 # reinstall all packages again and again in docker
 mod:
-	go mod tidy && go install ./... && go mod vendor
+	go mod tidy -compat=1.17 && go install ./... && go mod vendor
+
+tests:
+	go test ./... -cover -coverpkg ./...
+
+mock:
+	mockgen -source=internal/db/friends.go -destination=mocks/friends_db_mock.go \
+	&& mockgen -source=internal/db/post.go -destination=mocks/post_db_mock.go \
+	&& mockgen -source=internal/db/user.go -destination=mocks/user_db_mock.go \
+	&& mockgen -source=internal/db/chat.go -destination=mocks/chat_db_mock.go
