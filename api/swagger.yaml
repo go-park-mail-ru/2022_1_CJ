@@ -164,6 +164,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EditUserProfileResponse"
+  
+  /user/search:
+      get:
+        tags:
+          - User
+        summary: Search users
+        parameters:
+          - in: query
+            name: selector
+            schema:
+              type: string
+            required: true
+        responses:
+          500:
+            description: Internal error
+            content: {}
+          200:
+            description: Представители
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/SearchUsersResponse"
 
   /friends/request:
     post:
@@ -505,6 +527,13 @@ components:
 
     GetPostResponse:
       $ref: "#/components/schemas/Post"
+      
+    SearchUsersResponse:
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User" 
 
     # --------------------- Models --------------------- #
 
@@ -524,6 +553,8 @@ components:
             email:
               type: string
               example: mail@example.com
+            image:
+              type: string
 
     UserName:
       type: object

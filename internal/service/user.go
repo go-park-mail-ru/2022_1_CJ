@@ -18,6 +18,7 @@ type UserService interface {
 	GetProfile(ctx context.Context, request *dto.GetProfileRequest) (*dto.GetProfileResponse, error)
 	EditProfile(ctx context.Context, request *dto.EditProfileRequest, userID string) (*dto.EditProfileResponse, error)
 	UpdatePhoto(ctx context.Context, url string, userID string) (*dto.UpdatePhotoResponse, error)
+	SearchUsers(ctx context.Context, request *dto.SearchUsersRequest) (*dto.SearchUsersResponse, error)
 }
 
 type userServiceImpl struct {
@@ -148,6 +149,20 @@ func (svc *userServiceImpl) UpdatePhoto(ctx context.Context, url string, userID 
 	}
 
 	return &dto.UpdatePhotoResponse{URL: url}, nil
+}
+
+func (svc *userServiceImpl) SearchUsers(ctx context.Context, request *dto.SearchUsersRequest) (*dto.SearchUsersResponse, error) {
+	usersCore, err := svc.db.UserRepo.SelectUsers(ctx, request.Selector)
+	if err != nil {
+		return nil, err
+	}
+
+	users := []dto.User{}
+	for _, userCore := range usersCore {
+		users = append(users, convert.User2DTO(&userCore))
+	}
+
+	return &dto.SearchUsersResponse{Users: users}, nil
 }
 
 func NewUserService(log *logrus.Entry, db *db.Repository) UserService {

@@ -26,6 +26,8 @@ type UserRepository interface {
 	UserAddPost(ctx context.Context, userID string, postID string) error
 	UserCheckPost(ctx context.Context, user *core.User, postID string) error
 	UserDeletePost(ctx context.Context, userID string, postID string) error
+
+	SelectUsers(ctx context.Context, selector string) ([]core.User, error)
 }
 
 type userRepositoryImpl struct {
@@ -123,6 +125,28 @@ func (repo *userRepositoryImpl) DeleteUser(ctx context.Context, user *core.User)
 	filter := bson.M{"email": user.Email}
 	_, err := repo.coll.DeleteOne(ctx, filter)
 	return err
+}
+
+func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string) ([]core.User, error) {
+	users := []core.User{}
+
+	fuzzy := bson.M{"$regex": selector, "$options": "i"}
+	filter := bson.M{"$or": []bson.M{
+		{"name.first": fuzzy},
+		{"name.last": fuzzy}},
+	}
+
+	cursor, err := repo.coll.Find(ctx, filter)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return users, nil
+		}
+		return nil, err
+	} else {
+		err = cursor.All(ctx, &users)
+	}
+
+	return users, err
 }
 
 // NewUserRepository creates a new instance of userRepositoryImpl

@@ -76,3 +76,11 @@ type UpdatePhotoRequest struct{}
 type UpdatePhotoResponse struct {
 	URL string `json:"url"`
 }
+
+type SearchUsersRequest struct {
+	Selector string `query:"selector" validate:"required"`
+}
+
+type SearchUsersResponse struct {
+	Users []User `json:"users"`
+}
