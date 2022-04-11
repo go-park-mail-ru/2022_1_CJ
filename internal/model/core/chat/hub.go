@@ -1,42 +1,42 @@
-package core
+package chat
+
+import (
+	"context"
+	"github.com/gorilla/websocket"
+)
 
 type Hub struct {
-	clients map[*Client]bool
-	// for message
-	// TODO: should be struct message
-	broadcast  chan []byte
-	register   chan *Client
-	unregister chan *Client
+	Clients    map[string]*Client
+	Register   chan *Client
+	Unregister chan *Client
 }
 
 func NewHub() *Hub {
 	return &Hub{
-		broadcast:  make(chan []byte),
-		register:   make(chan *Client),
-		unregister: make(chan *Client),
-		clients:    make(map[*Client]bool),
+		Register:   make(chan *Client),
+		Unregister: make(chan *Client),
+		Clients:    make(map[string]*Client),
 	}
 }
 
 func (h *Hub) Run() {
 	for {
 		select {
-		case client := <-h.register:
-			h.clients[client] = true
-		case client := <-h.unregister:
-			if _, ok := h.clients[client]; ok {
-				delete(h.clients, client)
+		case client := <-h.Register:
+			h.Clients[client.ID] = client
+		case client := <-h.Unregister:
+			if _, ok := h.Clients[client.ID]; ok {
+				delete(h.Clients, client.ID)
 				close(client.send)
-			}
-		case message := <-h.broadcast:
-			for client := range h.clients {
-				select {
-				case client.send <- message:
-				default:
-					close(client.send)
-					delete(h.clients, client)
-				}
 			}
 		}
 	}
+}
+
+func (h *Hub) NewClientConnectWS(ctx context.Context, conn *websocket.Conn, userID string) {
+	client := NewClient(h, conn, userID)
+	client.hub.Register <- client
+
+	go client.WritePump()
+	go client.ReadPump()
 }

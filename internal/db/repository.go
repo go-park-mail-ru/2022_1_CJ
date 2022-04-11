@@ -10,6 +10,7 @@ type Repository struct {
 	UserRepo    UserRepository
 	FriendsRepo FriendsRepository
 	PostRepo    PostRepository
+	ChatRepo    ChatRepository
 }
 
 func NewRepository(dbConn *mongo.Database) (*Repository, error) {
@@ -29,6 +30,11 @@ func NewRepository(dbConn *mongo.Database) (*Repository, error) {
 	repository.PostRepo, err = NewPostRepository(dbConn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create post repository: %w", err)
+	}
+
+	repository.ChatRepo, err = NewChatRepository(dbConn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create chats repository: %w", err)
 	}
 
 	return repository, nil

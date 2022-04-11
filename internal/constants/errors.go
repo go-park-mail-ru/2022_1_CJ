@@ -49,4 +49,8 @@ var (
 	// Not Uniq
 	ErrRequestAlreadyExist = &CodedError{errors.New("your request already was sent"), http.StatusConflict}
 	ErrAlreadyFriends      = &CodedError{errors.New("your already friend with this person"), http.StatusConflict}
+
+	// Chat
+	ErrSingleChat         = &CodedError{errors.New("you can't create dialog with no one"), http.StatusConflict}
+	ErrDialogAlreadyExist = &CodedError{errors.New("dialog already exist"), http.StatusConflict}
 )

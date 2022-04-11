@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core/chat"
 	"os"
 	"os/signal"
 	"time"
@@ -13,7 +14,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/api"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 )
 
 const (
@@ -81,12 +81,12 @@ func main() {
 
 	// -------------------- Hub for WebSocket -------------------- //
 
-	hub := core.NewHub()
+	hub := chat.NewHub()
 	go hub.Run()
 
 	// -------------------- Set up service -------------------- //
 
-	svc, err := api.NewAPIService(logrus.NewEntry(log), mongoDB, debug)
+	svc, err := api.NewAPIService(hub, logrus.NewEntry(log), mongoDB, debug)
 	if err != nil {
 		log.Fatalf("error creating service instance: %s", err)
 	}

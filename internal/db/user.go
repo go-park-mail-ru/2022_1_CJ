@@ -29,6 +29,9 @@ type UserRepository interface {
 	GetPostsByUser(ctx context.Context, UserID string) ([]string, error)
 
 	EditInfo(ctx context.Context, NewInfo core.EditInfo, UserID string) (*core.User, error)
+
+	AddDialog(ctx context.Context, DialogID string, UserID string) error
+	GetUserDialogs(ctx context.Context, UserID string) ([]string, error)
 }
 
 type userRepositoryImpl struct {
@@ -176,6 +179,20 @@ func (repo *userRepositoryImpl) EditInfo(ctx context.Context, NewInfo core.EditI
 	_, err = repo.coll.ReplaceOne(ctx, filter, user)
 
 	return user, wrapError(err)
+}
+
+func (repo *userRepositoryImpl) AddDialog(ctx context.Context, DialogID string, UserID string) error {
+	if _, err := repo.coll.UpdateByID(ctx, UserID, bson.M{"$push": bson.D{{Key: "dialog_ids", Value: DialogID}}}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *userRepositoryImpl) GetUserDialogs(ctx context.Context, UserID string) ([]string, error) {
+	user := new(core.User)
+	filter := bson.M{"_id": UserID}
+	err := repo.coll.FindOne(ctx, filter).Decode(user)
+	return user.DialogIDs, wrapError(err)
 }
 
 func (repo *userRepositoryImpl) InitUser(user *core.User) error {
