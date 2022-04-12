@@ -1,14 +1,26 @@
 package chat
 
-type Dialog struct {
-	ID         string   `bson:"_id"`
-	AuthorIDs  []string `bson:"author_ids,omitempty" `
-	MessageIDs []string `bson:"messages_ids,omitempty"`
+type Message struct {
+	DialogName string `json:"dialog_name" bson:"dialog_name"`
+	DialogID   string `json:"dialog_id" bson:"dialog_id"`
+	Event      string `json:"event" bson:"event"`
+	SrcID      string `json:"src_id" bson:"src_id"`
+	Payload    []byte `json:"payload" bson:"payload"`
 }
 
-type Message struct {
-	ID        string `bson:"_id"`
-	Text      string `bson:"text"`
-	AuthorID  string `bson:"author_id"`
-	CreatedAt int64  `bson:"created_at"`
+// Message protocol used only with a room's Send channel.
+type RoomMessage struct {
+	Sender *Conn    `json:"sender"`
+	Data   *Message `json:"data"`
+}
+
+// Constructs and returns a new Message type.
+func ConstructMessage(room, event, dst, src string, payload []byte) *Message {
+	return &Message{
+		DialogName: room,
+		DialogID:   dst,
+		Event:      event,
+		SrcID:      src,
+		Payload:    payload,
+	}
 }

@@ -2,8 +2,6 @@ package api
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core/chat"
-
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/api/controllers"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
@@ -32,7 +30,7 @@ func (svc *APIService) Shutdown(ctx context.Context) error {
 	return nil
 }
 
-func NewAPIService(hub *chat.Hub, log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIService, error) {
+func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIService, error) {
 	svc := &APIService{
 		log:    log,
 		router: echo.New(),
@@ -47,13 +45,13 @@ func NewAPIService(hub *chat.Hub, log *logrus.Entry, dbConn *mongo.Database, deb
 		log.Fatal(err)
 	}
 
-	registry := service.NewRegistry(hub, log, repository)
+	registry := service.NewRegistry(log, repository)
 
 	authCtrl := controllers.NewAuthController(log, registry)
 	userCtrl := controllers.NewUserController(log, registry)
 	friendsCtrl := controllers.NewFriendsController(log, registry)
 	postCtrl := controllers.NewPostController(log, registry)
-	chatCtrl := controllers.NewChatController(hub, log, repository, registry)
+	chatCtrl := controllers.NewChatController(log, repository, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
 	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware())
@@ -93,7 +91,6 @@ func NewAPIService(hub *chat.Hub, log *logrus.Entry, dbConn *mongo.Database, deb
 	chatAPI := api.Group("/chat", svc.AuthMiddleware())
 
 	chatAPI.GET("/chats", chatCtrl.GetChats)
-	chatAPI.GET("/create", chatCtrl.CreateChat)
 	chatAPI.GET("/ws", chatCtrl.WsHandler)
 	return svc, nil
 }

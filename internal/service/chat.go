@@ -5,7 +5,6 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core/chat"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/sirupsen/logrus"
 )
@@ -17,7 +16,6 @@ type ChatService interface {
 }
 
 type chatServiceImpl struct {
-	hub *chat.Hub
 	log *logrus.Entry
 	db  *db.Repository
 }
@@ -97,6 +95,6 @@ func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDial
 	return &dto.GetDialogsResponse{DialogsInfo: DialogsInfo}, err
 }
 
-func NewChatService(hub *chat.Hub, log *logrus.Entry, db *db.Repository) ChatService {
-	return &chatServiceImpl{hub: hub, log: log, db: db}
+func NewChatService(log *logrus.Entry, db *db.Repository) ChatService {
+	return &chatServiceImpl{log: log, db: db}
 }

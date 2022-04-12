@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core/chat"
 	"os"
 	"os/signal"
 	"time"
@@ -78,11 +77,6 @@ func main() {
 
 	log.Info("connected to MongoDB")
 	mongoDB := client.Database(viper.GetString("db.database"))
-
-	// -------------------- Hub for WebSocket -------------------- //
-
-	hub := chat.NewHub()
-	go hub.Run()
 
 	// -------------------- Set up service -------------------- //
 

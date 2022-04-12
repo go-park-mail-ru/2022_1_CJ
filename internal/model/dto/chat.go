@@ -24,3 +24,18 @@ type GetDialogsRequest struct {
 type GetDialogsResponse struct {
 	DialogsInfo []common.DialogInfo `json:"dialogs_info"`
 }
+
+type SendMsg struct {
+	DialogId string `json:"dialog_id"`
+	Message  string `json:"message"`
+}
+
+type SendMsgRequest struct {
+	Type    string  `json:"type"`
+	Payload SendMsg `json:"payload"`
+}
+
+type GetMsgRequest struct {
+	Type    string             `json:"type"`
+	Payload common.MessageInfo `json:"payload"`
+}
