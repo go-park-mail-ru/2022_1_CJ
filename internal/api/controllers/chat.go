@@ -43,6 +43,21 @@ func (c *ChatController) GetChats(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
+func (c *ChatController) CreateChat(ctx echo.Context) error {
+	request := new(dto.CreateDialogRequest)
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
+	request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
+
+	response, err := c.registry.ChatService.CreateDialog(context.Background(), request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
 func (c *ChatController) WsHandler(ctx echo.Context) error {
 	conn, err := upgrader.Upgrade(ctx.Response(), ctx.Request(), nil)
 	if err != nil {

@@ -93,6 +93,7 @@ func NewAPIService(hub *chat.Hub, log *logrus.Entry, dbConn *mongo.Database, deb
 	chatAPI := api.Group("/chat", svc.AuthMiddleware())
 
 	chatAPI.GET("/chats", chatCtrl.GetChats)
+	chatAPI.GET("/create", chatCtrl.CreateChat)
 	chatAPI.GET("/ws", chatCtrl.WsHandler)
 	return svc, nil
 }
