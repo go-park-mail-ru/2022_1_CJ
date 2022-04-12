@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"go.mongodb.org/mongo-driver/bson"
@@ -24,6 +23,19 @@ type FriendsRepository interface {
 	GetFriendsByUserID(ctx context.Context, UserID string) ([]string, error)
 
 	GetFriendsByID(ctx context.Context, FriendsID string) ([]string, error)
+}
+
+type friendsRepositoryImpl struct {
+	db   *mongo.Database
+	coll *mongo.Collection
+}
+
+func NewFriendsRepository(db *mongo.Database) (*friendsRepositoryImpl, error) {
+	return &friendsRepositoryImpl{db: db, coll: db.Collection("friends")}, nil
+}
+
+func NewFriendsRepositoryTest(collection *mongo.Collection) (*friendsRepositoryImpl, error) {
+	return &friendsRepositoryImpl{coll: collection}, nil
 }
 
 func (repo *friendsRepositoryImpl) CreateFriends(ctx context.Context, FriendsID string, UserID string) error {
@@ -135,13 +147,4 @@ func (repo *friendsRepositoryImpl) GetFriendsByID(ctx context.Context, FriendsID
 	filter := bson.M{"_id": FriendsID}
 	err := repo.coll.FindOne(ctx, filter).Decode(friends)
 	return friends.Friends, wrapError(err)
-}
-
-type friendsRepositoryImpl struct {
-	db   *mongo.Database
-	coll *mongo.Collection
-}
-
-func NewFriendsRepository(db *mongo.Database) (*friendsRepositoryImpl, error) {
-	return &friendsRepositoryImpl{db: db, coll: db.Collection("friends")}, nil
 }

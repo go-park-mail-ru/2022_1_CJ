@@ -39,6 +39,16 @@ type userRepositoryImpl struct {
 	coll *mongo.Collection
 }
 
+// NewUserRepository creates a new instance of userRepositoryImpl
+func NewUserRepository(db *mongo.Database) (*userRepositoryImpl, error) {
+	return &userRepositoryImpl{db: db, coll: db.Collection("users")}, nil
+}
+
+// NewUserRepositoryTest for Tests (bad)
+func NewUserRepositoryTest(collection *mongo.Collection) (*userRepositoryImpl, error) {
+	return &userRepositoryImpl{coll: collection}, nil
+}
+
 // CreateUser tries to insert given user to the db:
 // returns error if the email is already taken, otherwise inserts.
 func (repo *userRepositoryImpl) CreateUser(ctx context.Context, user *core.User) error {
@@ -129,11 +139,6 @@ func (repo *userRepositoryImpl) DeleteUser(ctx context.Context, user *core.User)
 	filter := bson.M{"email": user.Email}
 	_, err := repo.coll.DeleteOne(ctx, filter)
 	return err
-}
-
-// NewUserRepository creates a new instance of userRepositoryImpl
-func NewUserRepository(db *mongo.Database) (*userRepositoryImpl, error) {
-	return &userRepositoryImpl{db: db, coll: db.Collection("users")}, nil
 }
 
 func (repo *userRepositoryImpl) GetPostsByUser(ctx context.Context, userID string) ([]string, error) {
