@@ -80,7 +80,7 @@ func main() {
 
 	// -------------------- Set up service -------------------- //
 
-	svc, err := api.NewAPIService(hub, logrus.NewEntry(log), mongoDB, debug)
+	svc, err := api.NewAPIService(logrus.NewEntry(log), mongoDB, debug)
 	if err != nil {
 		log.Fatalf("error creating service instance: %s", err)
 	}
