@@ -71,11 +71,10 @@ func TestGetUserPosts(t *testing.T) {
 		output               error
 	}{
 		{
-			name:                 "Don't found in BD",
-			input:                "0",
-			resultGetUserByID:    constants.ErrDBNotFound,
-			resultGetPostsByUser: constants.ErrDBNotFound,
-			output:               constants.ErrDBNotFound,
+			name:              "Don't found in BD",
+			input:             "0",
+			resultGetUserByID: constants.ErrDBNotFound,
+			output:            constants.ErrDBNotFound,
 		},
 		{
 			name:                 "Found in BD",
@@ -89,7 +88,7 @@ func TestGetUserPosts(t *testing.T) {
 	gomock.InOrder(
 		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[0].input).Return(&core.User{}, tests[0].resultGetUserByID),
 		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[1].input).Return(&core.User{}, tests[1].resultGetUserByID),
-		testRepo.mockUserR.EXPECT().GetPostsByUser(ctx, tests[1].input).Return([]string{}, tests[1].resultGetPostsByUser),
+		testRepo.mockPostR.EXPECT().GetPostsByUserID(ctx, tests[1].input).Return([]core.Post{}, tests[1].resultGetPostsByUser),
 	)
 
 	for _, test := range tests {
@@ -138,7 +137,7 @@ func TestGetFeed(t *testing.T) {
 	gomock.InOrder(
 		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[0].input).Return(&core.User{}, tests[0].resultGetUserByID),
 		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[1].input).Return(&core.User{}, tests[1].resultGetUserByID),
-		testRepo.mockPostR.EXPECT().GetFeed(ctx, tests[1].input).Return([]string{}, tests[1].resultGetFeed),
+		testRepo.mockPostR.EXPECT().GetFeed(ctx, tests[1].input).Return([]core.Post{}, tests[1].resultGetFeed),
 	)
 
 	for _, test := range tests {
@@ -180,27 +179,26 @@ func TestGetProfile(t *testing.T) {
 		output               Output
 	}{
 		{
-			name:                 "Don't found in BD",
-			input:                &dto.GetProfileRequest{UserID: "0"},
-			resultGetUserByID:    GetUserByID{&core.User{}, constants.ErrDBNotFound},
-			resultGetFriendsByID: FriendsByID{nil, nil},
-			output:               Output{nil, constants.ErrDBNotFound},
+			name:              "Don't found in BD",
+			input:             &dto.GetProfileRequest{UserID: "0"},
+			resultGetUserByID: GetUserByID{&core.User{}, constants.ErrDBNotFound},
+			output:            Output{nil, constants.ErrDBNotFound},
 		},
 		{
 			name:                 "Found in BD but not in friends Repo",
 			input:                &dto.GetProfileRequest{UserID: "1"},
-			resultGetUserByID:    GetUserByID{&core.User{FriendsID: "0"}, nil},
+			resultGetUserByID:    GetUserByID{&core.User{ID: "0"}, nil},
 			resultGetFriendsByID: FriendsByID{nil, constants.ErrDBNotFound},
 			output:               Output{nil, constants.ErrDBNotFound},
 		},
 		{
 			name:                 "Found in BD and in friendsRepo",
 			input:                &dto.GetProfileRequest{UserID: "2"},
-			resultGetUserByID:    GetUserByID{&core.User{FriendsID: "3"}, nil},
+			resultGetUserByID:    GetUserByID{&core.User{ID: "3"}, nil},
 			resultGetFriendsByID: FriendsByID{[]string{"4"}, nil},
 			output: Output{&dto.GetProfileResponse{
 				UserProfile: convert.Profile2DTO(
-					&core.User{FriendsID: "3"},
+					&core.User{ID: "3"},
 					[]string{"4"})}, nil},
 		},
 	}
@@ -208,9 +206,9 @@ func TestGetProfile(t *testing.T) {
 	gomock.InOrder(
 		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[0].input.UserID).Return(tests[0].resultGetUserByID.user, tests[0].resultGetUserByID.err),
 		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[1].input.UserID).Return(tests[1].resultGetUserByID.user, tests[1].resultGetUserByID.err),
-		testRepo.mockFriensR.EXPECT().GetFriendsByID(ctx, tests[1].resultGetUserByID.user.FriendsID).Return(tests[1].resultGetFriendsByID.friends, tests[1].resultGetFriendsByID.err),
+		testRepo.mockFriensR.EXPECT().GetFriendsByID(ctx, tests[1].resultGetUserByID.user.ID).Return(tests[1].resultGetFriendsByID.friends, tests[1].resultGetFriendsByID.err),
 		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[2].input.UserID).Return(tests[2].resultGetUserByID.user, tests[2].resultGetUserByID.err),
-		testRepo.mockFriensR.EXPECT().GetFriendsByID(ctx, tests[2].resultGetUserByID.user.FriendsID).Return(tests[2].resultGetFriendsByID.friends, tests[2].resultGetFriendsByID.err),
+		testRepo.mockFriensR.EXPECT().GetFriendsByID(ctx, tests[2].resultGetUserByID.user.ID).Return(tests[2].resultGetFriendsByID.friends, tests[2].resultGetFriendsByID.err),
 	)
 
 	for _, test := range tests {
@@ -246,9 +244,8 @@ func TestEditProfile(t *testing.T) {
 		err  error
 	}
 
-	type FriendsByID struct {
-		friends []string
-		err     error
+	type UpdateUser struct {
+		err error
 	}
 
 	type Output struct {
@@ -256,47 +253,46 @@ func TestEditProfile(t *testing.T) {
 		err error
 	}
 	tests := []struct {
-		name                 string
-		input                Input
-		resultEditInfo       EditInfo
-		resultGetFriendsByID FriendsByID
-		output               Output
+		name             string
+		input            Input
+		resultEditInfo   EditInfo
+		resultUpdateUser UpdateUser
+		output           Output
 	}{
 		{
 			name: "Don't found in BD",
 			input: Input{info: &dto.EditProfileRequest{
-				NewInfo: dto.EditProfile{
-					Name:     common.UserName{First: "John", Last: "Doe"},
-					Avatar:   "fmt/img/avatar.jpg",
-					Phone:    "+8(800)-555-35-35",
-					Location: "Moscow",
-					BirthDay: "01.02.2018"}},
-				userID: "0"},
-			resultEditInfo:       EditInfo{nil, constants.ErrDBNotFound},
-			resultGetFriendsByID: FriendsByID{nil, nil},
-			output:               Output{nil, constants.ErrDBNotFound},
+				Name:     common.UserName{First: "John", Last: "Doe"},
+				Avatar:   "fmt/img/avatar.jpg",
+				Phone:    "+8(800)-555-35-35",
+				Location: "Moscow",
+				BirthDay: "01.02.2018"}, userID: "0"},
+			resultEditInfo: EditInfo{nil, constants.ErrDBNotFound},
+			output:         Output{nil, constants.ErrDBNotFound},
 		},
 		{
 			name: "Found in BD",
 			input: Input{info: &dto.EditProfileRequest{
-				NewInfo: dto.EditProfile{
-					Name:     common.UserName{First: "John", Last: "Doe"},
-					Avatar:   "fmt/img/avatar.jpg",
-					Phone:    "+8(800)-555-35-35",
-					Location: "Moscow",
-					BirthDay: "01.02.2018"}},
-				userID: "1"},
-			resultEditInfo:       EditInfo{&core.User{}, nil},
-			resultGetFriendsByID: FriendsByID{nil, nil},
-			output:               Output{&dto.EditProfileResponse{UserProfile: dto.UserProfile{}}, nil},
+				Name:     common.UserName{First: "John", Last: "Doe"},
+				Avatar:   "fmt/img/avatar.jpg",
+				Phone:    "+8(800)-555-35-35",
+				Location: "Moscow",
+				BirthDay: "01.02.2018"}, userID: "1"},
+			resultEditInfo:   EditInfo{&core.User{}, nil},
+			resultUpdateUser: UpdateUser{nil},
+			output:           Output{&dto.EditProfileResponse{}, nil},
 		},
 	}
-	tes1 := convert.EditProfile2Core(&tests[0].input.info.NewInfo)
-	tes2 := convert.EditProfile2Core(&tests[1].input.info.NewInfo)
+
 	gomock.InOrder(
-		testRepo.mockUserR.EXPECT().EditInfo(ctx, &tes1, tests[0].input.userID).Return(tests[0].resultEditInfo.user, tests[0].resultEditInfo.err),
-		testRepo.mockUserR.EXPECT().EditInfo(ctx, &tes2, tests[1].input.userID).Return(tests[1].resultEditInfo.user, tests[1].resultEditInfo.err),
-		testRepo.mockFriensR.EXPECT().GetFriendsByUserID(ctx, tests[1].input.userID).Return(tests[1].resultGetFriendsByID.friends, tests[1].resultGetFriendsByID.err),
+		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[0].input.userID).Return(tests[0].resultEditInfo.user, tests[0].resultEditInfo.err),
+		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[1].input.userID).Return(tests[1].resultEditInfo.user, tests[1].resultEditInfo.err),
+		testRepo.mockUserR.EXPECT().UpdateUser(ctx, &core.User{
+			Image:    "fmt/img/avatar.jpg",
+			Name:     common.UserName{First: "John", Last: "Doe"},
+			Phone:    "+8(800)-555-35-35",
+			Location: "Moscow",
+			BirthDay: "01.02.2018"}).Return(tests[1].resultUpdateUser.err),
 	)
 
 	for _, test := range tests {

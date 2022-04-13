@@ -92,36 +92,6 @@ func (mr *MockUserRepositoryMockRecorder) DeleteUser(ctx, user interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockUserRepository)(nil).DeleteUser), ctx, user)
 }
 
-// EditInfo mocks base method.
-func (m *MockUserRepository) EditInfo(ctx context.Context, newInfo *core.EditInfo, userID string) (*core.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "EditInfo", ctx, newInfo, userID)
-	ret0, _ := ret[0].(*core.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// EditInfo indicates an expected call of EditInfo.
-func (mr *MockUserRepositoryMockRecorder) EditInfo(ctx, newInfo, userID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EditInfo", reflect.TypeOf((*MockUserRepository)(nil).EditInfo), ctx, newInfo, userID)
-}
-
-// GetPostsByUser mocks base method.
-func (m *MockUserRepository) GetPostsByUser(ctx context.Context, userID string) ([]string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPostsByUser", ctx, userID)
-	ret0, _ := ret[0].([]string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetPostsByUser indicates an expected call of GetPostsByUser.
-func (mr *MockUserRepositoryMockRecorder) GetPostsByUser(ctx, userID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPostsByUser", reflect.TypeOf((*MockUserRepository)(nil).GetPostsByUser), ctx, userID)
-}
-
 // GetUserByEmail mocks base method.
 func (m *MockUserRepository) GetUserByEmail(ctx context.Context, email string) (*core.User, error) {
 	m.ctrl.T.Helper()
@@ -165,6 +135,21 @@ func (m *MockUserRepository) GetUserDialogs(ctx context.Context, userID string) 
 func (mr *MockUserRepositoryMockRecorder) GetUserDialogs(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserDialogs", reflect.TypeOf((*MockUserRepository)(nil).GetUserDialogs), ctx, userID)
+}
+
+// SelectUsers mocks base method.
+func (m *MockUserRepository) SelectUsers(ctx context.Context, selector string) ([]core.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectUsers", ctx, selector)
+	ret0, _ := ret[0].([]core.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectUsers indicates an expected call of SelectUsers.
+func (mr *MockUserRepositoryMockRecorder) SelectUsers(ctx, selector interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUsers", reflect.TypeOf((*MockUserRepository)(nil).SelectUsers), ctx, selector)
 }
 
 // UpdateUser mocks base method.
