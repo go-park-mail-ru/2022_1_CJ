@@ -9,6 +9,7 @@ FROM alpine:latest as exec
 
 WORKDIR /cmd
 
+RUN mkdir -p /opt/pics
 RUN mkdir /cmd/configs
 VOLUME ["/cmd/configs"]
 

@@ -51,6 +51,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	userCtrl := controllers.NewUserController(log, registry)
 	friendsCtrl := controllers.NewFriendsController(log, registry)
 	postCtrl := controllers.NewPostController(log, registry)
+	staticCtrl := controllers.NewStaticController(log, registry)
 	chatCtrl := controllers.NewChatController(log, repository, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
@@ -69,17 +70,18 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	userAPI.GET("/get", userCtrl.GetUserData)
 	userAPI.GET("/posts", userCtrl.GetUserPosts)
 	userAPI.GET("/feed", userCtrl.GetFeed)
-
+	userAPI.POST("/update_photo", userCtrl.UpdatePhoto)
 	userAPI.GET("/profile", userCtrl.GetProfile)
 	userAPI.POST("/profile/edit", userCtrl.EditProfile)
+	userAPI.GET("/search", userCtrl.SearchUsers)
 
 	friendsAPI := api.Group("/friends", svc.AuthMiddleware())
 
-	friendsAPI.POST("/request", friendsCtrl.SendRequest)
-	friendsAPI.POST("/accept", friendsCtrl.AcceptRequest)
-	friendsAPI.PUT("/delete", friendsCtrl.DeleteFriend)
+	friendsAPI.POST("/request", friendsCtrl.SendFriendRequest)
+	friendsAPI.POST("/accept", friendsCtrl.AcceptFriendRequest)
+	friendsAPI.GET("/requests", friendsCtrl.GetFriendRequests)
 	friendsAPI.GET("/get", friendsCtrl.GetFriendsByUserID)
-	friendsAPI.GET("/requests", friendsCtrl.GetRequestsByUserID)
+	friendsAPI.DELETE("/delete", friendsCtrl.DeleteFriend)
 
 	postAPI := api.Group("/post", svc.AuthMiddleware())
 
@@ -87,6 +89,10 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	postAPI.GET("/get", postCtrl.GetPost)
 	postAPI.PUT("/edit", postCtrl.EditPost)
 	postAPI.DELETE("/delete", postCtrl.DeletePost)
+
+	static := api.Group("/static")
+
+	static.POST("/upload", staticCtrl.UploadImage, svc.AuthMiddleware())
 
 	chatAPI := api.Group("/chat", svc.AuthMiddleware())
 

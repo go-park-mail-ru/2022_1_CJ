@@ -2,12 +2,13 @@ package controllers
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
-	"net/http"
 )
 
 type FriendsController struct {
@@ -15,15 +16,15 @@ type FriendsController struct {
 	registry *service.Registry
 }
 
-func (c *FriendsController) SendRequest(ctx echo.Context) error {
-	request := new(dto.ReqSendRequest)
+func (c *FriendsController) SendFriendRequest(ctx echo.Context) error {
+	request := new(dto.SendFriendRequestRequest)
 	if err := ctx.Bind(request); err != nil {
 		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.FriendsService.SendRequest(context.Background(), request, UserID)
+	response, err := c.registry.FriendsService.SendFriendRequest(context.Background(), request, UserID)
 	if err != nil {
 		return err
 	}
@@ -31,15 +32,15 @@ func (c *FriendsController) SendRequest(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (c *FriendsController) AcceptRequest(ctx echo.Context) error {
-	request := new(dto.AcceptRequest)
+func (c *FriendsController) AcceptFriendRequest(ctx echo.Context) error {
+	request := new(dto.AcceptFriendRequestRequest)
 	if err := ctx.Bind(request); err != nil {
 		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
-	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.FriendsService.AcceptRequest(context.Background(), request, UserID)
+	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	response, err := c.registry.FriendsService.AcceptFriendRequest(context.Background(), request, UserID)
 	if err != nil {
 		return err
 	}
@@ -75,10 +76,10 @@ func (c *FriendsController) GetFriendsByUserID(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (c *FriendsController) GetRequestsByUserID(ctx echo.Context) error {
+func (c *FriendsController) GetFriendRequests(ctx echo.Context) error {
 	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.FriendsService.GetRequestsByUserID(context.Background(), UserID)
+	response, err := c.registry.FriendsService.GetFriendRequests(context.Background(), UserID)
 	if err != nil {
 		return err
 	}

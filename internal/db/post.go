@@ -14,10 +14,14 @@ import (
 
 type PostRepository interface {
 	CreatePost(ctx context.Context, post *core.Post) (*core.Post, error)
+
 	GetPostByID(ctx context.Context, postID string) (*core.Post, error)
+	GetPostsByUserID(ctx context.Context, userID string) ([]core.Post, error)
+
 	EditPost(ctx context.Context, post *core.Post) (*core.Post, error)
 	DeletePost(ctx context.Context, postID string) error
-	GetFeed(ctx context.Context, userID string) ([]string, error)
+
+	GetFeed(ctx context.Context, userID string) ([]core.Post, error)
 }
 
 type postRepositoryImpl struct {
@@ -40,6 +44,19 @@ func (repo *postRepositoryImpl) GetPostByID(ctx context.Context, postID string) 
 	return post, wrapError(err)
 }
 
+// TODO: add pagination
+func (repo *postRepositoryImpl) GetPostsByUserID(ctx context.Context, userID string) ([]core.Post, error) {
+	var posts []core.Post
+	filter := bson.M{"author_id": userID}
+	cursor, err := repo.coll.Find(ctx, filter)
+	if err != nil {
+		return posts, err
+	} else {
+		err = cursor.All(ctx, &posts)
+	}
+	return posts, err
+}
+
 func (repo *postRepositoryImpl) EditPost(ctx context.Context, post *core.Post) (*core.Post, error) {
 	filter := bson.M{"_id": post.ID}
 	_, err := repo.coll.ReplaceOne(ctx, filter, post)
@@ -53,23 +70,17 @@ func (repo *postRepositoryImpl) DeletePost(ctx context.Context, postID string) e
 }
 
 // TODO: refactor
-func (repo *postRepositoryImpl) GetFeed(ctx context.Context, userID string) ([]string, error) {
+func (repo *postRepositoryImpl) GetFeed(ctx context.Context, userID string) ([]core.Post, error) {
 	opts := options.Find()
 	opts.SetSort(bson.D{{Key: "created_at", Value: -1}})
-	opts.SetProjection(bson.D{{Key: "_id", Value: 1}})
 	cursor, err := repo.coll.Find(ctx, bson.M{}, opts)
 
-	results := []bson.M{}
-	if err = cursor.All(ctx, &results); err != nil {
+	var posts []core.Post
+	if err = cursor.All(ctx, &posts); err != nil {
 		return nil, err
 	}
 
-	postIDs := []string{}
-	for _, result := range results {
-		postIDs = append(postIDs, result["_id"].(string))
-	}
-
-	return postIDs, err
+	return posts, err
 }
 
 func NewPostRepository(db *mongo.Database) (*postRepositoryImpl, error) {

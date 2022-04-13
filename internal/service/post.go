@@ -42,7 +42,7 @@ func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.CreateP
 	}
 
 	svc.log.Debugf("UserAddPost success; Current post ID: %s", post.ID)
-	return &dto.CreatePostResponse{Post: convert.Post2DTO(post)}, nil
+	return &dto.CreatePostResponse{}, nil
 }
 
 func (svc *postServiceImpl) GetPost(ctx context.Context, request *dto.GetPostRequest) (*dto.GetPostResponse, error) {
@@ -52,7 +52,13 @@ func (svc *postServiceImpl) GetPost(ctx context.Context, request *dto.GetPostReq
 		return nil, err
 	}
 	svc.log.Debug("GetPostByID success")
-	return &dto.GetPostResponse{Post: convert.Post2DTO(post)}, nil
+
+	author, err := svc.db.UserRepo.GetUserByID(ctx, post.AuthorID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.GetPostResponse{Post: convert.Post2DTO(post, author)}, nil
 }
 
 func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostRequest, userID string) (*dto.EditPostResponse, error) {
@@ -88,7 +94,7 @@ func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostR
 
 	svc.log.Debugf("Post data after edit: Message: %s; Images paths: %v", post.Message, post.Images)
 
-	return &dto.EditPostResponse{Post: convert.Post2DTO(post)}, nil
+	return &dto.EditPostResponse{}, nil
 }
 
 func (svc *postServiceImpl) DeletePost(ctx context.Context, request *dto.DeletePostRequest, userID string) (*dto.DeletePostResponse, error) {
