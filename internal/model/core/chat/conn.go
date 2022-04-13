@@ -125,7 +125,7 @@ func (c *Conn) readPump() {
 	})
 	for {
 		data := new(Message)
-		err := c.Socket.ReadJSON(data)
+		err := c.Socket.ReadJSON(&data)
 		c.log.Infof("readPump smth: %s", data.Event)
 		if err != nil {
 			if _, wok := err.(*websocket.CloseError); wok == false {
@@ -160,6 +160,7 @@ func (c *Conn) readPump() {
 
 func (c *Conn) write(mt int, payload []byte) error {
 	c.Socket.SetWriteDeadline(time.Now().Add(writeWait))
+	//c.Socket.WriteJSON()
 	return c.Socket.WriteMessage(mt, payload)
 }
 
@@ -177,10 +178,14 @@ func (c *Conn) writePump() {
 				c.write(websocket.CloseMessage, []byte{})
 				return
 			}
+			c.Socket.WriteJSON(msg)
 			bytes, err := json.Marshal(msg)
 			if err != nil {
+				c.log.Infof("true")
 				c.write(websocket.CloseMessage, []byte{})
 				return
+			} else {
+				c.log.Infof("false")
 			}
 			if err := c.write(websocket.BinaryMessage, bytes); err != nil {
 				return
