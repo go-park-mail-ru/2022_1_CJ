@@ -26,10 +26,8 @@ type UserRepository interface {
 	UserAddPost(ctx context.Context, userID string, postID string) error
 	UserCheckPost(ctx context.Context, user *core.User, postID string) error
 	UserDeletePost(ctx context.Context, userID string, postID string) error
-	GetPostsByUser(ctx context.Context, userID string) ([]string, error)
 
 	SelectUsers(ctx context.Context, selector string) ([]core.User, error)
-	EditInfo(ctx context.Context, newInfo *core.EditInfo, userID string) (*core.User, error)
 
 	AddDialog(ctx context.Context, dialogID string, UserID string) error
 	GetUserDialogs(ctx context.Context, userID string) ([]string, error)
@@ -162,6 +160,20 @@ func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string
 	}
 
 	return users, err
+}
+
+func (repo *userRepositoryImpl) AddDialog(ctx context.Context, dialogID string, userID string) error {
+	if _, err := repo.coll.UpdateByID(ctx, userID, bson.M{"$push": bson.D{{Key: "dialog_ids", Value: dialogID}}}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *userRepositoryImpl) GetUserDialogs(ctx context.Context, userID string) ([]string, error) {
+	user := new(core.User)
+	filter := bson.M{"_id": userID}
+	err := repo.coll.FindOne(ctx, filter).Decode(user)
+	return user.DialogIDs, wrapError(err)
 }
 
 func (repo *userRepositoryImpl) InitUser(user *core.User) error {
