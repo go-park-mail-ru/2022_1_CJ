@@ -71,7 +71,7 @@ func (repo *chatRepositoryImpl) GetDialogInfo(ctx context.Context, DialogID stri
 	filter := bson.D{{"_id", DialogID}}
 	err := repo.coll.FindOne(ctx, filter).Decode(dialog)
 	return common.DialogInfo{DialogID: DialogID,
-			Title: strings.Join(dialog.AuthorIDs[:], ",")},
+			Title: strings.Join(dialog.Participants[:], ",")},
 		wrapError(err)
 }
 
@@ -81,9 +81,9 @@ func initDialog(dialog *core.Dialog, userID string, authorIDs []string) error {
 		return err
 	}
 	dialog.ID = did
-	dialog.AuthorIDs = append(dialog.AuthorIDs, userID)
+	dialog.Participants = append(dialog.Participants, userID)
 	for _, id := range authorIDs {
-		dialog.AuthorIDs = append(dialog.AuthorIDs, id)
+		dialog.Participants = append(dialog.Participants, id)
 	}
 	return nil
 }
@@ -94,7 +94,7 @@ func initNewMassage(newMsg *core.Message, m common.MessageInfo) error {
 		return err
 	}
 	newMsg.ID = msgID
-	newMsg.Text = m.Text
+	newMsg.Body = m.Text
 	newMsg.AuthorID = m.AuthorID
 	newMsg.CreatedAt = time.Now().Unix()
 	return nil
