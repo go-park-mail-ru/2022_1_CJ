@@ -108,11 +108,7 @@ func TestCreatePost(t *testing.T) {
 				err: nil},
 			inputUserAddPost:  InputUserAddPost{userID: "1", postID: "1"},
 			outputUserAddPost: OutputUserAddPost{err: nil},
-			output: Output{&dto.CreatePostResponse{Post: convert.Post2DTO(&core.Post{
-				ID:       "1",
-				AuthorID: "1",
-				Message:  "It's my second post!",
-				Images:   []string{"src/img.jpg"}})}, nil},
+			output:            Output{&dto.CreatePostResponse{}, nil},
 		},
 	}
 
@@ -185,13 +181,14 @@ func TestGetPost(t *testing.T) {
 			output: Output{&dto.GetPostResponse{Post: convert.Post2DTO(&core.Post{
 				AuthorID: "1",
 				Message:  "It's my second post!",
-				Images:   []string{"src/img.jpg"}})}, nil},
+				Images:   []string{"src/img.jpg"}}, &core.User{ID: "1"})}, nil},
 		},
 	}
 
 	gomock.InOrder(
 		testRepo.mockPostR.EXPECT().GetPostByID(ctx, tests[0].input.info.PostID).Return(tests[0].outputGetPost.post, tests[0].outputGetPost.err),
 		testRepo.mockPostR.EXPECT().GetPostByID(ctx, tests[1].input.info.PostID).Return(tests[1].outputGetPost.post, tests[1].outputGetPost.err),
+		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[1].outputGetPost.post.AuthorID).Return(&core.User{ID: "1"}, nil),
 	)
 
 	for _, test := range tests {
@@ -336,12 +333,7 @@ func TestEditPost(t *testing.T) {
 				Images:   []string{"src/img.jpg"},
 				AuthorID: "3"},
 				err: nil},
-			output: Output{&dto.EditPostResponse{Post: convert.Post2DTO(&core.Post{
-				ID:       "1",
-				Message:  "It's my first post!",
-				Images:   []string{"src/img.jpg"},
-				AuthorID: "3"})},
-				nil},
+			output: Output{&dto.EditPostResponse{}, nil},
 		},
 	}
 

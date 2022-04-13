@@ -35,17 +35,17 @@ func (m *MockFriendsRepository) EXPECT() *MockFriendsRepositoryMockRecorder {
 }
 
 // CreateFriends mocks base method.
-func (m *MockFriendsRepository) CreateFriends(ctx context.Context, FriendsID, UserID string) error {
+func (m *MockFriendsRepository) CreateFriends(ctx context.Context, userID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateFriends", ctx, FriendsID, UserID)
+	ret := m.ctrl.Call(m, "CreateFriends", ctx, userID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateFriends indicates an expected call of CreateFriends.
-func (mr *MockFriendsRepositoryMockRecorder) CreateFriends(ctx, FriendsID, UserID interface{}) *gomock.Call {
+func (mr *MockFriendsRepositoryMockRecorder) CreateFriends(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFriends", reflect.TypeOf((*MockFriendsRepository)(nil).CreateFriends), ctx, FriendsID, UserID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFriends", reflect.TypeOf((*MockFriendsRepository)(nil).CreateFriends), ctx, userID)
 }
 
 // DeleteFriend mocks base method.
@@ -63,116 +63,116 @@ func (mr *MockFriendsRepositoryMockRecorder) DeleteFriend(ctx, ExFriendID1, ExFr
 }
 
 // DeleteRequest mocks base method.
-func (m *MockFriendsRepository) DeleteRequest(ctx context.Context, UserID, PersonID string) error {
+func (m *MockFriendsRepository) DeleteRequest(ctx context.Context, userID, PersonID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteRequest", ctx, UserID, PersonID)
+	ret := m.ctrl.Call(m, "DeleteRequest", ctx, userID, PersonID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteRequest indicates an expected call of DeleteRequest.
-func (mr *MockFriendsRepositoryMockRecorder) DeleteRequest(ctx, UserID, PersonID interface{}) *gomock.Call {
+func (mr *MockFriendsRepositoryMockRecorder) DeleteRequest(ctx, userID, PersonID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRequest", reflect.TypeOf((*MockFriendsRepository)(nil).DeleteRequest), ctx, UserID, PersonID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRequest", reflect.TypeOf((*MockFriendsRepository)(nil).DeleteRequest), ctx, userID, PersonID)
 }
 
 // GetFriendsByID mocks base method.
-func (m *MockFriendsRepository) GetFriendsByID(ctx context.Context, FriendsID string) ([]string, error) {
+func (m *MockFriendsRepository) GetFriendsByID(ctx context.Context, userID string) ([]string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFriendsByID", ctx, FriendsID)
+	ret := m.ctrl.Call(m, "GetFriendsByID", ctx, userID)
 	ret0, _ := ret[0].([]string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFriendsByID indicates an expected call of GetFriendsByID.
-func (mr *MockFriendsRepositoryMockRecorder) GetFriendsByID(ctx, FriendsID interface{}) *gomock.Call {
+func (mr *MockFriendsRepositoryMockRecorder) GetFriendsByID(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendsByID", reflect.TypeOf((*MockFriendsRepository)(nil).GetFriendsByID), ctx, FriendsID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendsByID", reflect.TypeOf((*MockFriendsRepository)(nil).GetFriendsByID), ctx, userID)
 }
 
 // GetFriendsByUserID mocks base method.
-func (m *MockFriendsRepository) GetFriendsByUserID(ctx context.Context, UserID string) ([]string, error) {
+func (m *MockFriendsRepository) GetFriendsByUserID(ctx context.Context, userID string) ([]string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFriendsByUserID", ctx, UserID)
+	ret := m.ctrl.Call(m, "GetFriendsByUserID", ctx, userID)
 	ret0, _ := ret[0].([]string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFriendsByUserID indicates an expected call of GetFriendsByUserID.
-func (mr *MockFriendsRepositoryMockRecorder) GetFriendsByUserID(ctx, UserID interface{}) *gomock.Call {
+func (mr *MockFriendsRepositoryMockRecorder) GetFriendsByUserID(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendsByUserID", reflect.TypeOf((*MockFriendsRepository)(nil).GetFriendsByUserID), ctx, UserID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendsByUserID", reflect.TypeOf((*MockFriendsRepository)(nil).GetFriendsByUserID), ctx, userID)
 }
 
 // GetRequestsByUserID mocks base method.
-func (m *MockFriendsRepository) GetRequestsByUserID(ctx context.Context, UserID string) ([]string, error) {
+func (m *MockFriendsRepository) GetRequestsByUserID(ctx context.Context, userID string) ([]string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRequestsByUserID", ctx, UserID)
+	ret := m.ctrl.Call(m, "GetRequestsByUserID", ctx, userID)
 	ret0, _ := ret[0].([]string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetRequestsByUserID indicates an expected call of GetRequestsByUserID.
-func (mr *MockFriendsRepositoryMockRecorder) GetRequestsByUserID(ctx, UserID interface{}) *gomock.Call {
+func (mr *MockFriendsRepositoryMockRecorder) GetRequestsByUserID(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestsByUserID", reflect.TypeOf((*MockFriendsRepository)(nil).GetRequestsByUserID), ctx, UserID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRequestsByUserID", reflect.TypeOf((*MockFriendsRepository)(nil).GetRequestsByUserID), ctx, userID)
 }
 
 // IsNotFriend mocks base method.
-func (m *MockFriendsRepository) IsNotFriend(ctx context.Context, UserID, PersonID string) error {
+func (m *MockFriendsRepository) IsNotFriend(ctx context.Context, userID, PersonID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsNotFriend", ctx, UserID, PersonID)
+	ret := m.ctrl.Call(m, "IsNotFriend", ctx, userID, PersonID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // IsNotFriend indicates an expected call of IsNotFriend.
-func (mr *MockFriendsRepositoryMockRecorder) IsNotFriend(ctx, UserID, PersonID interface{}) *gomock.Call {
+func (mr *MockFriendsRepositoryMockRecorder) IsNotFriend(ctx, userID, PersonID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNotFriend", reflect.TypeOf((*MockFriendsRepository)(nil).IsNotFriend), ctx, UserID, PersonID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsNotFriend", reflect.TypeOf((*MockFriendsRepository)(nil).IsNotFriend), ctx, userID, PersonID)
 }
 
 // IsUniqRequest mocks base method.
-func (m *MockFriendsRepository) IsUniqRequest(ctx context.Context, UserID, PersonID string) error {
+func (m *MockFriendsRepository) IsUniqRequest(ctx context.Context, userID, PersonID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsUniqRequest", ctx, UserID, PersonID)
+	ret := m.ctrl.Call(m, "IsUniqRequest", ctx, userID, PersonID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // IsUniqRequest indicates an expected call of IsUniqRequest.
-func (mr *MockFriendsRepositoryMockRecorder) IsUniqRequest(ctx, UserID, PersonID interface{}) *gomock.Call {
+func (mr *MockFriendsRepositoryMockRecorder) IsUniqRequest(ctx, userID, PersonID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUniqRequest", reflect.TypeOf((*MockFriendsRepository)(nil).IsUniqRequest), ctx, UserID, PersonID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUniqRequest", reflect.TypeOf((*MockFriendsRepository)(nil).IsUniqRequest), ctx, userID, PersonID)
 }
 
 // MakeFriends mocks base method.
-func (m *MockFriendsRepository) MakeFriends(ctx context.Context, UserID, PersonID string) error {
+func (m *MockFriendsRepository) MakeFriends(ctx context.Context, userID, PersonID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MakeFriends", ctx, UserID, PersonID)
+	ret := m.ctrl.Call(m, "MakeFriends", ctx, userID, PersonID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // MakeFriends indicates an expected call of MakeFriends.
-func (mr *MockFriendsRepositoryMockRecorder) MakeFriends(ctx, UserID, PersonID interface{}) *gomock.Call {
+func (mr *MockFriendsRepositoryMockRecorder) MakeFriends(ctx, userID, PersonID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeFriends", reflect.TypeOf((*MockFriendsRepository)(nil).MakeFriends), ctx, UserID, PersonID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeFriends", reflect.TypeOf((*MockFriendsRepository)(nil).MakeFriends), ctx, userID, PersonID)
 }
 
 // MakeRequest mocks base method.
-func (m *MockFriendsRepository) MakeRequest(ctx context.Context, UserID, PersonID string) error {
+func (m *MockFriendsRepository) MakeRequest(ctx context.Context, userID, PersonID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "MakeRequest", ctx, UserID, PersonID)
+	ret := m.ctrl.Call(m, "MakeRequest", ctx, userID, PersonID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // MakeRequest indicates an expected call of MakeRequest.
-func (mr *MockFriendsRepositoryMockRecorder) MakeRequest(ctx, UserID, PersonID interface{}) *gomock.Call {
+func (mr *MockFriendsRepositoryMockRecorder) MakeRequest(ctx, userID, PersonID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeRequest", reflect.TypeOf((*MockFriendsRepository)(nil).MakeRequest), ctx, UserID, PersonID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MakeRequest", reflect.TypeOf((*MockFriendsRepository)(nil).MakeRequest), ctx, userID, PersonID)
 }

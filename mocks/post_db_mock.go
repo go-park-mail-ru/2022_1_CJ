@@ -80,10 +80,10 @@ func (mr *MockPostRepositoryMockRecorder) EditPost(ctx, post interface{}) *gomoc
 }
 
 // GetFeed mocks base method.
-func (m *MockPostRepository) GetFeed(ctx context.Context, userID string) ([]string, error) {
+func (m *MockPostRepository) GetFeed(ctx context.Context, userID string) ([]core.Post, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFeed", ctx, userID)
-	ret0, _ := ret[0].([]string)
+	ret0, _ := ret[0].([]core.Post)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -107,4 +107,19 @@ func (m *MockPostRepository) GetPostByID(ctx context.Context, postID string) (*c
 func (mr *MockPostRepositoryMockRecorder) GetPostByID(ctx, postID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPostByID", reflect.TypeOf((*MockPostRepository)(nil).GetPostByID), ctx, postID)
+}
+
+// GetPostsByUserID mocks base method.
+func (m *MockPostRepository) GetPostsByUserID(ctx context.Context, userID string) ([]core.Post, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPostsByUserID", ctx, userID)
+	ret0, _ := ret[0].([]core.Post)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPostsByUserID indicates an expected call of GetPostsByUserID.
+func (mr *MockPostRepositoryMockRecorder) GetPostsByUserID(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPostsByUserID", reflect.TypeOf((*MockPostRepository)(nil).GetPostsByUserID), ctx, userID)
 }
