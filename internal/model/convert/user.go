@@ -18,5 +18,6 @@ func User2DTO(user *core.User) dto.User {
 		ID:    user.ID,
 		Email: user.Email,
 		Name:  user.Name,
+		Image: user.Image,
 	}
 }

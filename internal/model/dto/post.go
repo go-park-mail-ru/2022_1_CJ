@@ -1,10 +1,10 @@
 package dto
 
 type Post struct {
-	AuthorID string   `json:"author_id"`
-	PostID   string   `json:"post_id"`
-	Message  string   `json:"message"`
-	Images   []string `json:"images,omitempty"`
+	ID      string   `json:"id"`
+	Author  User     `json:"author"`
+	Message string   `json:"message"`
+	Images  []string `json:"images,omitempty"`
 }
 
 type CreatePostRequest struct {
@@ -12,9 +12,7 @@ type CreatePostRequest struct {
 	Images  []string `json:"images,omitempty"`
 }
 
-type CreatePostResponse struct {
-	Post Post `json:"post"`
-}
+type CreatePostResponse BasicResponse
 
 type GetPostRequest struct {
 	PostID string `query:"post_id" validate:"required"`
@@ -30,9 +28,7 @@ type EditPostRequest struct {
 	Images  []string `json:"images,omitempty"`
 }
 
-type EditPostResponse struct {
-	Post Post `json:"post"`
-}
+type EditPostResponse BasicResponse
 
 type DeletePostRequest struct {
 	PostID string `query:"post_id"`

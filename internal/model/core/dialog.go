@@ -1,14 +1,15 @@
 package core
 
-type Dialog struct {
-	ID         string   `bson:"_id"`
-	AuthorIDs  []string `bson:"author_ids,omitempty" `
-	MessageIDs []string `bson:"messages_ids,omitempty"`
-}
-
 type Message struct {
 	ID        string `bson:"_id"`
-	Text      string `bson:"text"`
+	Body      string `bson:"body"`
 	AuthorID  string `bson:"author_id"`
-	CreatedAt int64  `bson:"created_at"`
+	CreatedAt int64  `bson:"created_at"` // unix timestamp
+}
+
+type Dialog struct {
+	ID           string    `bson:"_id"`
+	Name         string    `bson:"name"`
+	Participants []string  `bson:"participants"`
+	Messages     []Message `bson:"messages"`
 }

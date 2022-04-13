@@ -7,17 +7,20 @@ type User struct {
 	ID    string          `json:"id"`
 	Email string          `json:"email"`
 	Name  common.UserName `json:"name"`
+	Image string          `json:"image"`
 }
 
 // Add status
 type UserProfile struct {
-	UserInfo  User     `json:"user_info"`
-	Avatar    string   `json:"avatar"`
-	Phone     string   `json:"phone"`
-	Location  string   `json:"location"`
-	BirthDay  string   `json:"birth_day"`
-	FriendIDs []string `json:"friend_ids"`
-	PostIDs   []string `json:"post_ids"`
+	ID        string          `json:"id"`
+	Email     string          `json:"email"`
+	Name      common.UserName `json:"name"`
+	Avatar    string          `json:"avatar"`
+	Phone     string          `json:"phone"`
+	Location  string          `json:"location"`
+	BirthDay  string          `json:"birth_day"`
+	FriendIDs []string        `json:"friend_ids"`
+	PostIDs   []string        `json:"post_ids"`
 }
 
 type EditProfile struct {
@@ -41,11 +44,13 @@ type GetUserPostsRequest struct {
 }
 
 type GetUserPostsResponse struct {
-	PostIDs []string `json:"post_ids"`
+	Posts []Post `json:"posts"`
 }
 
+type GetUserFeedRequest struct{}
+
 type GetUserFeedResponse struct {
-	PostIDs []string `json:"post_ids"`
+	Posts []Post `json:"posts"`
 }
 
 type GetProfileRequest struct {
@@ -57,9 +62,25 @@ type GetProfileResponse struct {
 }
 
 type EditProfileRequest struct {
-	NewInfo EditProfile `json:"new_info"`
+	Name     common.UserName `json:"name"`
+	Avatar   string          `json:"avatar"`
+	Phone    string          `json:"phone"`
+	Location string          `json:"location"`
+	BirthDay string          `json:"birth_day"`
 }
 
-type EditProfileResponse struct {
-	UserProfile UserProfile `json:"user_profile"`
+type EditProfileResponse BasicResponse
+
+type UpdatePhotoRequest struct{}
+
+type UpdatePhotoResponse struct {
+	URL string `json:"url"`
+}
+
+type SearchUsersRequest struct {
+	Selector string `query:"selector" validate:"required"`
+}
+
+type SearchUsersResponse struct {
+	Users []User `json:"users"`
 }
