@@ -94,7 +94,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 
 	static.POST("/upload", staticCtrl.UploadImage, svc.AuthMiddleware())
 
-	chatAPI := api.Group("/chat", svc.AuthMiddleware())
+	chatAPI := api.Group("/messenger", svc.AuthMiddleware())
 
 	chatAPI.GET("/dialogs", chatCtrl.GetDialogs)
 	chatAPI.POST("/create", chatCtrl.CreateDialog)

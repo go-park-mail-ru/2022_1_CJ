@@ -264,7 +264,3 @@ func SocketHandler(ctx echo.Context, log *logrus.Entry, repo *db.Repository, req
 	}
 	return nil
 }
-
-/* TODO:
-3. Отладка
-*/
