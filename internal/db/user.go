@@ -160,6 +160,7 @@ func (repo *userRepositoryImpl) InitUser(user *core.User) error {
 		return err
 	}
 	user.ID = uid
+	user.Image = "default.jpeg"
 	user.CreatedAt = time.Now().Unix()
 	return nil
 }
