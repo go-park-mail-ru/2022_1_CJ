@@ -12,7 +12,7 @@ import (
 )
 
 type ChatRepository interface {
-	IsUniqDialog(ctx context.Context, fUserID string, sUserID string) error
+	IsUniqDialog(ctx context.Context, firstUserID string, secondUserID string) error
 	CreateDialog(ctx context.Context, UserId string, AuthorIDs []string) (*core.Dialog, error)
 	IsChatExist(ctx context.Context, DialogID string) error
 	SendMessage(ctx context.Context, Message common.MessageInfo) error
@@ -24,9 +24,12 @@ type chatRepositoryImpl struct {
 	coll *mongo.Collection
 }
 
-func (repo *chatRepositoryImpl) IsUniqDialog(ctx context.Context, fUserID string, sUserID string) error {
-	filter := bson.M{"$size": bson.D{{Key: "author_ids", Value: 2}},
-		"author_ids": bson.A{fUserID, sUserID}} // Проверка на правильность
+func (repo *chatRepositoryImpl) IsUniqDialog(ctx context.Context, firstUserID string, secondUserID string) error {
+	filter := bson.M{"$and": bson.A{
+		bson.D{{"author_ids.2", bson.D{{"$exists", false}}}},
+		bson.D{{"author_ids", firstUserID}},
+		bson.D{{"author_ids", secondUserID}},
+	}}
 	if err := repo.coll.FindOne(ctx, filter).Err(); err != mongo.ErrNoDocuments {
 		if err == nil {
 			return constants.ErrDialogAlreadyExist

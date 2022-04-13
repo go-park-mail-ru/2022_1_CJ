@@ -27,7 +27,7 @@ type User struct {
 	Password  UserPassword    `bson:"password"`
 	Posts     []string        `bson:"posts,omitempty"`
 	FriendsID string          `bson:"friends_id"`
-	DialogIDs []string        `bson:"dialog_ids"`
+	DialogIDs []string        `bson:"dialog_ids,omitempty"`
 }
 
 type EditInfo struct {

@@ -18,7 +18,7 @@ type ChatController struct {
 	db       *db.Repository
 }
 
-func (c *ChatController) GetChats(ctx echo.Context) error {
+func (c *ChatController) GetDialogs(ctx echo.Context) error {
 	request := new(dto.GetDialogsRequest)
 	if err := ctx.Bind(request); err != nil {
 		return err
@@ -26,6 +26,21 @@ func (c *ChatController) GetChats(ctx echo.Context) error {
 	request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
 	response, err := c.registry.ChatService.GetDialogs(context.Background(), request)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (c *ChatController) CreateDialog(ctx echo.Context) error {
+	request := new(dto.CreateDialogRequest)
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
+	request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
+
+	response, err := c.registry.ChatService.CreateDialog(context.Background(), request)
 	if err != nil {
 		return err
 	}

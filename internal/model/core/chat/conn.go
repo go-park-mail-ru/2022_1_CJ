@@ -266,7 +266,5 @@ func SocketHandler(ctx echo.Context, log *logrus.Entry, repo *db.Repository, req
 }
 
 /* TODO:
-1. Создание чата сразу для всех пользователей
-2. Нотификация о создании чата для всех пользователей
 3. Отладка
 */

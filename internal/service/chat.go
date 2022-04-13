@@ -23,13 +23,14 @@ type chatServiceImpl struct {
 func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.CreateDialogRequest) (*dto.CreateDialogResponse, error) {
 	switch {
 	case len(request.AuthorIDs) < 1:
-		svc.log.Errorf("CreateDialog error: %s", constants.ErrSingleChat)
+		svc.log.Errorf("%s", constants.ErrSingleChat)
 		return nil, constants.ErrSingleChat
 	case len(request.AuthorIDs) == 1:
-		if err := svc.db.ChatRepo.IsUniqDialog(ctx, request.UserID, request.AuthorIDs[0]); err != nil {
-			svc.log.Errorf("CreateDialog error: %s", err)
-			return nil, err
-		}
+		// TODO: don't correct working IsUniqDialog
+		//if err := svc.db.ChatRepo.IsUniqDialog(ctx, request.UserID, request.AuthorIDs[0]); err != nil {
+		//	svc.log.Errorf("IsUniqDialog error: %s", err)
+		//	return nil, err
+		//}
 	}
 
 	dialog, err := svc.db.ChatRepo.CreateDialog(ctx, request.UserID, request.AuthorIDs)
@@ -37,15 +38,16 @@ func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.Creat
 		svc.log.Errorf("CreateDialog error: %s", err)
 		return nil, err
 	}
+
 	svc.log.Debug("Create dialog success")
 	if err := svc.db.UserRepo.AddDialog(ctx, dialog.ID, request.UserID); err != nil {
-		svc.log.Errorf("CreateDialog error: %s", err)
+		svc.log.Errorf("AddDialog error: %s", err)
 		return nil, err
 	}
 
 	for _, id := range request.AuthorIDs {
 		if err := svc.db.UserRepo.AddDialog(ctx, dialog.ID, id); err != nil {
-			svc.log.Errorf("CreateDialog error: %s", err)
+			svc.log.Errorf("AddDialog error: %s", err)
 			return nil, err
 		}
 	}
