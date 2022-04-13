@@ -73,6 +73,7 @@ func HandleData(c *Conn, msg *Message) {
 		}
 	default:
 		if msg.DialogID != "" {
+			c.log.Infof("Write in dialog")
 			RoomManager.Lock()
 			room, rok := RoomManager.Rooms[msg.DialogID]
 			RoomManager.Unlock()
@@ -87,7 +88,8 @@ func HandleData(c *Conn, msg *Message) {
 			}
 			ConnManager.Lock()
 			// Strange
-			dst, cok := ConnManager.Conns[msg.SrcID]
+			// was msg.SrcID
+			dst, cok := ConnManager.Conns[c.ID]
 			ConnManager.Unlock()
 			if cok == false {
 				break
@@ -124,6 +126,7 @@ func (c *Conn) readPump() {
 	for {
 		data := new(Message)
 		err := c.Socket.ReadJSON(data)
+		c.log.Infof("readPump smth: %s", data.Event)
 		if err != nil {
 			if _, wok := err.(*websocket.CloseError); wok == false {
 				break
@@ -169,6 +172,7 @@ func (c *Conn) writePump() {
 	for {
 		select {
 		case msg, ok := <-c.Send:
+			c.log.Infof("writePump smth: %s", msg.Event)
 			if ok == false {
 				c.write(websocket.CloseMessage, []byte{})
 				return
@@ -191,6 +195,7 @@ func (c *Conn) writePump() {
 
 // Adds the Conn to a Room. If the Room does not exist, it is created.
 func (c *Conn) Join(id string) {
+	c.log.Infof("join conn method with id: %s", id)
 	RoomManager.Lock()
 	room, ok := RoomManager.Rooms[id]
 	RoomManager.Unlock()
@@ -205,6 +210,7 @@ func (c *Conn) Join(id string) {
 
 // Removes the Conn from a Room.
 func (c *Conn) Leave(id string) {
+	c.log.Infof("leave conn method with id: %s", id)
 	RoomManager.Lock()
 	room, rok := RoomManager.Rooms[id]
 	RoomManager.Unlock()
@@ -259,8 +265,10 @@ func SocketHandler(ctx echo.Context, log *logrus.Entry, repo *db.Repository, req
 	c := NewConnection(ctx.Response(), ctx.Request(), log, repo, request.UserID)
 	if c != nil {
 		go c.writePump()
+		// Запускаем для отладки рут
 		c.Join("root")
 		go c.readPump()
+		c.log.Infof("new user: %s", c.ID)
 	}
 	return nil
 }

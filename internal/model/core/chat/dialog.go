@@ -44,6 +44,7 @@ func (r *Room) Start() {
 				log.Println(err)
 				break
 			}
+			c.log.Infof("ConstructMessage, join in chat")
 			c.Send <- ConstructMessage(r.ID, "join", "", c.ID, payload)
 		case c := <-r.leavechan:
 			r.Lock()
@@ -55,8 +56,10 @@ func (r *Room) Start() {
 			r.Lock()
 			delete(r.Members, id)
 			r.Unlock()
+			c.log.Infof("ConstructMessage, left chat")
 			c.Send <- ConstructMessage(r.ID, "leave", "", id, []byte(c.ID))
 		case rmsg := <-r.Send:
+			rmsg.Sender.log.Infof("Sendner %s, event: %s, payload: %s", rmsg.Sender.ID, rmsg.Data.Event, rmsg.Data.Payload)
 			r.Lock()
 			for id := range r.Members {
 				r.Unlock()

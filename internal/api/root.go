@@ -98,6 +98,6 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 
 	chatAPI.GET("/dialogs", chatCtrl.GetDialogs)
 	chatAPI.POST("/create", chatCtrl.CreateDialog)
-	chatAPI.POST("/ws", chatCtrl.WsHandler)
+	chatAPI.GET("/ws", chatCtrl.WsHandler)
 	return svc, nil
 }
