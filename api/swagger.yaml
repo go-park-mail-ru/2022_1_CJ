@@ -343,7 +343,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/GetPostResponse"
 
-
 components:
   parameters:
     userIDParam:
