@@ -31,6 +31,7 @@ type UserRepository interface {
 
 	AddDialog(ctx context.Context, dialogID string, UserID string) error
 	GetUserDialogs(ctx context.Context, userID string) ([]string, error)
+	IsUserInDialog(ctx context.Context, userID string, dialogID string) (bool, error)
 }
 
 type userRepositoryImpl struct {
@@ -174,6 +175,14 @@ func (repo *userRepositoryImpl) GetUserDialogs(ctx context.Context, userID strin
 	filter := bson.M{"_id": userID}
 	err := repo.coll.FindOne(ctx, filter).Decode(user)
 	return user.DialogIDs, wrapError(err)
+}
+
+func (repo *userRepositoryImpl) IsUserInDialog(ctx context.Context, userID string, dialogID string) (bool, error) {
+	filter := bson.M{"_id": userID, "dialog_ids": dialogID}
+	if err := repo.coll.FindOne(ctx, filter).Err(); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (repo *userRepositoryImpl) InitUser(user *core.User) error {

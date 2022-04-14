@@ -55,8 +55,6 @@ func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.Creat
 	return &dto.CreateDialogResponse{DialogID: dialog.ID}, nil
 }
 
-// Сделать получатель всех чатов
-
 func (svc *chatServiceImpl) SendMessage(ctx context.Context, request *dto.SendMessageRequest) (*dto.SendMessageResponse, error) {
 	message := &common.MessageInfo{Text: request.MessageInfo.Text,
 		AuthorID: request.MessageInfo.AuthorID,

@@ -3,7 +3,7 @@ package chat
 type Message struct {
 	DialogName string `json:"dialog_name" bson:"dialog_name"`
 	DialogID   string `json:"dialog_id" bson:"dialog_id"`
-	Event      string `json:"event" bson:"event"`
+	Event      string `json:"type" bson:"event"`
 	SrcID      string `json:"src_id" bson:"src_id"`
 	Payload    []byte `json:"payload" bson:"payload"`
 }

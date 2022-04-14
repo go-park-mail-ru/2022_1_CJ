@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"context"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/labstack/echo"
@@ -50,9 +51,16 @@ var (
 func HandleData(c *Conn, msg *Message) {
 	switch msg.Event {
 	case "join":
-		c.Join(msg.DialogID)
+		if access, err := c.db.UserRepo.IsUserInDialog(context.Background(), c.ID, msg.DialogID);
+			err == nil && access {
+			c.log.Infof("join ws successful")
+			c.Join(msg.DialogID)
+		}
 	case "leave":
-		c.Leave(msg.DialogID)
+		if access, err := c.db.UserRepo.IsUserInDialog(context.Background(), c.ID, msg.DialogID);
+			err == nil && access {
+			c.Leave(msg.DialogID)
+		}
 	case "joined":
 		c.Emit(msg)
 	case "left":
