@@ -25,7 +25,7 @@ type Conn struct {
 
 const (
 	writeWait      = 10 * time.Second
-	pongWait       = 60 * time.Second
+	pongWait       = 1200 * time.Second
 	pingPeriod     = pongWait * 9 / 10
 	maxMessageSize = 1024 * 1024 * 1024
 )
@@ -72,26 +72,26 @@ func HandleData(c *Conn, msg *Message) {
 		}
 	default:
 		if msg.DialogID != "" {
-			c.log.Infof("Write in dialog")
-			RoomManager.Lock()
-			room, rok := RoomManager.Rooms[msg.DialogID]
-			RoomManager.Unlock()
-			if rok == false {
-				break
-			}
-
-			room.Lock()
-			for id, _ := range room.Members {
-				ConnManager.Lock()
-				dst, cok := ConnManager.Conns[id]
-				ConnManager.Unlock()
-				if cok == false {
-					continue
-				}
-				dst.Send <- msg
-			}
-			room.Unlock()
-		} else {
+			//	c.log.Infof("Write in dialog")
+			//	RoomManager.Lock()
+			//	room, rok := RoomManager.Rooms[msg.DialogID]
+			//	RoomManager.Unlock()
+			//	if rok == false {
+			//		break
+			//	}
+			//
+			//	room.Lock()
+			//	for id, _ := range room.Members {
+			//		ConnManager.Lock()
+			//		dst, cok := ConnManager.Conns[id]
+			//		ConnManager.Unlock()
+			//		if cok == false {
+			//			continue
+			//		}
+			//		dst.Send <- msg
+			//	}
+			//	room.Unlock()
+			//} else {
 			c.Emit(msg)
 		}
 	}
@@ -156,7 +156,7 @@ func (c *Conn) readPump() {
 
 func (c *Conn) write(mt int, payload []byte) error {
 	//c.Socket.WriteJSON()
-	return c.Socket.WriteMessage(1, payload)
+	return c.Socket.WriteMessage(mt, payload)
 }
 
 func (c *Conn) writePump() {
@@ -183,10 +183,6 @@ func (c *Conn) writePump() {
 				return
 			}
 
-			if err := c.write(websocket.BinaryMessage, msg.Payload); err != nil {
-				c.log.Errorf("error write: %s", err)
-				return
-			}
 		case <-ticker.C:
 			if err := c.write(websocket.PingMessage, []byte{}); err != nil {
 				return
@@ -197,7 +193,6 @@ func (c *Conn) writePump() {
 
 // Adds the Conn to a Room. If the Room does not exist, it is created.
 func (c *Conn) Join(id string) {
-	c.log.Infof("join conn method with id: %s", id)
 	RoomManager.Lock()
 	room, ok := RoomManager.Rooms[id]
 	RoomManager.Unlock()
@@ -268,7 +263,7 @@ func SocketHandler(ctx echo.Context, log *logrus.Entry, repo *db.Repository, req
 	if c != nil {
 		go c.writePump()
 		// Запускаем для отладки рут
-		c.Join("root")
+		//c.Join("root")
 		go c.readPump()
 		c.log.Infof("new user: %s", c.ID)
 	}

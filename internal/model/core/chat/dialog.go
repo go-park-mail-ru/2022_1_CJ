@@ -44,7 +44,6 @@ func (r *Room) Start() {
 				log.Println(err)
 				break
 			}
-			c.log.Infof("ConstructMessage, join in chat")
 			c.Send <- ConstructMessage(r.ID, "join", "", c.ID, payload)
 		case c := <-r.leavechan:
 			r.Lock()
