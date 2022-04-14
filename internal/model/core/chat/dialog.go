@@ -59,7 +59,8 @@ func (r *Room) Start() {
 			c.log.Infof("ConstructMessage, left chat")
 			c.Send <- ConstructMessage(r.ID, "leave", "", id, []byte(c.ID))
 		case rmsg := <-r.Send:
-			rmsg.Sender.log.Infof("Sendner %s, event: %s, payload: %s", rmsg.Sender.ID, rmsg.Data.Event, rmsg.Data.Payload)
+			rmsg.Sender.log.Infof("Sendner %s, event: %s, payload: %s",
+				rmsg.Sender.ID, rmsg.Data.Event, rmsg.Data.Payload)
 			r.Lock()
 			for id := range r.Members {
 				r.Unlock()

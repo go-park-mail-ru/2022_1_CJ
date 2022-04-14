@@ -1,7 +1,6 @@
 package chat
 
 import (
-	"encoding/json"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/labstack/echo"
@@ -80,21 +79,18 @@ func HandleData(c *Conn, msg *Message) {
 			if rok == false {
 				break
 			}
+
 			room.Lock()
-			_, mok := room.Members[msg.DialogID]
+			for id, _ := range room.Members {
+				ConnManager.Lock()
+				dst, cok := ConnManager.Conns[id]
+				ConnManager.Unlock()
+				if cok == false {
+					continue
+				}
+				dst.Send <- msg
+			}
 			room.Unlock()
-			if mok == false {
-				break
-			}
-			ConnManager.Lock()
-			// Strange
-			// was msg.SrcID
-			dst, cok := ConnManager.Conns[c.ID]
-			ConnManager.Unlock()
-			if cok == false {
-				break
-			}
-			dst.Send <- msg
 		} else {
 			c.Emit(msg)
 		}
@@ -159,9 +155,8 @@ func (c *Conn) readPump() {
 }
 
 func (c *Conn) write(mt int, payload []byte) error {
-	c.Socket.SetWriteDeadline(time.Now().Add(writeWait))
 	//c.Socket.WriteJSON()
-	return c.Socket.WriteMessage(mt, payload)
+	return c.Socket.WriteMessage(1, payload)
 }
 
 func (c *Conn) writePump() {
@@ -173,21 +168,23 @@ func (c *Conn) writePump() {
 	for {
 		select {
 		case msg, ok := <-c.Send:
-			c.log.Infof("writePump smth: %s", msg.Event)
+			c.log.Infof("writePump smth: %s", msg)
 			if ok == false {
 				c.write(websocket.CloseMessage, []byte{})
 				return
 			}
-			c.Socket.WriteJSON(msg)
-			bytes, err := json.Marshal(msg)
-			if err != nil {
-				c.log.Infof("true")
-				c.write(websocket.CloseMessage, []byte{})
+			//bytes, err := json.Marshal(msg)
+			//if err != nil {
+			//	c.write(websocket.CloseMessage, []byte{})
+			//	return
+			//}
+			if err := c.Socket.WriteJSON(msg); err != nil {
+				c.log.Errorf("error write: %s", err)
 				return
-			} else {
-				c.log.Infof("false")
 			}
-			if err := c.write(websocket.BinaryMessage, bytes); err != nil {
+
+			if err := c.write(websocket.BinaryMessage, msg.Payload); err != nil {
+				c.log.Errorf("error write: %s", err)
 				return
 			}
 		case <-ticker.C:
