@@ -4,7 +4,8 @@ import (
 	"context"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/sirupsen/logrus"
 )
@@ -58,25 +59,22 @@ func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.Creat
 // Сделать получатель всех чатов
 
 func (svc *chatServiceImpl) SendMessage(ctx context.Context, request *dto.SendMessageRequest) (*dto.SendMessageResponse, error) {
-	message := &common.MessageInfo{Text: request.MessageInfo.Text,
-		AuthorID: request.MessageInfo.AuthorID,
-		DialogID: request.MessageInfo.DialogID}
-	svc.log.Debugf("Text: %s; DialogID: %s; AuthorID: %s", message.Text, message.DialogID, message.AuthorID)
+	message := &core.Message{Body: request.MessageInfo.Body,
+		AuthorID: request.MessageInfo.AuthorID, IsRead: false}
 
-	if err := svc.db.ChatRepo.IsChatExist(ctx, message.DialogID); err != nil {
+	svc.log.Debugf("Text: %s; DialogID: %s; AuthorID: %s", message.Body, request.MessageInfo.DialogID, message.AuthorID)
+
+	if err := svc.db.ChatRepo.IsChatExist(ctx, request.MessageInfo.DialogID); err != nil {
 		svc.log.Errorf("Chat not exist error: %s", err)
 		return nil, err
 	}
 
-	svc.log.Debug("Chat was founded")
-
-	if err := svc.db.ChatRepo.SendMessage(ctx, *message); err != nil {
+	if err := svc.db.ChatRepo.SendMessage(ctx, message, request.MessageInfo.DialogID); err != nil {
 		svc.log.Errorf("SendMessage error: %s", err)
 		return nil, err
 	}
 
 	svc.log.Debug("Message was sent successful")
-
 	return &dto.SendMessageResponse{}, nil
 }
 
@@ -86,15 +84,15 @@ func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDial
 		svc.log.Errorf("GetUserDialogs error: %s", err)
 		return nil, err
 	}
-	var DialogsInfo []common.DialogInfo
+	var dialogs []dto.Dialog
 	for _, id := range ids {
-		dInf, err := svc.db.ChatRepo.GetDialogInfo(ctx, id)
+		dInf, err := svc.db.ChatRepo.GetDialogByID(ctx, id)
 		if err != nil {
 			svc.log.Errorf("GetDialogInfo error: %s", err)
 		}
-		DialogsInfo = append(DialogsInfo, dInf)
+		dialogs = append(dialogs, convert.Dialog2DTO(dInf, request.UserID))
 	}
-	return &dto.GetDialogsResponse{DialogsInfo: DialogsInfo}, err
+	return &dto.GetDialogsResponse{Dialogs: dialogs}, err
 }
 
 func NewChatService(log *logrus.Entry, db *db.Repository) ChatService {

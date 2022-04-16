@@ -1,6 +1,18 @@
 package dto
 
-import "github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
+type Message struct {
+	DialogID string `json:"dialog_id"`
+	Event    string `json:"event"`
+	AuthorID string `json:"author_id"`
+	DestinID string `json:"dst,omitempty"`
+	Body     string `json:"body"`
+}
+
+type Dialog struct {
+	DialogID     string   `json:"dialog_id"`
+	Name         string   `json:"name"`
+	Participants []string `json:"participants"`
+}
 
 type CreateDialogRequest struct {
 	UserID    string   `json:"user_id"`
@@ -12,7 +24,7 @@ type CreateDialogResponse struct {
 }
 
 type SendMessageRequest struct {
-	MessageInfo common.MessageInfo `json:"message_info"`
+	MessageInfo Message `json:"message"`
 }
 
 type SendMessageResponse struct{}
@@ -22,20 +34,5 @@ type GetDialogsRequest struct {
 }
 
 type GetDialogsResponse struct {
-	DialogsInfo []common.DialogInfo `json:"dialogs_info"`
-}
-
-type SendMsg struct {
-	DialogId string `json:"dialog_id"`
-	Message  string `json:"message"`
-}
-
-type SendMsgRequest struct {
-	Type    string  `json:"type"`
-	Payload SendMsg `json:"payload"`
-}
-
-type GetMsgRequest struct {
-	Type    string             `json:"type"`
-	Payload common.MessageInfo `json:"payload"`
+	Dialogs []Dialog `json:"dialogs"`
 }
