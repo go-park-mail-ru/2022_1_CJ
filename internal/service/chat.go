@@ -14,6 +14,8 @@ type ChatService interface {
 	CreateDialog(ctx context.Context, request *dto.CreateDialogRequest) (*dto.CreateDialogResponse, error)
 	SendMessage(ctx context.Context, request *dto.SendMessageRequest) (*dto.SendMessageResponse, error)
 	GetDialogs(ctx context.Context, request *dto.GetDialogsRequest) (*dto.GetDialogsResponse, error)
+
+	GetDialog(ctx context.Context, request *dto.GetDialogRequest) (*dto.GetDialogResponse, error)
 }
 
 type chatServiceImpl struct {
@@ -59,17 +61,17 @@ func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.Creat
 // Сделать получатель всех чатов
 
 func (svc *chatServiceImpl) SendMessage(ctx context.Context, request *dto.SendMessageRequest) (*dto.SendMessageResponse, error) {
-	message := &core.Message{Body: request.MessageInfo.Body,
-		AuthorID: request.MessageInfo.AuthorID, IsRead: false}
+	message := &core.Message{Body: request.Message.Body,
+		AuthorID: request.Message.AuthorID, IsRead: false}
 
-	svc.log.Debugf("Text: %s; DialogID: %s; AuthorID: %s", message.Body, request.MessageInfo.DialogID, message.AuthorID)
+	svc.log.Debugf("Text: %s; DialogID: %s; AuthorID: %s", message.Body, request.Message.DialogID, message.AuthorID)
 
-	if err := svc.db.ChatRepo.IsChatExist(ctx, request.MessageInfo.DialogID); err != nil {
+	if err := svc.db.ChatRepo.IsChatExist(ctx, request.Message.DialogID); err != nil {
 		svc.log.Errorf("Chat not exist error: %s", err)
 		return nil, err
 	}
 
-	if err := svc.db.ChatRepo.SendMessage(ctx, message, request.MessageInfo.DialogID); err != nil {
+	if err := svc.db.ChatRepo.SendMessage(ctx, message, request.Message.DialogID); err != nil {
 		svc.log.Errorf("SendMessage error: %s", err)
 		return nil, err
 	}
@@ -93,6 +95,35 @@ func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDial
 		dialogs = append(dialogs, convert.Dialog2DTO(dInf, request.UserID))
 	}
 	return &dto.GetDialogsResponse{Dialogs: dialogs}, err
+}
+
+func (svc *chatServiceImpl) GetDialog(ctx context.Context, request *dto.GetDialogRequest) (*dto.GetDialogResponse, error) {
+	ids, err := svc.db.UserRepo.GetUserDialogs(ctx, request.UserID)
+	if err != nil {
+		svc.log.Errorf("GetUserDialogs error: %s", err)
+		return nil, err
+	}
+
+	check := func(s []string, str string) bool {
+		for _, v := range s {
+			if v == str {
+				return true
+			}
+		}
+		return false
+	}
+	if isHave := check(ids, request.DialogID); isHave != true {
+		svc.log.Errorf("User don't have dialog")
+		return nil, constants.ErrDBNotFound
+	}
+
+	dialog, err := svc.db.ChatRepo.GetDialogByID(ctx, request.DialogID)
+	if err != nil {
+		svc.log.Errorf("GetDialogByID error: %s", err)
+		return nil, err
+	}
+
+	return &dto.GetDialogResponse{Dialog: convert.Dialog2DTO(dialog, request.UserID), Messages: convert.Messages2DTO(dialog.Messages)}, err
 }
 
 func NewChatService(log *logrus.Entry, db *db.Repository) ChatService {
