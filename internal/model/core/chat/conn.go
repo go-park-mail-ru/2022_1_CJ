@@ -51,14 +51,13 @@ var (
 func HandleData(c *Conn, msg *Message) {
 	switch msg.Event {
 	case "join":
-		if access, err := c.db.UserRepo.IsUserInDialog(context.Background(), c.ID, msg.DialogID);
-			err == nil && access {
-			c.log.Infof("join ws successful")
-			c.Join(msg.DialogID)
-		}
+		//if access, err := c.db.UserRepo.IsUserInDialog(context.Background(), c.ID, msg.DialogID);
+		//	err == nil && access {
+		c.log.Infof("join ws successful")
+		c.Join(msg.DialogID)
+		//}
 	case "leave":
-		if access, err := c.db.UserRepo.IsUserInDialog(context.Background(), c.ID, msg.DialogID);
-			err == nil && access {
+		if access, err := c.db.UserRepo.IsUserInDialog(context.Background(), c.ID, msg.DialogID); err == nil && access {
 			c.Leave(msg.DialogID)
 		}
 	case "joined":
@@ -80,26 +79,26 @@ func HandleData(c *Conn, msg *Message) {
 		}
 	default:
 		if msg.DialogID != "" {
-			//	c.log.Infof("Write in dialog")
-			//	RoomManager.Lock()
-			//	room, rok := RoomManager.Rooms[msg.DialogID]
-			//	RoomManager.Unlock()
-			//	if rok == false {
-			//		break
-			//	}
-			//
-			//	room.Lock()
-			//	for id, _ := range room.Members {
-			//		ConnManager.Lock()
-			//		dst, cok := ConnManager.Conns[id]
-			//		ConnManager.Unlock()
-			//		if cok == false {
-			//			continue
-			//		}
-			//		dst.Send <- msg
-			//	}
-			//	room.Unlock()
-			//} else {
+			c.log.Infof("Write in dialog")
+			RoomManager.Lock()
+			room, rok := RoomManager.Rooms[msg.DialogID]
+			RoomManager.Unlock()
+			if rok == false {
+				break
+			}
+
+			room.Lock()
+			for id, _ := range room.Members {
+				ConnManager.Lock()
+				dst, cok := ConnManager.Conns[id]
+				ConnManager.Unlock()
+				if cok == false {
+					continue
+				}
+				dst.Send <- msg
+			}
+			room.Unlock()
+		} else {
 			c.Emit(msg)
 		}
 	}
