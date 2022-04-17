@@ -29,8 +29,9 @@ type UserRepository interface {
 
 	SelectUsers(ctx context.Context, selector string) ([]core.User, error)
 
-	AddDialog(ctx context.Context, dialogID string, UserID string) error
+	AddDialog(ctx context.Context, dialogID string, userID string) error
 	GetUserDialogs(ctx context.Context, userID string) ([]string, error)
+	UserCheckDialog(ctx context.Context, dialogID string, userID string) error
 }
 
 type userRepositoryImpl struct {
@@ -165,6 +166,14 @@ func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string
 func (repo *userRepositoryImpl) AddDialog(ctx context.Context, dialogID string, userID string) error {
 	if _, err := repo.coll.UpdateByID(ctx, userID, bson.M{"$push": bson.D{{Key: "dialog_ids", Value: dialogID}}}); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (repo *userRepositoryImpl) UserCheckDialog(ctx context.Context, dialogID string, userID string) error {
+	filter := bson.M{"_id": userID, "dialog_ids": dialogID}
+	if err := repo.coll.FindOne(ctx, filter).Err(); err == mongo.ErrNoDocuments {
+		return constants.ErrDBNotFound
 	}
 	return nil
 }

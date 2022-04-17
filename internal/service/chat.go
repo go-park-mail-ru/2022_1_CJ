@@ -43,6 +43,11 @@ func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.Creat
 		return nil, err
 	}
 
+	if err := svc.db.UserRepo.AddDialog(ctx, dialog.ID, request.UserID); err != nil {
+		svc.log.Errorf("AddDialog error: %s", err)
+		return nil, err
+	}
+
 	svc.log.Debug("Create dialog success")
 	for _, id := range request.AuthorIDs {
 		if err := svc.db.UserRepo.AddDialog(ctx, dialog.ID, id); err != nil {
@@ -114,22 +119,9 @@ func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDial
 }
 
 func (svc *chatServiceImpl) GetDialog(ctx context.Context, request *dto.GetDialogRequest) (*dto.GetDialogResponse, error) {
-	ids, err := svc.db.UserRepo.GetUserDialogs(ctx, request.UserID)
+	err := svc.db.UserRepo.UserCheckDialog(ctx, request.DialogID, request.UserID)
 	if err != nil {
-		svc.log.Errorf("GetUserDialogs error: %s", err)
-		return nil, err
-	}
-
-	check := func(s []string, str string) bool {
-		for _, v := range s {
-			if v == str {
-				return true
-			}
-		}
-		return false
-	}
-	if isHave := check(ids, request.DialogID); isHave != true {
-		svc.log.Errorf("User don't have dialog")
+		svc.log.Errorf("Don't found in db")
 		return nil, constants.ErrDBNotFound
 	}
 
