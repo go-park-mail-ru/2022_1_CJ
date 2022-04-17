@@ -6,7 +6,7 @@ import (
 )
 
 func Dialog2DTO(dialog *core.Dialog, userID string) dto.Dialog {
-	participants := make([]string, 0)
+	var participants []string
 	for _, id := range dialog.Participants {
 		if id != userID {
 			participants = append(participants, id)

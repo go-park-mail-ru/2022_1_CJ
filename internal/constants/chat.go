@@ -19,6 +19,9 @@ const (
 	SendChat   = "send"
 	ReadChat   = "read"
 	Empty      = ""
+
+	ErrChat           = "error"
+	ErrChatDoNotExist = "room does not exit"
 )
 
 var Upgrader = websocket.Upgrader{

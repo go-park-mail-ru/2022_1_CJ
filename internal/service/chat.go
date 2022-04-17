@@ -17,6 +17,7 @@ type ChatService interface {
 
 	SendMessage(ctx context.Context, request *dto.SendMessageRequest) (*dto.SendMessageResponse, error)
 	ReadMessage(ctx context.Context, request *dto.ReadMessageRequest) (*dto.ReadMessageResponse, error)
+	CheckDialog(ctx context.Context, request *dto.CheckDialogRequest) error
 }
 
 type chatServiceImpl struct {
@@ -116,6 +117,15 @@ func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDial
 		dialogs = append(dialogs, convert.Dialog2DTO(dInf, request.UserID))
 	}
 	return &dto.GetDialogsResponse{Dialogs: dialogs}, err
+}
+
+func (svc *chatServiceImpl) CheckDialog(ctx context.Context, request *dto.CheckDialogRequest) error {
+	err := svc.db.UserRepo.UserCheckDialog(ctx, request.DialogID, request.UserID)
+	if err != nil {
+		svc.log.Errorf("Don't found in db")
+		return constants.ErrDBNotFound
+	}
+	return nil
 }
 
 func (svc *chatServiceImpl) GetDialog(ctx context.Context, request *dto.GetDialogRequest) (*dto.GetDialogResponse, error) {

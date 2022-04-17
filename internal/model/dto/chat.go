@@ -63,3 +63,8 @@ type GetDialogResponse struct {
 	Dialog   Dialog        `json:"dialog"`
 	Messages []MessageInfo `json:"messages"`
 }
+
+type CheckDialogRequest struct {
+	UserID   string `json:"user_id"`
+	DialogID string `json:"dialog_id"`
+}
