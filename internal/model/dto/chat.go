@@ -2,11 +2,13 @@ package dto
 
 // Message for chat for wb
 type Message struct {
-	DialogID string `json:"dialog_id"`
-	Event    string `json:"event"`
-	AuthorID string `json:"author_id"`
-	DestinID string `json:"dst,omitempty"`
-	Body     string `json:"body"`
+	ID        string `json:"_id"`
+	DialogID  string `json:"dialog_id"`
+	Event     string `json:"event"`
+	AuthorID  string `json:"author_id"`
+	DestinID  string `json:"dst,omitempty"`
+	Body      string `json:"body"`
+	CreatedAt int64  `json:"created_at"`
 }
 
 // Message for chat for giving
@@ -37,6 +39,12 @@ type SendMessageRequest struct {
 }
 
 type SendMessageResponse struct{}
+
+type ReadMessageRequest struct {
+	Message Message `json:"message"`
+}
+
+type ReadMessageResponse struct{}
 
 type GetDialogsRequest struct {
 	UserID string `json:"user_id"`

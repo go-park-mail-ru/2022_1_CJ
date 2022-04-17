@@ -13,7 +13,8 @@ type ChatRepository interface {
 	IsUniqDialog(ctx context.Context, firstUserID string, secondUserID string) error
 	CreateDialog(ctx context.Context, userID string, authorIDs []string) (*core.Dialog, error)
 	IsChatExist(ctx context.Context, dialogID string) error
-	SendMessage(ctx context.Context, message *core.Message, dialogID string) error
+	SendMessage(ctx context.Context, message core.Message, dialogID string) error
+	ReadMessage(ctx context.Context, messageID string, dialogID string) error
 	GetDialogByID(ctx context.Context, dialogID string) (*core.Dialog, error)
 }
 
@@ -55,13 +56,20 @@ func (repo *chatRepositoryImpl) IsChatExist(ctx context.Context, dialogID string
 	return nil
 }
 
-func (repo *chatRepositoryImpl) SendMessage(ctx context.Context, message *core.Message, authorID string) error {
-	if err := initNewMessage(message); err != nil {
+func (repo *chatRepositoryImpl) SendMessage(ctx context.Context, message core.Message, dialogID string) error {
+	update := bson.M{"$push": bson.D{{Key: "messages", Value: message}}}
+
+	if _, err := repo.coll.UpdateByID(ctx, dialogID, update); err != nil {
 		return err
 	}
-	update := bson.D{{"$put", message}}
-	if _, err := repo.coll.UpdateByID(ctx, authorID, update); err != nil {
-		return err
+	return nil
+}
+
+func (repo *chatRepositoryImpl) ReadMessage(ctx context.Context, messageID string, dialogID string) error {
+	filter := bson.M{"_id": dialogID, "messages._id": messageID}
+	update := bson.M{"$set": bson.D{{Key: "messages.$.is_read", Value: true}}}
+	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
+		return wrapError(err)
 	}
 	return nil
 }
@@ -85,16 +93,6 @@ func initDialog(dialog *core.Dialog, userID string, authorIDs []string) error {
 	for _, authorID := range authorIDs {
 		dialog.Participants = append(dialog.Participants, authorID)
 	}
-	return nil
-}
-
-func initNewMessage(msg *core.Message) error {
-	msgID, err := core.GenUUID()
-	if err != nil {
-		return err
-	}
-	msg.ID = msgID
-	msg.CreatedAt = time.Now().Unix()
 	return nil
 }
 

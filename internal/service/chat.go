@@ -12,10 +12,11 @@ import (
 
 type ChatService interface {
 	CreateDialog(ctx context.Context, request *dto.CreateDialogRequest) (*dto.CreateDialogResponse, error)
-	SendMessage(ctx context.Context, request *dto.SendMessageRequest) (*dto.SendMessageResponse, error)
 	GetDialogs(ctx context.Context, request *dto.GetDialogsRequest) (*dto.GetDialogsResponse, error)
-
 	GetDialog(ctx context.Context, request *dto.GetDialogRequest) (*dto.GetDialogResponse, error)
+
+	SendMessage(ctx context.Context, request *dto.SendMessageRequest) (*dto.SendMessageResponse, error)
+	ReadMessage(ctx context.Context, request *dto.ReadMessageRequest) (*dto.ReadMessageResponse, error)
 }
 
 type chatServiceImpl struct {
@@ -43,11 +44,6 @@ func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.Creat
 	}
 
 	svc.log.Debug("Create dialog success")
-	if err := svc.db.UserRepo.AddDialog(ctx, dialog.ID, request.UserID); err != nil {
-		svc.log.Errorf("AddDialog error: %s", err)
-		return nil, err
-	}
-
 	for _, id := range request.AuthorIDs {
 		if err := svc.db.UserRepo.AddDialog(ctx, dialog.ID, id); err != nil {
 			svc.log.Errorf("AddDialog error: %s", err)
@@ -61,8 +57,12 @@ func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.Creat
 // Сделать получатель всех чатов
 
 func (svc *chatServiceImpl) SendMessage(ctx context.Context, request *dto.SendMessageRequest) (*dto.SendMessageResponse, error) {
-	message := &core.Message{Body: request.Message.Body,
-		AuthorID: request.Message.AuthorID, IsRead: false}
+	message := core.Message{
+		Body:      request.Message.Body,
+		AuthorID:  request.Message.AuthorID,
+		IsRead:    false,
+		ID:        request.Message.ID,
+		CreatedAt: request.Message.CreatedAt}
 
 	svc.log.Debugf("Text: %s; DialogID: %s; AuthorID: %s", message.Body, request.Message.DialogID, message.AuthorID)
 
@@ -78,6 +78,22 @@ func (svc *chatServiceImpl) SendMessage(ctx context.Context, request *dto.SendMe
 
 	svc.log.Debug("Message was sent successful")
 	return &dto.SendMessageResponse{}, nil
+}
+
+func (svc *chatServiceImpl) ReadMessage(ctx context.Context, request *dto.ReadMessageRequest) (*dto.ReadMessageResponse, error) {
+
+	if err := svc.db.ChatRepo.IsChatExist(ctx, request.Message.DialogID); err != nil {
+		svc.log.Errorf("Chat not exist error: %s", err)
+		return nil, err
+	}
+
+	if err := svc.db.ChatRepo.ReadMessage(ctx, request.Message.Body, request.Message.DialogID); err != nil {
+		svc.log.Errorf("SendMessage error: %s", err)
+		return nil, err
+	}
+
+	svc.log.Debug("Message was sent successful")
+	return &dto.ReadMessageResponse{}, nil
 }
 
 func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDialogsRequest) (*dto.GetDialogsResponse, error) {

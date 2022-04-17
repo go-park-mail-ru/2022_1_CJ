@@ -29,7 +29,7 @@ func Message2DTO(messages core.Message) dto.MessageInfo {
 }
 
 func Messages2DTO(messages []core.Message) []dto.MessageInfo {
-	result := make([]dto.MessageInfo, 0)
+	var result []dto.MessageInfo
 	for _, message := range messages {
 		result = append(result, Message2DTO(message))
 	}

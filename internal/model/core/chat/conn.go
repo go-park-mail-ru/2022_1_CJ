@@ -1,12 +1,13 @@
 package chat
 
 import (
+	"context"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
-	"net/http"
 	"sync"
 	"time"
 
@@ -20,7 +21,7 @@ type Conn struct {
 	ID      string
 	Send    chan dto.Message
 	Dialogs map[string]string
-	db      *db.Repository
+	reg     *service.Registry
 	log     *logrus.Entry
 }
 
@@ -78,9 +79,26 @@ func HandleData(c *Conn, msg *dto.Message) {
 			if cok == false {
 				break
 			}
-			dst.Send <- *msg
+			if msg.Body != constants.Empty {
+				_, err := c.reg.ChatService.ReadMessage(context.Background(), &dto.ReadMessageRequest{Message: *msg})
+				if err != nil {
+					return
+				}
+				dst.Send <- *msg
+			}
 		}
 	case constants.SendChat:
+		msgID, err := core.GenUUID()
+		if err != nil {
+			break
+		}
+		msg.ID = msgID
+		msg.CreatedAt = time.Now().Unix()
+
+		_, err = c.reg.ChatService.SendMessage(context.Background(), &dto.SendMessageRequest{Message: *msg})
+		if err != nil {
+			return
+		}
 		c.Emit(msg)
 	default:
 		return
@@ -112,6 +130,7 @@ func (c *Conn) readPump() {
 		var data dto.Message
 		err := c.Socket.ReadJSON(&data)
 		data.AuthorID = c.ID
+
 		if err != nil {
 			if _, wok := err.(*websocket.CloseError); wok == false {
 				break
@@ -217,9 +236,8 @@ func (c *Conn) Emit(msg *dto.Message) {
 }
 
 // Upgrades an HTTP connection and creates a new Conn type.
-func NewConnection(w http.ResponseWriter, r *http.Request, log *logrus.Entry,
-	repo *db.Repository, userID string) *Conn {
-	socket, err := constants.Upgrader.Upgrade(w, r, nil)
+func NewConnection(ctx *echo.Context, log *logrus.Entry, registry *service.Registry, userID string) *Conn {
+	socket, err := constants.Upgrader.Upgrade((*ctx).Response(), (*ctx).Request(), nil)
 	if err != nil {
 		return nil
 	}
@@ -229,7 +247,7 @@ func NewConnection(w http.ResponseWriter, r *http.Request, log *logrus.Entry,
 		Send:    make(chan dto.Message),
 		Dialogs: make(map[string]string),
 		log:     log,
-		db:      repo,
+		reg:     registry,
 	}
 	ConnManager.Lock()
 	ConnManager.Conns[c.ID] = c
@@ -238,8 +256,8 @@ func NewConnection(w http.ResponseWriter, r *http.Request, log *logrus.Entry,
 }
 
 // Calls NewConnection, starts the returned Conn's writer, joins the root room, and finally starts the Conn's reader.
-func SocketHandler(ctx echo.Context, log *logrus.Entry, repo *db.Repository, request *dto.CreateDialogRequest) error {
-	c := NewConnection(ctx.Response(), ctx.Request(), log, repo, request.UserID)
+func SocketHandler(ctx *echo.Context, log *logrus.Entry, registry *service.Registry, userID string) error {
+	c := NewConnection(ctx, log, registry, userID)
 	if c != nil {
 		go c.writePump()
 		//c.Join("root")
