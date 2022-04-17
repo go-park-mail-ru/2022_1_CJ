@@ -2,11 +2,12 @@ package chat
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
-	"net/http"
 	"sync"
 	"time"
 
@@ -16,25 +17,12 @@ import (
 // The Conn type represents a single client.
 type Conn struct {
 	sync.Mutex
-	Socket *websocket.Conn
-	ID     string
-	Send   chan *Message
-	Rooms  map[string]string
-	db     *db.Repository
-	log    *logrus.Entry
-}
-
-const (
-	writeWait      = 10 * time.Second
-	pongWait       = 1200 * time.Second
-	pingPeriod     = pongWait * 9 / 10
-	maxMessageSize = 1024 * 1024 * 1024
-)
-
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  4096,
-	WriteBufferSize: 4096,
-	CheckOrigin:     func(r *http.Request) bool { return true },
+	Socket  *websocket.Conn
+	ID      string
+	Send    chan dto.Message
+	Dialogs map[string]string
+	reg     *service.Registry
+	log     *logrus.Entry
 }
 
 var (
@@ -48,25 +36,19 @@ var (
 )
 
 // Handles incoming, error free messages.
-func HandleData(c *Conn, msg *Message) {
+func HandleData(c *Conn, msg *dto.Message) {
 	switch msg.Event {
-	case "join":
-		//if access, err := c.db.UserRepo.IsUserInDialog(context.Background(), c.ID, msg.DialogID);
-		//	err == nil && access {
-		c.log.Infof("join ws successful")
+	case constants.JoinChat:
 		c.Join(msg.DialogID)
-		//}
-	case "leave":
-		if access, err := c.db.UserRepo.IsUserInDialog(context.Background(), c.ID, msg.DialogID); err == nil && access {
-			c.Leave(msg.DialogID)
-		}
-	case "joined":
+	case constants.LeaveChat:
+		c.Leave(msg.DialogID)
+	case constants.JoinedChat:
 		c.Emit(msg)
-	case "left":
+	case constants.LeftChat:
 		c.Emit(msg)
-		RoomManager.Lock()
-		room, ok := RoomManager.Rooms[msg.DialogID]
-		RoomManager.Unlock()
+		DialogManager.Lock()
+		room, ok := DialogManager.Rooms[msg.DialogID]
+		DialogManager.Unlock()
 		if ok == false {
 			break
 		}
@@ -77,41 +59,59 @@ func HandleData(c *Conn, msg *Message) {
 		if members == 0 {
 			room.Stop()
 		}
-	default:
-		if msg.DialogID != "" {
-			c.log.Infof("Write in dialog")
-			RoomManager.Lock()
-			room, rok := RoomManager.Rooms[msg.DialogID]
-			RoomManager.Unlock()
+	case constants.ReadChat:
+		if msg.DestinID != constants.Empty {
+			DialogManager.Lock()
+			room, rok := DialogManager.Rooms[msg.DialogID]
+			DialogManager.Unlock()
 			if rok == false {
 				break
 			}
-
 			room.Lock()
-			for id, _ := range room.Members {
-				ConnManager.Lock()
-				dst, cok := ConnManager.Conns[id]
-				ConnManager.Unlock()
-				if cok == false {
-					continue
-				}
-				dst.Send <- msg
-			}
+			id, mok := room.Members[msg.DestinID]
 			room.Unlock()
-		} else {
-			c.Emit(msg)
+			if mok == false {
+				break
+			}
+			ConnManager.Lock()
+			dst, cok := ConnManager.Conns[id]
+			ConnManager.Unlock()
+			if cok == false {
+				break
+			}
+			if msg.Body != constants.Empty {
+				_, err := c.reg.ChatService.ReadMessage(context.Background(), &dto.ReadMessageRequest{Message: *msg})
+				if err != nil {
+					return
+				}
+				dst.Send <- *msg
+			}
 		}
+	case constants.SendChat:
+		msgID, err := core.GenUUID()
+		if err != nil {
+			break
+		}
+		msg.ID = msgID
+		msg.CreatedAt = time.Now().Unix()
+
+		_, err = c.reg.ChatService.SendMessage(context.Background(), &dto.SendMessageRequest{Message: *msg})
+		if err != nil {
+			return
+		}
+		c.Emit(msg)
+	default:
+		return
 	}
 }
-
 func (c *Conn) readPump() {
 	defer func() {
 		c.Lock()
-		for id := range c.Rooms {
+		for name := range c.Dialogs {
 			c.Unlock()
-			RoomManager.Lock()
-			room, ok := RoomManager.Rooms[id]
-			RoomManager.Unlock()
+			DialogManager.Lock()
+			room, ok := DialogManager.Rooms[name]
+			DialogManager.Unlock()
 			if ok == true {
 				room.Leave(c)
 			}
@@ -120,31 +120,32 @@ func (c *Conn) readPump() {
 		c.Unlock()
 		c.Socket.Close()
 	}()
-	c.Socket.SetReadLimit(maxMessageSize)
-	c.Socket.SetReadDeadline(time.Now().Add(pongWait))
+	c.Socket.SetReadLimit(constants.MaxMessageSize)
+	c.Socket.SetReadDeadline(time.Now().Add(constants.PongWait))
 	c.Socket.SetPongHandler(func(string) error {
-		c.Socket.SetReadDeadline(time.Now().Add(pongWait))
+		c.Socket.SetReadDeadline(time.Now().Add(constants.PongWait))
 		return nil
 	})
 	for {
-		data := new(Message)
+		var data dto.Message
 		err := c.Socket.ReadJSON(&data)
-		c.log.Infof("readPump smth: %s", data.Event)
+		data.AuthorID = c.ID
+
 		if err != nil {
 			if _, wok := err.(*websocket.CloseError); wok == false {
 				break
 			}
 			c.Lock()
-			for id := range c.Rooms {
+			for name := range c.Dialogs {
 				c.Unlock()
-				RoomManager.Lock()
-				room, rok := RoomManager.Rooms[id]
-				RoomManager.Unlock()
+				DialogManager.Lock()
+				room, rok := DialogManager.Rooms[name]
+				DialogManager.Unlock()
 				if rok == false {
 					c.Lock()
 					continue
 				}
-				room.Emit(c, ConstructMessage(id, "left", "", c.ID, []byte(c.ID)))
+				room.Emit(c, ConstructMessage(name, constants.LeftChat, c.ID, constants.Empty, c.ID))
 				room.Lock()
 				delete(room.Members, c.ID)
 				members := len(room.Members)
@@ -157,17 +158,17 @@ func (c *Conn) readPump() {
 			c.Unlock()
 			break
 		}
-		HandleData(c, data)
+		HandleData(c, &data)
 	}
 }
 
 func (c *Conn) write(mt int, payload []byte) error {
-	//c.Socket.WriteJSON()
+	c.Socket.SetWriteDeadline(time.Now().Add(constants.WriteWait))
 	return c.Socket.WriteMessage(mt, payload)
 }
 
 func (c *Conn) writePump() {
-	ticker := time.NewTicker(pingPeriod)
+	ticker := time.NewTicker(constants.PingPeriod)
 	defer func() {
 		ticker.Stop()
 		c.Socket.Close()
@@ -175,21 +176,13 @@ func (c *Conn) writePump() {
 	for {
 		select {
 		case msg, ok := <-c.Send:
-			c.log.Infof("writePump smth: %s", msg)
 			if ok == false {
 				c.write(websocket.CloseMessage, []byte{})
 				return
 			}
-			//bytes, err := json.Marshal(msg)
-			//if err != nil {
-			//	c.write(websocket.CloseMessage, []byte{})
-			//	return
-			//}
 			if err := c.Socket.WriteJSON(msg); err != nil {
-				c.log.Errorf("error write: %s", err)
 				return
 			}
-
 		case <-ticker.C:
 			if err := c.write(websocket.PingMessage, []byte{}); err != nil {
 				return
@@ -198,65 +191,63 @@ func (c *Conn) writePump() {
 	}
 }
 
-// Adds the Conn to a Room. If the Room does not exist, it is created.
-func (c *Conn) Join(id string) {
-	RoomManager.Lock()
-	room, ok := RoomManager.Rooms[id]
-	RoomManager.Unlock()
+// Adds the Conn to a Dialog. If the Dialog does not exist, it is created.
+func (c *Conn) Join(name string) {
+	DialogManager.Lock()
+	room, ok := DialogManager.Rooms[name]
+	DialogManager.Unlock()
 	if ok == false {
-		room = NewRoom(id)
+		room = NewRoom(name)
 	}
 	c.Lock()
-	c.Rooms[id] = id
+	c.Dialogs[name] = name
 	c.Unlock()
 	room.Join(c)
 }
 
-// Removes the Conn from a Room.
-func (c *Conn) Leave(id string) {
-	c.log.Infof("leave conn method with id: %s", id)
-	RoomManager.Lock()
-	room, rok := RoomManager.Rooms[id]
-	RoomManager.Unlock()
+// Removes the Conn from a Dialog.
+func (c *Conn) Leave(name string) {
+	DialogManager.Lock()
+	room, rok := DialogManager.Rooms[name]
+	DialogManager.Unlock()
 	if rok == false {
 		return
 	}
 	c.Lock()
-	_, cok := c.Rooms[id]
+	_, cok := c.Dialogs[name]
 	c.Unlock()
 	if cok == false {
 		return
 	}
 	c.Lock()
-	delete(c.Rooms, id)
+	delete(c.Dialogs, name)
 	c.Unlock()
 	room.Leave(c)
 }
 
-// Broadcasts a Message to all members of a Room.
-func (c *Conn) Emit(msg *Message) {
-	RoomManager.Lock()
-	room, ok := RoomManager.Rooms[msg.DialogID]
-	RoomManager.Unlock()
+// Broadcasts a Message to all members of a Dialog.
+func (c *Conn) Emit(msg *dto.Message) {
+	DialogManager.Lock()
+	room, ok := DialogManager.Rooms[msg.DialogID]
+	DialogManager.Unlock()
 	if ok == true {
 		room.Emit(c, msg)
 	}
 }
 
 // Upgrades an HTTP connection and creates a new Conn type.
-func NewConnection(w http.ResponseWriter, r *http.Request, log *logrus.Entry,
-	repo *db.Repository, userID string) *Conn {
-	socket, err := upgrader.Upgrade(w, r, nil)
+func NewConnection(ctx *echo.Context, log *logrus.Entry, registry *service.Registry, userID string) *Conn {
+	socket, err := constants.Upgrader.Upgrade((*ctx).Response(), (*ctx).Request(), nil)
 	if err != nil {
 		return nil
 	}
 	c := &Conn{
-		Socket: socket,
-		ID:     userID,
-		Send:   make(chan *Message, 10),
-		Rooms:  make(map[string]string),
-		log:    log,
-		db:     repo,
+		Socket:  socket,
+		ID:      userID,
+		Send:    make(chan dto.Message),
+		Dialogs: make(map[string]string),
+		log:     log,
+		reg:     registry,
 	}
 	ConnManager.Lock()
 	ConnManager.Conns[c.ID] = c
@@ -265,12 +256,10 @@ func NewConnection(w http.ResponseWriter, r *http.Request, log *logrus.Entry,
 }
 
 // Calls NewConnection, starts the returned Conn's writer, joins the root room, and finally starts the Conn's reader.
-func SocketHandler(ctx echo.Context, log *logrus.Entry, repo *db.Repository, request *dto.CreateDialogRequest) error {
-	c := NewConnection(ctx.Response(), ctx.Request(), log, repo, request.UserID)
+func SocketHandler(ctx *echo.Context, log *logrus.Entry, registry *service.Registry, userID string) error {
+	c := NewConnection(ctx, log, registry, userID)
 	if c != nil {
 		go c.writePump()
-		// Запускаем для отладки рут
-		//c.Join("root")
 		go c.readPump()
 		c.log.Infof("new user: %s", c.ID)
 	}
