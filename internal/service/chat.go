@@ -51,9 +51,11 @@ func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.Creat
 
 	svc.log.Debug("Create dialog success")
 	for _, id := range request.AuthorIDs {
-		if err := svc.db.UserRepo.AddDialog(ctx, dialog.ID, id); err != nil {
-			svc.log.Errorf("AddDialog error: %s", err)
-			return nil, err
+		if id != request.UserID {
+			if err := svc.db.UserRepo.AddDialog(ctx, dialog.ID, id); err != nil {
+				svc.log.Errorf("AddDialog error: %s", err)
+				return nil, err
+			}
 		}
 	}
 	svc.log.Debug("Add dialog to users success")
@@ -63,19 +65,25 @@ func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.Creat
 // Сделать получатель всех чатов
 
 func (svc *chatServiceImpl) SendMessage(ctx context.Context, request *dto.SendMessageRequest) (*dto.SendMessageResponse, error) {
+	dialog, err := svc.db.ChatRepo.GetDialogByID(ctx, request.Message.DialogID)
+	if err != nil {
+		svc.log.Errorf("Chat not exist error: %s", err)
+		return nil, err
+	}
+
+	var isRead []core.IsRead
+	for _, id := range dialog.Participants {
+		isRead = append(isRead, core.IsRead{Participant: id, IsRead: false})
+	}
+
 	message := core.Message{
 		Body:      request.Message.Body,
 		AuthorID:  request.Message.AuthorID,
-		IsRead:    false,
+		IsRead:    isRead,
 		ID:        request.Message.ID,
 		CreatedAt: request.Message.CreatedAt}
 
 	svc.log.Debugf("Text: %s; DialogID: %s; AuthorID: %s", message.Body, request.Message.DialogID, message.AuthorID)
-
-	if err := svc.db.ChatRepo.IsChatExist(ctx, request.Message.DialogID); err != nil {
-		svc.log.Errorf("Chat not exist error: %s", err)
-		return nil, err
-	}
 
 	if err := svc.db.ChatRepo.SendMessage(ctx, message, request.Message.DialogID); err != nil {
 		svc.log.Errorf("SendMessage error: %s", err)
@@ -93,7 +101,7 @@ func (svc *chatServiceImpl) ReadMessage(ctx context.Context, request *dto.ReadMe
 		return nil, err
 	}
 
-	if err := svc.db.ChatRepo.ReadMessage(ctx, request.Message.Body, request.Message.DialogID); err != nil {
+	if err := svc.db.ChatRepo.ReadMessage(ctx, request.Message.AuthorID, request.Message.Body, request.Message.DialogID); err != nil {
 		svc.log.Errorf("SendMessage error: %s", err)
 		return nil, err
 	}
@@ -120,7 +128,13 @@ func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDial
 }
 
 func (svc *chatServiceImpl) CheckDialog(ctx context.Context, request *dto.CheckDialogRequest) error {
-	err := svc.db.UserRepo.UserCheckDialog(ctx, request.DialogID, request.UserID)
+	dialog, err := svc.db.ChatRepo.GetDialogByID(ctx, request.DialogID)
+	if err != nil {
+		svc.log.Errorf("GetDialogInfo error: %s", err)
+	}
+
+	svc.log.Info("Dialog: %s in User: %s", request.DialogID, request.UserID)
+	err = svc.db.UserRepo.UserCheckDialog(ctx, dialog.ID, request.UserID)
 	if err != nil {
 		svc.log.Errorf("Don't found in db")
 		return constants.ErrDBNotFound

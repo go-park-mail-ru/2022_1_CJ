@@ -14,7 +14,7 @@ type ChatRepository interface {
 	CreateDialog(ctx context.Context, userID string, authorIDs []string) (*core.Dialog, error)
 	IsChatExist(ctx context.Context, dialogID string) error
 	SendMessage(ctx context.Context, message core.Message, dialogID string) error
-	ReadMessage(ctx context.Context, messageID string, dialogID string) error
+	ReadMessage(ctx context.Context, userID string, messageID string, dialogID string) error
 	GetDialogByID(ctx context.Context, dialogID string) (*core.Dialog, error)
 }
 
@@ -41,7 +41,7 @@ func (repo *chatRepositoryImpl) IsUniqDialog(ctx context.Context, firstUserID st
 
 func (repo *chatRepositoryImpl) CreateDialog(ctx context.Context, userID string, authorIDs []string) (*core.Dialog, error) {
 	dialog := new(core.Dialog)
-	if err := initDialog(dialog, userID, authorIDs); err != nil {
+	if err := repo.initDialog(dialog, userID, authorIDs); err != nil {
 		return nil, err
 	}
 	_, err := repo.coll.InsertOne(ctx, dialog)
@@ -65,9 +65,20 @@ func (repo *chatRepositoryImpl) SendMessage(ctx context.Context, message core.Me
 	return nil
 }
 
-func (repo *chatRepositoryImpl) ReadMessage(ctx context.Context, messageID string, dialogID string) error {
+// TODO don't work correctly!!!!!!!!!Broke the dialog
+func (repo *chatRepositoryImpl) ReadMessage(ctx context.Context, userID string, messageID string, dialogID string) error {
+	message := new(core.Message)
 	filter := bson.M{"_id": dialogID, "messages._id": messageID}
-	update := bson.M{"$set": bson.D{{Key: "messages.$.is_read", Value: true}}}
+	err := repo.coll.FindOne(ctx, filter).Decode(message)
+	if err != nil {
+		return wrapError(err)
+	}
+	for i, id := range message.IsRead {
+		if id.Participant == userID {
+			message.IsRead[i].IsRead = true
+		}
+	}
+	update := bson.M{"$set": bson.D{{Key: "messages.$.is_participants_read", Value: message}}}
 	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
 		return wrapError(err)
 	}
@@ -81,7 +92,7 @@ func (repo *chatRepositoryImpl) GetDialogByID(ctx context.Context, DialogID stri
 	return dialog, wrapError(err)
 }
 
-func initDialog(dialog *core.Dialog, userID string, authorIDs []string) error {
+func (repo *chatRepositoryImpl) initDialog(dialog *core.Dialog, userID string, authorIDs []string) error {
 	id, err := core.GenUUID()
 	if err != nil {
 		return err

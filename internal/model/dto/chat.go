@@ -1,5 +1,7 @@
 package dto
 
+import "github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
+
 // Message for chat for wb
 type Message struct {
 	ID        string `json:"_id"`
@@ -13,10 +15,10 @@ type Message struct {
 
 // Message for chat for giving
 type MessageInfo struct {
-	AuthorID  string `json:"author_id"`
-	Body      string `json:"body"`
-	IsRead    bool   `json:"is_read"`
-	CreatedAt int64  `json:"created_at"`
+	AuthorID  string        `json:"author_id"`
+	Body      string        `json:"body"`
+	IsRead    []core.IsRead `json:"is_read"`
+	CreatedAt int64         `json:"created_at"`
 }
 
 type Dialog struct {
