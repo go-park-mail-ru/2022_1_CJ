@@ -17,7 +17,7 @@ type Message struct {
 type MessageInfo struct {
 	AuthorID  string        `json:"author_id"`
 	Body      string        `json:"body"`
-	IsRead    []core.IsRead `json:"is_read"`
+	IsRead    []core.IsRead `json:"is_read,omitempty"`
 	CreatedAt int64         `json:"created_at"`
 }
 

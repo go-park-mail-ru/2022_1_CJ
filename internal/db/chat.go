@@ -6,6 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
@@ -67,22 +68,23 @@ func (repo *chatRepositoryImpl) SendMessage(ctx context.Context, message core.Me
 
 // TODO don't work correctly!!!!!!!!!Broke the dialog
 func (repo *chatRepositoryImpl) ReadMessage(ctx context.Context, userID string, messageID string, dialogID string) error {
-	message := new(core.Message)
-	filter := bson.M{"_id": dialogID, "messages._id": messageID}
-	err := repo.coll.FindOne(ctx, filter).Decode(message)
-	if err != nil {
+
+	filter := bson.M{"_id": dialogID}
+
+	update := bson.M{"$set": bson.D{{Key: "messages.$[n1].is_participants_read.$[n2].is_read", Value: true}}}
+	var s []interface{}
+	ch1 := bson.D{{Key: "n1._id", Value: messageID}}
+	ch2 := bson.D{{Key: "n2._id", Value: userID}}
+	s = append(s, ch1)
+	s = append(s, ch2)
+	arrayFilter := options.FindOneAndUpdateOptions{ArrayFilters: &options.ArrayFilters{Filters: s}}
+
+	if err := repo.coll.FindOneAndUpdate(ctx, filter, update, &arrayFilter).Err(); err != nil {
 		return wrapError(err)
 	}
-	for i, id := range message.IsRead {
-		if id.Participant == userID {
-			message.IsRead[i].IsRead = true
-		}
-	}
-	update := bson.M{"$set": bson.D{{Key: "messages.$.is_participants_read", Value: message}}}
-	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
-		return wrapError(err)
-	}
+
 	return nil
+
 }
 
 func (repo *chatRepositoryImpl) GetDialogByID(ctx context.Context, DialogID string) (*core.Dialog, error) {

@@ -73,7 +73,9 @@ func (svc *chatServiceImpl) SendMessage(ctx context.Context, request *dto.SendMe
 
 	var isRead []core.IsRead
 	for _, id := range dialog.Participants {
-		isRead = append(isRead, core.IsRead{Participant: id, IsRead: false})
+		if id != request.Message.AuthorID {
+			isRead = append(isRead, core.IsRead{Participant: id, IsRead: false})
+		}
 	}
 
 	message := core.Message{
@@ -106,7 +108,7 @@ func (svc *chatServiceImpl) ReadMessage(ctx context.Context, request *dto.ReadMe
 		return nil, err
 	}
 
-	svc.log.Debug("Message was sent successful")
+	svc.log.Debug("Message was read successful")
 	return &dto.ReadMessageResponse{}, nil
 }
 
@@ -155,7 +157,7 @@ func (svc *chatServiceImpl) GetDialog(ctx context.Context, request *dto.GetDialo
 		return nil, err
 	}
 
-	return &dto.GetDialogResponse{Dialog: convert.Dialog2DTO(dialog, request.UserID), Messages: convert.Messages2DTO(dialog.Messages)}, err
+	return &dto.GetDialogResponse{Dialog: convert.Dialog2DTO(dialog, request.UserID), Messages: convert.Messages2DTO(dialog.Messages, request.UserID)}, err
 }
 
 func NewChatService(log *logrus.Entry, db *db.Repository) ChatService {

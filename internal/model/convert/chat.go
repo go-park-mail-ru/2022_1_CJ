@@ -19,19 +19,26 @@ func Dialog2DTO(dialog *core.Dialog, userID string) dto.Dialog {
 	}
 }
 
-func Message2DTO(messages core.Message) dto.MessageInfo {
+func Message2DTO(messages core.Message, userID string) dto.MessageInfo {
+	if userID == messages.AuthorID {
+		return dto.MessageInfo{
+			AuthorID:  messages.AuthorID,
+			Body:      messages.Body,
+			IsRead:    messages.IsRead,
+			CreatedAt: messages.CreatedAt,
+		}
+	}
 	return dto.MessageInfo{
 		AuthorID:  messages.AuthorID,
 		Body:      messages.Body,
-		IsRead:    messages.IsRead,
 		CreatedAt: messages.CreatedAt,
 	}
 }
 
-func Messages2DTO(messages []core.Message) []dto.MessageInfo {
+func Messages2DTO(messages []core.Message, userID string) []dto.MessageInfo {
 	var result []dto.MessageInfo
 	for _, message := range messages {
-		result = append(result, Message2DTO(message))
+		result = append(result, Message2DTO(message, userID))
 	}
 	return result
 }
