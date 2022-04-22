@@ -38,7 +38,7 @@ func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.Creat
 		//}
 	}
 
-	dialog, err := svc.db.ChatRepo.CreateDialog(ctx, request.UserID, request.AuthorIDs)
+	dialog, err := svc.db.ChatRepo.CreateDialog(ctx, request.UserID, request.Name, request.AuthorIDs)
 	if err != nil {
 		svc.log.Errorf("CreateDialog error: %s", err)
 		return nil, err

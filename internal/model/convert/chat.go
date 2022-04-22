@@ -6,6 +6,23 @@ import (
 )
 
 func Dialog2DTO(dialog *core.Dialog, userID string) dto.Dialog {
+	nonRead := int64(0)
+	for _, message := range dialog.Messages {
+		if message.AuthorID != userID {
+			for _, id := range message.IsRead {
+				if id.Participant == userID {
+					if id.IsRead == false {
+						nonRead += 1
+					} else {
+						break
+					}
+				}
+			}
+		} else {
+			break
+		}
+	}
+
 	var participants []string
 	for _, id := range dialog.Participants {
 		if id != userID {
@@ -16,22 +33,24 @@ func Dialog2DTO(dialog *core.Dialog, userID string) dto.Dialog {
 		DialogID:     dialog.ID,
 		Name:         dialog.Name,
 		Participants: participants,
+		NonRead:      nonRead,
 	}
 }
 
-func Message2DTO(messages core.Message, userID string) dto.MessageInfo {
-	if userID == messages.AuthorID {
+func Message2DTO(message core.Message, userID string) dto.MessageInfo {
+
+	if userID == message.AuthorID {
 		return dto.MessageInfo{
-			AuthorID:  messages.AuthorID,
-			Body:      messages.Body,
-			IsRead:    messages.IsRead,
-			CreatedAt: messages.CreatedAt,
+			AuthorID:  message.AuthorID,
+			Body:      message.Body,
+			IsRead:    message.IsRead,
+			CreatedAt: message.CreatedAt,
 		}
 	}
 	return dto.MessageInfo{
-		AuthorID:  messages.AuthorID,
-		Body:      messages.Body,
-		CreatedAt: messages.CreatedAt,
+		AuthorID:  message.AuthorID,
+		Body:      message.Body,
+		CreatedAt: message.CreatedAt,
 	}
 }
 

@@ -1,7 +1,7 @@
 package core
 
 type IsRead struct {
-	Participant string `bson:"_id" json:"_id"`
+	Participant string `bson:"_id" json:"id"`
 	IsRead      bool   `bson:"is_read" json:"is_read"`
 }
 

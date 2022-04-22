@@ -12,7 +12,7 @@ import (
 
 type ChatRepository interface {
 	IsUniqDialog(ctx context.Context, firstUserID string, secondUserID string) error
-	CreateDialog(ctx context.Context, userID string, authorIDs []string) (*core.Dialog, error)
+	CreateDialog(ctx context.Context, userID string, name string, authorIDs []string) (*core.Dialog, error)
 	IsChatExist(ctx context.Context, dialogID string) error
 	SendMessage(ctx context.Context, message core.Message, dialogID string) error
 	ReadMessage(ctx context.Context, userID string, messageID string, dialogID string) error
@@ -40,9 +40,9 @@ func (repo *chatRepositoryImpl) IsUniqDialog(ctx context.Context, firstUserID st
 	return nil
 }
 
-func (repo *chatRepositoryImpl) CreateDialog(ctx context.Context, userID string, authorIDs []string) (*core.Dialog, error) {
+func (repo *chatRepositoryImpl) CreateDialog(ctx context.Context, userID string, name string, authorIDs []string) (*core.Dialog, error) {
 	dialog := new(core.Dialog)
-	if err := repo.initDialog(dialog, userID, authorIDs); err != nil {
+	if err := repo.initDialog(dialog, userID, authorIDs, name); err != nil {
 		return nil, err
 	}
 	_, err := repo.coll.InsertOne(ctx, dialog)
@@ -94,14 +94,14 @@ func (repo *chatRepositoryImpl) GetDialogByID(ctx context.Context, DialogID stri
 	return dialog, wrapError(err)
 }
 
-func (repo *chatRepositoryImpl) initDialog(dialog *core.Dialog, userID string, authorIDs []string) error {
+func (repo *chatRepositoryImpl) initDialog(dialog *core.Dialog, userID string, authorIDs []string, name string) error {
 	id, err := core.GenUUID()
 	if err != nil {
 		return err
 	}
 	dialog.CreatedAt = time.Now().Unix()
 	dialog.ID = id
-
+	dialog.Name = name
 	dialog.Participants = append(dialog.Participants, userID)
 	for _, authorID := range authorIDs {
 		dialog.Participants = append(dialog.Participants, authorID)

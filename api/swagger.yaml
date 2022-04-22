@@ -364,6 +364,78 @@ paths:
               schema:
                 $ref: "#/components/schemas/BasicResponse"
 
+  /messenger/dialogs:
+    get:
+      tags:
+        - messenger
+      summary: get all dialogs
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDialogsResponse"
+
+  /messenger/get:
+    post:
+      tags:
+        - messenger
+      summary: get dialog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetDialogRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDialogResponse"
+
+  /messenger/create:
+    post:
+      tags:
+        - messenger
+      summary: create dialog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDialogRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateDialogResponse"
+
+  /messenger/ws:
+    get:
+      tags:
+        - messenger
+      summary: websocket chat
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+
 components:
   parameters:
     userIDParam:
@@ -533,7 +605,44 @@ components:
         users:
           type: array
           items:
-            $ref: "#/components/schemas/User" 
+            $ref: "#/components/schemas/User"
+
+    GetDialogsResponse:
+      properties:
+        dialogs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Dialog"
+
+    GetDialogRequest:
+      properties:
+        dialog_id:
+          type: string
+
+    GetDialogResponse:
+      properties:
+        dialog:
+          $ref: "#/components/schemas/Dialog"
+        messages:
+          description: is read return only for author
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageInfo"
+
+    CreateDialogRequest:
+      properties:
+        name:
+          type: string
+        author_ids:
+          type: array
+          items:
+            type: string
+
+    CreateDialogResponse:
+      properties:
+        dialog_id:
+          type: string
+
 
     # --------------------- Models --------------------- #
 
@@ -627,3 +736,39 @@ components:
               type: array
               items:
                 type: string
+    Dialog:
+      type: object
+      properties:
+        dialog_id:
+          type: string
+        name:
+          type: string
+        non_read:
+          type: integer
+        participants:
+          type: array
+          items:
+            type: string
+
+    MessageInfo:
+      type: object
+      description: is_read return only for user's message
+      properties:
+        author_id:
+          type: string
+        body:
+          type: string
+        created_at:
+          type: integer
+        is_read:
+          type: array
+          items:
+            $ref: "#/components/schemas/IsRead"
+
+    IsRead:
+      type: object
+      properties:
+        id:
+          type: string
+        is_read:
+          type: string

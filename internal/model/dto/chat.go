@@ -25,10 +25,12 @@ type Dialog struct {
 	DialogID     string   `json:"dialog_id"`
 	Name         string   `json:"name"`
 	Participants []string `json:"participants"`
+	NonRead      int64    `json:"non_read"`
 }
 
 type CreateDialogRequest struct {
 	UserID    string   `json:"user_id"`
+	Name      string   `json:"name"`
 	AuthorIDs []string `json:"author_ids"`
 }
 
