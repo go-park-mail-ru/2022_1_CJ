@@ -31,11 +31,14 @@ func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.Creat
 		svc.log.Errorf("%s", constants.ErrSingleChat)
 		return nil, constants.ErrSingleChat
 	case len(request.AuthorIDs) == 1:
-		// TODO: don't correct working IsUniqDialog
-		//if err := svc.db.ChatRepo.IsUniqDialog(ctx, request.UserID, request.AuthorIDs[0]); err != nil {
-		//	svc.log.Errorf("IsUniqDialog error: %s", err)
-		//	return nil, err
-		//}
+		if request.AuthorIDs[0] == request.UserID {
+			svc.log.Errorf("%s", constants.ErrSingleChat)
+			return nil, constants.ErrSingleChat
+		}
+		if err := svc.db.ChatRepo.IsUniqDialog(ctx, request.UserID, request.AuthorIDs[0]); err != nil {
+			svc.log.Errorf("IsUniqDialog error: %s", err)
+			return nil, err
+		}
 	}
 
 	dialog, err := svc.db.ChatRepo.CreateDialog(ctx, request.UserID, request.Name, request.AuthorIDs)
@@ -61,8 +64,6 @@ func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.Creat
 	svc.log.Debug("Add dialog to users success")
 	return &dto.CreateDialogResponse{DialogID: dialog.ID}, nil
 }
-
-// Сделать получатель всех чатов
 
 func (svc *chatServiceImpl) SendMessage(ctx context.Context, request *dto.SendMessageRequest) (*dto.SendMessageResponse, error) {
 	dialog, err := svc.db.ChatRepo.GetDialogByID(ctx, request.Message.DialogID)
@@ -133,6 +134,7 @@ func (svc *chatServiceImpl) CheckDialog(ctx context.Context, request *dto.CheckD
 	dialog, err := svc.db.ChatRepo.GetDialogByID(ctx, request.DialogID)
 	if err != nil {
 		svc.log.Errorf("GetDialogInfo error: %s", err)
+		return err
 	}
 
 	svc.log.Info("Dialog: %s in User: %s", request.DialogID, request.UserID)

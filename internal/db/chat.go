@@ -26,9 +26,9 @@ type chatRepositoryImpl struct {
 
 func (repo *chatRepositoryImpl) IsUniqDialog(ctx context.Context, firstUserID string, secondUserID string) error {
 	filter := bson.M{"$and": bson.A{
-		bson.D{{"author_ids.2", bson.D{{"$exists", false}}}},
-		bson.D{{"author_ids", firstUserID}},
-		bson.D{{"author_ids", secondUserID}},
+		bson.D{{"participants", bson.M{"$size": 2}}},
+		bson.D{{"participants", firstUserID}},
+		bson.D{{"participants", secondUserID}},
 	}}
 	if err := repo.coll.FindOne(ctx, filter).Err(); err != mongo.ErrNoDocuments {
 		if err == nil {
@@ -66,7 +66,6 @@ func (repo *chatRepositoryImpl) SendMessage(ctx context.Context, message core.Me
 	return nil
 }
 
-// TODO don't work correctly!!!!!!!!!Broke the dialog
 func (repo *chatRepositoryImpl) ReadMessage(ctx context.Context, userID string, messageID string, dialogID string) error {
 
 	filter := bson.M{"_id": dialogID}

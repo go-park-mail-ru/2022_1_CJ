@@ -206,9 +206,9 @@ func TestGetProfile(t *testing.T) {
 	gomock.InOrder(
 		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[0].input.UserID).Return(tests[0].resultGetUserByID.user, tests[0].resultGetUserByID.err),
 		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[1].input.UserID).Return(tests[1].resultGetUserByID.user, tests[1].resultGetUserByID.err),
-		testRepo.mockFriensR.EXPECT().GetFriendsByID(ctx, tests[1].resultGetUserByID.user.ID).Return(tests[1].resultGetFriendsByID.friends, tests[1].resultGetFriendsByID.err),
+		testRepo.mockFriendsR.EXPECT().GetFriendsByID(ctx, tests[1].resultGetUserByID.user.ID).Return(tests[1].resultGetFriendsByID.friends, tests[1].resultGetFriendsByID.err),
 		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[2].input.UserID).Return(tests[2].resultGetUserByID.user, tests[2].resultGetUserByID.err),
-		testRepo.mockFriensR.EXPECT().GetFriendsByID(ctx, tests[2].resultGetUserByID.user.ID).Return(tests[2].resultGetFriendsByID.friends, tests[2].resultGetFriendsByID.err),
+		testRepo.mockFriendsR.EXPECT().GetFriendsByID(ctx, tests[2].resultGetUserByID.user.ID).Return(tests[2].resultGetFriendsByID.friends, tests[2].resultGetFriendsByID.err),
 	)
 
 	for _, test := range tests {
