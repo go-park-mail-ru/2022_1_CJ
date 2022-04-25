@@ -10,6 +10,7 @@ func TestUser(t *testing.T) *core.User {
 	t.Helper()
 
 	return &core.User{
+		ID: "123456789",
 		Name: common.UserName{
 			First: "Sasha",
 			Last:  "Userov",
@@ -18,4 +19,10 @@ func TestUser(t *testing.T) *core.User {
 		Image: "src/img.jpg",
 		Phone: "+8(800)-555-35-35",
 	}
+}
+
+func TestUserNull(t *testing.T) *core.User {
+	t.Helper()
+
+	return &core.User{}
 }
