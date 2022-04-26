@@ -27,6 +27,18 @@ func TestUserNull(t *testing.T) *core.User {
 	return &core.User{}
 }
 
+func TestPostNull(t *testing.T) *core.Post {
+	t.Helper()
+
+	return &core.Post{}
+}
+
+func TestDialogNull(t *testing.T) *core.Dialog {
+	t.Helper()
+
+	return &core.Dialog{}
+}
+
 func TestPost(t *testing.T) *core.Post {
 	t.Helper()
 	return &core.Post{
@@ -46,5 +58,16 @@ func TestDialog(t *testing.T) *core.Dialog {
 		Participants: []string{"12345671", "12345672"},
 		Messages:     []core.Message{},
 		CreatedAt:    124565,
+	}
+}
+
+func TestMessage(t *testing.T) *core.Message {
+	t.Helper()
+	return &core.Message{
+		ID:        "12345678",
+		Body:      "hi message",
+		AuthorID:  "12345671",
+		IsRead:    []core.IsRead{{"12345672", false}},
+		CreatedAt: 124565,
 	}
 }

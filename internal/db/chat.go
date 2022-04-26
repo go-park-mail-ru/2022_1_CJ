@@ -24,6 +24,15 @@ type chatRepositoryImpl struct {
 	coll *mongo.Collection
 }
 
+func NewChatRepository(db *mongo.Database) (*chatRepositoryImpl, error) {
+	return &chatRepositoryImpl{db: db, coll: db.Collection("chats")}, nil
+}
+
+// NewUserRepositoryTest for Tests (bad)
+func NewChatRepositoryTest(collection *mongo.Collection) (*chatRepositoryImpl, error) {
+	return &chatRepositoryImpl{coll: collection}, nil
+}
+
 func (repo *chatRepositoryImpl) IsUniqDialog(ctx context.Context, firstUserID string, secondUserID string) error {
 	filter := bson.M{"$and": bson.A{
 		bson.D{{"participants", bson.M{"$size": 2}}},
@@ -42,7 +51,7 @@ func (repo *chatRepositoryImpl) IsUniqDialog(ctx context.Context, firstUserID st
 
 func (repo *chatRepositoryImpl) CreateDialog(ctx context.Context, userID string, name string, authorIDs []string) (*core.Dialog, error) {
 	dialog := new(core.Dialog)
-	if err := repo.initDialog(dialog, userID, authorIDs, name); err != nil {
+	if err := repo.InitDialog(dialog, userID, authorIDs, name); err != nil {
 		return nil, err
 	}
 	_, err := repo.coll.InsertOne(ctx, dialog)
@@ -93,7 +102,7 @@ func (repo *chatRepositoryImpl) GetDialogByID(ctx context.Context, DialogID stri
 	return dialog, wrapError(err)
 }
 
-func (repo *chatRepositoryImpl) initDialog(dialog *core.Dialog, userID string, authorIDs []string, name string) error {
+func (repo *chatRepositoryImpl) InitDialog(dialog *core.Dialog, userID string, authorIDs []string, name string) error {
 	id, err := core.GenUUID()
 	if err != nil {
 		return err
@@ -106,8 +115,4 @@ func (repo *chatRepositoryImpl) initDialog(dialog *core.Dialog, userID string, a
 		dialog.Participants = append(dialog.Participants, authorID)
 	}
 	return nil
-}
-
-func NewChatRepository(db *mongo.Database) (*chatRepositoryImpl, error) {
-	return &chatRepositoryImpl{db: db, coll: db.Collection("chats")}, nil
 }
