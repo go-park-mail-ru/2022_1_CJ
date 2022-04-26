@@ -26,3 +26,25 @@ func TestUserNull(t *testing.T) *core.User {
 
 	return &core.User{}
 }
+
+func TestPost(t *testing.T) *core.Post {
+	t.Helper()
+	return &core.Post{
+		ID:        "12345678",
+		AuthorID:  "123456789",
+		Message:   "Hi it's my first post",
+		Images:    []string{"src/image.jpg"},
+		CreatedAt: 1323123,
+	}
+}
+
+func TestDialog(t *testing.T) *core.Dialog {
+	t.Helper()
+	return &core.Dialog{
+		ID:           "12345678",
+		Name:         "My dialog",
+		Participants: []string{"12345671", "12345672"},
+		Messages:     []core.Message{},
+		CreatedAt:    124565,
+	}
+}
