@@ -26,7 +26,7 @@ type Conn struct {
 }
 
 var (
-	// Stores all Conn types by their uuid.
+	// ConnManager Stores all Conn types by their uuid.
 	ConnManager = struct {
 		sync.Mutex
 		Conns map[string]*Conn
@@ -35,73 +35,25 @@ var (
 	}
 )
 
-// Handles incoming, error free messages.
+// HandleData Handles incoming, error free messages.
 func HandleData(c *Conn, msg *dto.Message) {
-	switch msg.Event {
-	case constants.JoinChat:
-		c.Join(msg.DialogID)
-	case constants.LeaveChat:
-		c.Leave(msg.DialogID)
-	case constants.JoinedChat:
-		c.Emit(msg)
-	case constants.LeftChat:
-		c.Emit(msg)
-		DialogManager.Lock()
-		room, ok := DialogManager.Rooms[msg.DialogID]
-		DialogManager.Unlock()
-		if ok == false {
-			break
+	if c.IsDialogExist(msg.DialogID) {
+		switch msg.Event {
+		case constants.JoinChat:
+			c.Join(msg.DialogID)
+		case constants.LeaveChat:
+			c.Leave(msg.DialogID)
+		case constants.JoinedChat:
+			c.Emit(msg)
+		case constants.LeftChat:
+			c.LeftChat(msg)
+		case constants.ReadChat:
+			c.ReadMessage(msg)
+		case constants.SendChat:
+			c.SendMessage(msg)
+		default:
+			c.Send <- *ConstructMessage(msg.DialogID, constants.ErrChat, c.ID, constants.Empty, constants.ErrRequest)
 		}
-		room.Lock()
-		delete(room.Members, c.ID)
-		members := len(room.Members)
-		room.Unlock()
-		if members == 0 {
-			room.Stop()
-		}
-	case constants.ReadChat:
-		if msg.DestinID != constants.Empty {
-			DialogManager.Lock()
-			room, rok := DialogManager.Rooms[msg.DialogID]
-			DialogManager.Unlock()
-			if rok == false {
-				break
-			}
-			room.Lock()
-			id, mok := room.Members[msg.DestinID]
-			room.Unlock()
-			if mok == false {
-				break
-			}
-			ConnManager.Lock()
-			dst, cok := ConnManager.Conns[id]
-			ConnManager.Unlock()
-			if cok == false {
-				break
-			}
-			if msg.Body != constants.Empty {
-				_, err := c.reg.ChatService.ReadMessage(context.Background(), &dto.ReadMessageRequest{Message: *msg})
-				if err != nil {
-					return
-				}
-				dst.Send <- *msg
-			}
-		}
-	case constants.SendChat:
-		msgID, err := core.GenUUID()
-		if err != nil {
-			break
-		}
-		msg.ID = msgID
-		msg.CreatedAt = time.Now().Unix()
-		c.log.Infof("Dialog ID: %s", msg.DialogID)
-		_, err = c.reg.ChatService.SendMessage(context.Background(), &dto.SendMessageRequest{Message: *msg})
-		if err != nil {
-			return
-		}
-		c.Emit(msg)
-	default:
-		return
 	}
 }
 func (c *Conn) readPump() {
@@ -118,12 +70,12 @@ func (c *Conn) readPump() {
 			c.Lock()
 		}
 		c.Unlock()
-		c.Socket.Close()
+		_ = c.Socket.Close()
 	}()
 	c.Socket.SetReadLimit(constants.MaxMessageSize)
-	c.Socket.SetReadDeadline(time.Now().Add(constants.PongWait))
+	_ = c.Socket.SetReadDeadline(time.Now().Add(constants.PongWait))
 	c.Socket.SetPongHandler(func(string) error {
-		c.Socket.SetReadDeadline(time.Now().Add(constants.PongWait))
+		_ = c.Socket.SetReadDeadline(time.Now().Add(constants.PongWait))
 		return nil
 	})
 	for {
@@ -163,7 +115,7 @@ func (c *Conn) readPump() {
 }
 
 func (c *Conn) write(mt int, payload []byte) error {
-	c.Socket.SetWriteDeadline(time.Now().Add(constants.WriteWait))
+	_ = c.Socket.SetWriteDeadline(time.Now().Add(constants.WriteWait))
 	return c.Socket.WriteMessage(mt, payload)
 }
 
@@ -171,13 +123,13 @@ func (c *Conn) writePump() {
 	ticker := time.NewTicker(constants.PingPeriod)
 	defer func() {
 		ticker.Stop()
-		c.Socket.Close()
+		_ = c.Socket.Close()
 	}()
 	for {
 		select {
 		case msg, ok := <-c.Send:
 			if ok == false {
-				c.write(websocket.CloseMessage, []byte{})
+				_ = c.write(websocket.CloseMessage, []byte{})
 				return
 			}
 			if err := c.Socket.WriteJSON(msg); err != nil {
@@ -191,7 +143,7 @@ func (c *Conn) writePump() {
 	}
 }
 
-// Adds the Conn to a Dialog. If the Dialog does not exist, it is created.
+// Join Adds the Conn to a Dialog. If the Dialog does not exist, it is created.
 func (c *Conn) Join(name string) {
 	DialogManager.Lock()
 	room, ok := DialogManager.Rooms[name]
@@ -205,7 +157,77 @@ func (c *Conn) Join(name string) {
 	room.Join(c)
 }
 
-// Removes the Conn from a Dialog.
+// SendMessage ...
+func (c *Conn) SendMessage(msg *dto.Message) {
+	msgID, err := core.GenUUID()
+	if err != nil {
+		return
+	}
+	msg.ID = msgID
+	msg.CreatedAt = time.Now().Unix()
+
+	_, err = c.reg.ChatService.SendMessage(context.Background(), &dto.SendMessageRequest{Message: *msg})
+	if err != nil {
+		c.log.Infof("don't send message")
+		return
+	}
+	c.log.Infof("send message")
+	c.Emit(msg)
+}
+
+// LeftChat ...
+func (c *Conn) LeftChat(msg *dto.Message) {
+	c.Emit(msg)
+	DialogManager.Lock()
+	room, ok := DialogManager.Rooms[msg.DialogID]
+	DialogManager.Unlock()
+	if ok == false {
+		return
+	}
+	room.Lock()
+	delete(room.Members, c.ID)
+	members := len(room.Members)
+	room.Unlock()
+	if members == 0 {
+		room.Stop()
+	}
+}
+
+// ReadMessage ...
+func (c *Conn) ReadMessage(msg *dto.Message) {
+	if msg.DestinID != constants.Empty {
+		DialogManager.Lock()
+		room, rok := DialogManager.Rooms[msg.DialogID]
+		DialogManager.Unlock()
+		if rok == false {
+			return
+		}
+		room.Lock()
+		id, mok := room.Members[msg.DestinID]
+		room.Unlock()
+		if mok == false {
+			return
+		}
+		ConnManager.Lock()
+		dst, cok := ConnManager.Conns[id]
+		ConnManager.Unlock()
+		if cok == false {
+			return
+		}
+		if msg.Body != constants.Empty {
+
+			_, err := c.reg.ChatService.ReadMessage(context.Background(), &dto.ReadMessageRequest{Message: *msg})
+			if err != nil {
+				c.log.Errorf("don't read message in db")
+				return
+			}
+			c.log.Infof("read message")
+			dst.Send <- *msg
+		}
+	}
+}
+
+// Leave Removes the Conn from a Dialog.
 func (c *Conn) Leave(name string) {
 	DialogManager.Lock()
 	room, rok := DialogManager.Rooms[name]
@@ -225,7 +247,19 @@ func (c *Conn) Leave(name string) {
 	room.Leave(c)
 }
 
-// Broadcasts a Message to all members of a Dialog.
+// IsDialogExist CheckDialog ...
+func (c *Conn) IsDialogExist(name string) bool {
+
+	err := c.reg.ChatService.CheckDialog(context.Background(), &dto.CheckDialogRequest{UserID: c.ID, DialogID: name})
+	if err != nil {
+		c.Send <- *ConstructMessage(name, constants.ErrChat, c.ID, constants.Empty, constants.ErrChatDoNotExist)
+		c.log.Debug("room doesn't exist")
+		return false
+	}
+	return true
+}
+
+// Emit Broadcasts a Message to all members of a Dialog.
 func (c *Conn) Emit(msg *dto.Message) {
 	DialogManager.Lock()
 	room, ok := DialogManager.Rooms[msg.DialogID]
@@ -235,7 +269,7 @@ func (c *Conn) Emit(msg *dto.Message) {
 	}
 }
 
-// Upgrades an HTTP connection and creates a new Conn type.
+// NewConnection Upgrades an HTTP connection and creates a new Conn type.
 func NewConnection(ctx *echo.Context, log *logrus.Entry, registry *service.Registry, userID string) *Conn {
 	socket, err := constants.Upgrader.Upgrade((*ctx).Response(), (*ctx).Request(), nil)
 	if err != nil {
@@ -255,7 +289,7 @@ func NewConnection(ctx *echo.Context, log *logrus.Entry, registry *service.Regis
 	return c
 }
 
-// Calls NewConnection, starts the returned Conn's writer, joins the root room, and finally starts the Conn's reader.
+// SocketHandler Calls NewConnection, starts the returned Conn's writer, joins the root room, and finally starts the Conn's reader.
 func SocketHandler(ctx *echo.Context, log *logrus.Entry, registry *service.Registry, userID string) error {
 	c := NewConnection(ctx, log, registry, userID)
 	if c != nil {

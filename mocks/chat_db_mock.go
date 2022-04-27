@@ -8,7 +8,6 @@ import (
 	context "context"
 	reflect "reflect"
 
-	common "github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	core "github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	gomock "github.com/golang/mock/gomock"
 )
@@ -37,73 +36,87 @@ func (m *MockChatRepository) EXPECT() *MockChatRepositoryMockRecorder {
 }
 
 // CreateDialog mocks base method.
-func (m *MockChatRepository) CreateDialog(ctx context.Context, UserId string, AuthorIDs []string) (*core.Dialog, error) {
+func (m *MockChatRepository) CreateDialog(ctx context.Context, userID, name string, authorIDs []string) (*core.Dialog, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateDialog", ctx, UserId, AuthorIDs)
+	ret := m.ctrl.Call(m, "CreateDialog", ctx, userID, name, authorIDs)
 	ret0, _ := ret[0].(*core.Dialog)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateDialog indicates an expected call of CreateDialog.
-func (mr *MockChatRepositoryMockRecorder) CreateDialog(ctx, UserId, AuthorIDs interface{}) *gomock.Call {
+func (mr *MockChatRepositoryMockRecorder) CreateDialog(ctx, userID, name, authorIDs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDialog", reflect.TypeOf((*MockChatRepository)(nil).CreateDialog), ctx, UserId, AuthorIDs)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDialog", reflect.TypeOf((*MockChatRepository)(nil).CreateDialog), ctx, userID, name, authorIDs)
 }
 
-// GetDialogInfo mocks base method.
-func (m *MockChatRepository) GetDialogInfo(ctx context.Context, DialogID string) (common.DialogInfo, error) {
+// GetDialogByID mocks base method.
+func (m *MockChatRepository) GetDialogByID(ctx context.Context, dialogID string) (*core.Dialog, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetDialogInfo", ctx, DialogID)
-	ret0, _ := ret[0].(common.DialogInfo)
+	ret := m.ctrl.Call(m, "GetDialogByID", ctx, dialogID)
+	ret0, _ := ret[0].(*core.Dialog)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetDialogInfo indicates an expected call of GetDialogInfo.
-func (mr *MockChatRepositoryMockRecorder) GetDialogInfo(ctx, DialogID interface{}) *gomock.Call {
+// GetDialogByID indicates an expected call of GetDialogByID.
+func (mr *MockChatRepositoryMockRecorder) GetDialogByID(ctx, dialogID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialogInfo", reflect.TypeOf((*MockChatRepository)(nil).GetDialogInfo), ctx, DialogID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDialogByID", reflect.TypeOf((*MockChatRepository)(nil).GetDialogByID), ctx, dialogID)
 }
 
 // IsChatExist mocks base method.
-func (m *MockChatRepository) IsChatExist(ctx context.Context, DialogID string) error {
+func (m *MockChatRepository) IsChatExist(ctx context.Context, dialogID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsChatExist", ctx, DialogID)
+	ret := m.ctrl.Call(m, "IsChatExist", ctx, dialogID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // IsChatExist indicates an expected call of IsChatExist.
-func (mr *MockChatRepositoryMockRecorder) IsChatExist(ctx, DialogID interface{}) *gomock.Call {
+func (mr *MockChatRepositoryMockRecorder) IsChatExist(ctx, dialogID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsChatExist", reflect.TypeOf((*MockChatRepository)(nil).IsChatExist), ctx, DialogID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsChatExist", reflect.TypeOf((*MockChatRepository)(nil).IsChatExist), ctx, dialogID)
 }
 
 // IsUniqDialog mocks base method.
-func (m *MockChatRepository) IsUniqDialog(ctx context.Context, fUserID, sUserID string) error {
+func (m *MockChatRepository) IsUniqDialog(ctx context.Context, firstUserID, secondUserID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsUniqDialog", ctx, fUserID, sUserID)
+	ret := m.ctrl.Call(m, "IsUniqDialog", ctx, firstUserID, secondUserID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // IsUniqDialog indicates an expected call of IsUniqDialog.
-func (mr *MockChatRepositoryMockRecorder) IsUniqDialog(ctx, fUserID, sUserID interface{}) *gomock.Call {
+func (mr *MockChatRepositoryMockRecorder) IsUniqDialog(ctx, firstUserID, secondUserID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUniqDialog", reflect.TypeOf((*MockChatRepository)(nil).IsUniqDialog), ctx, fUserID, sUserID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUniqDialog", reflect.TypeOf((*MockChatRepository)(nil).IsUniqDialog), ctx, firstUserID, secondUserID)
+}
+
+// ReadMessage mocks base method.
+func (m *MockChatRepository) ReadMessage(ctx context.Context, userID, messageID, dialogID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ReadMessage", ctx, userID, messageID, dialogID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ReadMessage indicates an expected call of ReadMessage.
+func (mr *MockChatRepositoryMockRecorder) ReadMessage(ctx, userID, messageID, dialogID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadMessage", reflect.TypeOf((*MockChatRepository)(nil).ReadMessage), ctx, userID, messageID, dialogID)
 }
 
 // SendMessage mocks base method.
-func (m *MockChatRepository) SendMessage(ctx context.Context, Message common.MessageInfo) error {
+func (m *MockChatRepository) SendMessage(ctx context.Context, message core.Message, dialogID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SendMessage", ctx, Message)
+	ret := m.ctrl.Call(m, "SendMessage", ctx, message, dialogID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // SendMessage indicates an expected call of SendMessage.
-func (mr *MockChatRepositoryMockRecorder) SendMessage(ctx, Message interface{}) *gomock.Call {
+func (mr *MockChatRepositoryMockRecorder) SendMessage(ctx, message, dialogID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMessage", reflect.TypeOf((*MockChatRepository)(nil).SendMessage), ctx, Message)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMessage", reflect.TypeOf((*MockChatRepository)(nil).SendMessage), ctx, message, dialogID)
 }

@@ -6,7 +6,7 @@ info:
 servers:
   - url: /api
 security:
-  - CookieAuth: []
+  - CookieAuth: [ ]
 
 paths:
   /auth/signup:
@@ -14,7 +14,7 @@ paths:
       tags:
         - Authorization
       summary: Signup user
-      security: []
+      security: [ ]
       requestBody:
         content:
           application/json:
@@ -24,7 +24,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -37,7 +37,7 @@ paths:
       tags:
         - Authorization
       summary: Login user
-      security: []
+      security: [ ]
       requestBody:
         content:
           application/json:
@@ -47,7 +47,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -60,11 +60,11 @@ paths:
       tags:
         - Authorization
       summary: Logout user
-      security: []
+      security: [ ]
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -77,13 +77,13 @@ paths:
       tags:
         - User
       summary: Get user data
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/userIDParam"
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -101,7 +101,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -117,7 +117,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -135,7 +135,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -157,7 +157,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -166,26 +166,26 @@ paths:
                 $ref: "#/components/schemas/EditUserProfileResponse"
   
   /user/search:
-      get:
-        tags:
-          - User
-        summary: Search users
-        parameters:
-          - in: query
-            name: selector
-            schema:
-              type: string
-            required: true
-        responses:
-          500:
-            description: Internal error
-            content: {}
-          200:
-            description: Представители
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/SearchUsersResponse"
+    get:
+      tags:
+        - User
+      summary: Search users
+      parameters:
+        - in: query
+          name: selector
+          schema:
+            type: string
+          required: true
+      responses:
+        500:
+          description: Internal error
+          content: { }
+        200:
+          description: Представители
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchUsersResponse"
 
   /friends/request:
     post:
@@ -201,7 +201,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -223,7 +223,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -239,7 +239,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -255,7 +255,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -276,7 +276,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -298,7 +298,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -316,7 +316,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -338,7 +338,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -356,7 +356,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -364,6 +364,156 @@ paths:
               schema:
                 $ref: "#/components/schemas/BasicResponse"
 
+  /messenger/dialogs:
+    get:
+      tags:
+        - messenger
+      summary: get all dialogs
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDialogsResponse"
+
+  /messenger/get:
+    post:
+      tags:
+        - messenger
+      summary: get dialog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetDialogRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDialogResponse"
+
+  /messenger/create:
+    post:
+      tags:
+        - messenger
+      summary: create dialog
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDialogRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateDialogResponse"
+
+  /messenger/ws:
+    get:
+      tags:
+        - messenger
+      summary: websocket chat
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+
+  /like/increase:
+    post:
+      tags:
+        - like
+      summary: increase like
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IncreaseLikeRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IncreaseLikeResponse"
+
+  /like/reduce:
+    post:
+      tags:
+        - like
+      summary: reduce like
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReduceLikeRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReduceLikeResponse"
+
+  /like/post/get:
+    get:
+      tags:
+        - like
+      summary: get post likes
+      parameters:
+        - $ref: "#/components/parameters/postIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetLikePostResponse"
+  /like/photo/get:
+    get:
+      tags:
+        - like
+      summary: get photo likes
+      parameters:
+        - $ref: "#/components/parameters/photoIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetLikePhotoResponse"
 components:
   parameters:
     userIDParam:
@@ -377,6 +527,13 @@ components:
     postIDParam:
       in: query
       name: post_id
+      required: true
+      schema:
+        type: string
+
+    photoIDParam:
+      in: query
+      name: photo_id
       required: true
       schema:
         type: string
@@ -506,7 +663,7 @@ components:
             example: src/image.jpg
 
     CreatePostResponse:
-      $ref: "#/components/schemas/Post"
+      $ref: "#/components/schemas/BasicResponse"
 
     PostEditRequest:
       type: object
@@ -527,13 +684,76 @@ components:
 
     GetPostResponse:
       $ref: "#/components/schemas/Post"
-      
+
     SearchUsersResponse:
       properties:
         users:
           type: array
           items:
-            $ref: "#/components/schemas/User" 
+            $ref: "#/components/schemas/User"
+
+    GetDialogsResponse:
+      properties:
+        dialogs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Dialog"
+
+    GetDialogRequest:
+      properties:
+        dialog_id:
+          type: string
+
+    GetDialogResponse:
+      properties:
+        dialog:
+          $ref: "#/components/schemas/Dialog"
+        messages:
+          description: is read return only for author
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageInfo"
+
+    CreateDialogRequest:
+      properties:
+        name:
+          type: string
+        author_ids:
+          type: array
+          items:
+            type: string
+
+    CreateDialogResponse:
+      properties:
+        dialog_id:
+          type: string
+
+    IncreaseLikeRequest:
+      properties:
+        post_id:
+          type: string
+        photo_id:
+          type: string
+
+    IncreaseLikeResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    ReduceLikeRequest:
+      properties:
+        post_id:
+          type: string
+        photo_id:
+          type: string
+
+    ReduceLikeResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    GetLikePostResponse:
+      $ref: "#/components/schemas/Like"
+
+    GetLikePhotoResponse:
+      $ref: "#/components/schemas/Like"
+
 
     # --------------------- Models --------------------- #
 
@@ -590,12 +810,12 @@ components:
               type: array
               items:
                 type: string
-              example: [friend_id1, friend_id2]
+              example: [ friend_id1, friend_id2 ]
             post_ids:
               type: array
               items:
                 type: string
-              example: [post_id1, post_id2]
+              example: [ post_id1, post_id2 ]
 
     FriendRequest:
       type: object
@@ -623,7 +843,59 @@ components:
               type: string
             message:
               type: string
+            likes:
+              $ref: "#/components/schemas/Like"
             images:
               type: array
               items:
                 type: string
+    Dialog:
+      type: object
+      properties:
+        dialog_id:
+          type: string
+        name:
+          type: string
+        non_read:
+          type: integer
+        participants:
+          type: array
+          items:
+            type: string
+
+    MessageInfo:
+      type: object
+      description: is_read return only for user's message
+      properties:
+        author_id:
+          type: string
+        body:
+          type: string
+        created_at:
+          type: integer
+        is_read:
+          type: array
+          items:
+            $ref: "#/components/schemas/IsRead"
+
+    IsRead:
+      type: object
+      properties:
+        id:
+          type: string
+        is_read:
+          type: string
+
+    Like:
+      type: object
+      properties:
+        id:
+          type: string
+        amount:
+          type: integer
+        my_like:
+          type: boolean
+        user_ids:
+          type: array
+          items:
+            type: string

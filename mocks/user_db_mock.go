@@ -36,17 +36,17 @@ func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
 }
 
 // AddDialog mocks base method.
-func (m *MockUserRepository) AddDialog(ctx context.Context, dialogID, UserID string) error {
+func (m *MockUserRepository) AddDialog(ctx context.Context, dialogID, userID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddDialog", ctx, dialogID, UserID)
+	ret := m.ctrl.Call(m, "AddDialog", ctx, dialogID, userID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // AddDialog indicates an expected call of AddDialog.
-func (mr *MockUserRepositoryMockRecorder) AddDialog(ctx, dialogID, UserID interface{}) *gomock.Call {
+func (mr *MockUserRepositoryMockRecorder) AddDialog(ctx, dialogID, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddDialog", reflect.TypeOf((*MockUserRepository)(nil).AddDialog), ctx, dialogID, UserID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddDialog", reflect.TypeOf((*MockUserRepository)(nil).AddDialog), ctx, dialogID, userID)
 }
 
 // CheckUserEmailExistence mocks base method.
@@ -178,6 +178,20 @@ func (m *MockUserRepository) UserAddPost(ctx context.Context, userID, postID str
 func (mr *MockUserRepositoryMockRecorder) UserAddPost(ctx, userID, postID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserAddPost", reflect.TypeOf((*MockUserRepository)(nil).UserAddPost), ctx, userID, postID)
+}
+
+// UserCheckDialog mocks base method.
+func (m *MockUserRepository) UserCheckDialog(ctx context.Context, dialogID, userID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UserCheckDialog", ctx, dialogID, userID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UserCheckDialog indicates an expected call of UserCheckDialog.
+func (mr *MockUserRepositoryMockRecorder) UserCheckDialog(ctx, dialogID, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserCheckDialog", reflect.TypeOf((*MockUserRepository)(nil).UserCheckDialog), ctx, dialogID, userID)
 }
 
 // UserCheckPost mocks base method.

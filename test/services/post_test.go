@@ -114,8 +114,10 @@ func TestCreatePost(t *testing.T) {
 
 	gomock.InOrder(
 		testRepo.mockPostR.EXPECT().CreatePost(ctx, tests[0].inputCreatePost.post).Return(tests[0].outputCreatePost.post, tests[0].outputCreatePost.err),
+
 		testRepo.mockPostR.EXPECT().CreatePost(ctx, tests[1].inputCreatePost.post).Return(tests[1].outputCreatePost.post, tests[1].outputCreatePost.err),
 		testRepo.mockUserR.EXPECT().UserAddPost(ctx, tests[1].inputUserAddPost.userID, tests[1].inputUserAddPost.postID).Return(tests[1].outputUserAddPost.err),
+
 		testRepo.mockPostR.EXPECT().CreatePost(ctx, tests[2].inputCreatePost.post).Return(tests[2].outputCreatePost.post, tests[2].outputCreatePost.err),
 		testRepo.mockUserR.EXPECT().UserAddPost(ctx, tests[2].inputUserAddPost.userID, tests[2].inputUserAddPost.postID).Return(tests[2].outputUserAddPost.err),
 	)

@@ -143,7 +143,7 @@ func (repo *userRepositoryImpl) DeleteUser(ctx context.Context, user *core.User)
 }
 
 func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string) ([]core.User, error) {
-	users := []core.User{}
+	var users []core.User
 
 	fuzzy := bson.M{"$regex": selector, "$options": "i"}
 	filter := bson.M{"$or": []bson.M{

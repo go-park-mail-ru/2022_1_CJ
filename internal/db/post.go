@@ -29,6 +29,15 @@ type postRepositoryImpl struct {
 	coll *mongo.Collection
 }
 
+func NewPostRepository(db *mongo.Database) (*postRepositoryImpl, error) {
+	return &postRepositoryImpl{db: db, coll: db.Collection("posts")}, nil
+}
+
+// NewUserRepositoryTest for Tests (bad)
+func NewPostRepositoryTest(collection *mongo.Collection) (*postRepositoryImpl, error) {
+	return &postRepositoryImpl{coll: collection}, nil
+}
+
 func (repo *postRepositoryImpl) CreatePost(ctx context.Context, post *core.Post) (*core.Post, error) {
 	if err := repo.InitPost(post); err != nil {
 		return nil, err
@@ -81,10 +90,6 @@ func (repo *postRepositoryImpl) GetFeed(ctx context.Context, userID string) ([]c
 	}
 
 	return posts, err
-}
-
-func NewPostRepository(db *mongo.Database) (*postRepositoryImpl, error) {
-	return &postRepositoryImpl{db: db, coll: db.Collection("posts")}, nil
 }
 
 func (repo *postRepositoryImpl) InitPost(post *core.Post) error {

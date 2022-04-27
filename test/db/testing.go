@@ -10,6 +10,7 @@ func TestUser(t *testing.T) *core.User {
 	t.Helper()
 
 	return &core.User{
+		ID: "123456789",
 		Name: common.UserName{
 			First: "Sasha",
 			Last:  "Userov",
@@ -17,5 +18,56 @@ func TestUser(t *testing.T) *core.User {
 		Email: "user@example.org",
 		Image: "src/img.jpg",
 		Phone: "+8(800)-555-35-35",
+	}
+}
+
+func TestUserNull(t *testing.T) *core.User {
+	t.Helper()
+
+	return &core.User{}
+}
+
+func TestPostNull(t *testing.T) *core.Post {
+	t.Helper()
+
+	return &core.Post{}
+}
+
+func TestDialogNull(t *testing.T) *core.Dialog {
+	t.Helper()
+
+	return &core.Dialog{}
+}
+
+func TestPost(t *testing.T) *core.Post {
+	t.Helper()
+	return &core.Post{
+		ID:        "12345678",
+		AuthorID:  "123456789",
+		Message:   "Hi it's my first post",
+		Images:    []string{"src/image.jpg"},
+		CreatedAt: 1323123,
+	}
+}
+
+func TestDialog(t *testing.T) *core.Dialog {
+	t.Helper()
+	return &core.Dialog{
+		ID:           "12345678",
+		Name:         "My dialog",
+		Participants: []string{"12345671", "12345672"},
+		Messages:     []core.Message{},
+		CreatedAt:    124565,
+	}
+}
+
+func TestMessage(t *testing.T) *core.Message {
+	t.Helper()
+	return &core.Message{
+		ID:        "12345678",
+		Body:      "hi message",
+		AuthorID:  "12345671",
+		IsRead:    []core.IsRead{{"12345672", false}},
+		CreatedAt: 124565,
 	}
 }

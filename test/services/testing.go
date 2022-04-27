@@ -10,10 +10,10 @@ import (
 
 // TestRepository ...
 type TestRepository struct {
-	mockUserR   *mockDB.MockUserRepository
-	mockFriensR *mockDB.MockFriendsRepository
-	mockPostR   *mockDB.MockPostRepository
-	mockChatR   *mockDB.MockChatRepository
+	mockUserR    *mockDB.MockUserRepository
+	mockFriendsR *mockDB.MockFriendsRepository
+	mockPostR    *mockDB.MockPostRepository
+	mockChatR    *mockDB.MockChatRepository
 }
 
 // TestRepositories ...
@@ -25,7 +25,7 @@ func TestRepositories(t *testing.T, ctrl *gomock.Controller) (*db.Repository, *T
 		mockDB.NewMockChatRepository(ctrl),
 	}
 	t.Helper()
-	return &db.Repository{MockRepo.mockUserR, MockRepo.mockFriensR, MockRepo.mockPostR, MockRepo.mockChatR}, MockRepo
+	return &db.Repository{UserRepo: MockRepo.mockUserR, FriendsRepo: MockRepo.mockFriendsR, PostRepo: MockRepo.mockPostR, ChatRepo: MockRepo.mockChatR}, MockRepo
 }
 
 // TestLogger ...
