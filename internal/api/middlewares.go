@@ -18,19 +18,33 @@ import (
 func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) error {
+			// AUTH
 			svc.log.Info(ctx.Cookies())
-			cookie, err := ctx.Cookie(constants.CookieKeyAuthToken)
+			cookieAuth, err := ctx.Cookie(constants.CookieKeyAuthToken)
 			if err != nil {
 				return constants.ErrMissingAuthCookie
 			}
 
-			tw, err := utils.ParseAuthToken(cookie.Value)
+			tw, err := utils.ParseAuthToken(cookieAuth.Value)
 			if err != nil {
 				return err
 			}
 
-			ctx.Request().Header.Set(constants.HeaderKeyUserID, string(tw.UserID))
+			ctx.Request().Header.Set(constants.HeaderKeyUserID, tw.UserID)
 
+			// CSRF
+			cookieCSRF, err := ctx.Cookie(constants.CookieKeyCSRFToken)
+			if len(cookieCSRF.Value) == 0 || err != nil {
+				return constants.ErrMissingCSRFCookie
+			}
+
+			isCorrect, err := utils.CheckCSRFToken(tw.UserID, cookieCSRF.Value)
+			if err != nil {
+				return err
+			}
+			if !isCorrect {
+				return constants.ErrCSRFTokenWrong
+			}
 			return next(ctx)
 		}
 	}

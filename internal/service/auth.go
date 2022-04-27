@@ -52,6 +52,7 @@ func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupU
 	}
 	svc.log.Debug("Create user success")
 
+	// AUTH
 	authToken, err := utils.GenerateAuthToken(&utils.AuthTokenWrapper{UserID: user.ID})
 	if err != nil {
 		svc.log.Errorf("GenerateAuthToken error: %s", err)
@@ -59,7 +60,15 @@ func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupU
 	}
 	svc.log.Debugf("Generate auth token success; Token: %s", authToken)
 
-	return &dto.SignupUserResponse{AuthToken: authToken}, nil
+	// CSRF
+	csrfToken, err := utils.GenerateCSRFToken(user.ID)
+	if err != nil {
+		svc.log.Errorf("GenerateCSRFToken error: %s", err)
+		return nil, err
+	}
+	svc.log.Debugf("Generate csrf token success; Token: %s", csrfToken)
+
+	return &dto.SignupUserResponse{AuthToken: authToken, CSRFToken: csrfToken}, nil
 }
 
 func (svc *AuthServiceImpl) LoginUser(ctx context.Context, request *dto.LoginUserRequest) (*dto.LoginUserResponse, error) {
@@ -76,6 +85,7 @@ func (svc *AuthServiceImpl) LoginUser(ctx context.Context, request *dto.LoginUse
 
 	svc.log.Debug("Login success")
 
+	// AUTH
 	authToken, err := utils.GenerateAuthToken(&utils.AuthTokenWrapper{UserID: user.ID})
 	if err != nil {
 		svc.log.Errorf("GenerateAuthToken error: %s", err)
@@ -83,7 +93,15 @@ func (svc *AuthServiceImpl) LoginUser(ctx context.Context, request *dto.LoginUse
 	}
 	svc.log.Debugf("Generate auth token success; Token: %s", authToken)
 
-	return &dto.LoginUserResponse{AuthToken: authToken}, nil
+	// CSRF
+	csrfToken, err := utils.GenerateCSRFToken(user.ID)
+	if err != nil {
+		svc.log.Errorf("GenerateCSRFToken error: %s", err)
+		return nil, err
+	}
+	svc.log.Debugf("Generate csrf token success; Token: %s", csrfToken)
+
+	return &dto.LoginUserResponse{AuthToken: authToken, CSRFToken: csrfToken}, nil
 }
 
 func NewAuthService(log *logrus.Entry, db *db.Repository) AuthService {

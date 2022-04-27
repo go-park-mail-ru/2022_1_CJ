@@ -24,6 +24,9 @@ var (
 	ErrMissingAuthToken  = &CodedError{errors.New("missing authorization token"), http.StatusUnauthorized}
 	ErrMissingAuthCookie = &CodedError{errors.New("missing authorization cookie"), http.StatusUnauthorized}
 
+	ErrMissingCSRFCookie = &CodedError{errors.New("missing csrf cookie"), http.StatusUnauthorized}
+	ErrCSRFTokenWrong    = &CodedError{errors.New("wrong csrf token in cookie"), http.StatusUnauthorized}
+
 	ErrPasswordMismatch = &CodedError{errors.New("password mismatch"), http.StatusUnauthorized}
 
 	ErrAuthTokenInvalid        = &CodedError{errors.New("authorization token is invalid"), http.StatusUnauthorized}
