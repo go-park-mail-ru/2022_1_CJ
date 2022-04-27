@@ -57,9 +57,9 @@ func (repo *chatRepositoryImpl) IsChatExist(ctx context.Context, dialogID string
 }
 
 func (repo *chatRepositoryImpl) SendMessage(ctx context.Context, message core.Message, dialogID string) error {
+	filter := bson.M{"_id": dialogID}
 	update := bson.M{"$push": bson.D{{Key: "messages", Value: message}}}
-
-	if _, err := repo.coll.UpdateByID(ctx, dialogID, update); err != nil {
+	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
 		return err
 	}
 	return nil

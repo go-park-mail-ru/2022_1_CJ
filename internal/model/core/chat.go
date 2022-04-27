@@ -12,6 +12,6 @@ type Dialog struct {
 	ID           string    `bson:"_id"`
 	Name         string    `bson:"name"`
 	Participants []string  `bson:"participants"`
-	Messages     []Message `bson:"messages"`
+	Messages     []Message `bson:"messages,omitempty"`
 	CreatedAt    int64     `bson:"created_at"`
 }

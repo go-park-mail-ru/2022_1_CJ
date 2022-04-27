@@ -68,7 +68,6 @@ func (svc *chatServiceImpl) SendMessage(ctx context.Context, request *dto.SendMe
 		CreatedAt: request.Message.CreatedAt}
 
 	svc.log.Debugf("Text: %s; DialogID: %s; AuthorID: %s", message.Body, request.Message.DialogID, message.AuthorID)
-
 	if err := svc.db.ChatRepo.IsChatExist(ctx, request.Message.DialogID); err != nil {
 		svc.log.Errorf("Chat not exist error: %s", err)
 		return nil, err

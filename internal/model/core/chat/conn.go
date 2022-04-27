@@ -94,7 +94,7 @@ func HandleData(c *Conn, msg *dto.Message) {
 		}
 		msg.ID = msgID
 		msg.CreatedAt = time.Now().Unix()
-
+		c.log.Infof("Dialog ID: %s", msg.DialogID)
 		_, err = c.reg.ChatService.SendMessage(context.Background(), &dto.SendMessageRequest{Message: *msg})
 		if err != nil {
 			return
@@ -127,7 +127,7 @@ func (c *Conn) readPump() {
 		return nil
 	})
 	for {
-		var data dto.Message
+		data := new(dto.Message)
 		err := c.Socket.ReadJSON(&data)
 		data.AuthorID = c.ID
 
@@ -158,7 +158,7 @@ func (c *Conn) readPump() {
 			c.Unlock()
 			break
 		}
-		HandleData(c, &data)
+		HandleData(c, data)
 	}
 }
 
