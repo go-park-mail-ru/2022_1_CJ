@@ -13,7 +13,7 @@ import (
 
 type PostService interface {
 	CreatePost(ctx context.Context, request *dto.CreatePostRequest, userID string) (*dto.CreatePostResponse, error)
-	GetPost(ctx context.Context, request *dto.GetPostRequest) (*dto.GetPostResponse, error)
+	GetPost(ctx context.Context, request *dto.GetPostRequest, userID string) (*dto.GetPostResponse, error)
 	EditPost(ctx context.Context, request *dto.EditPostRequest, userID string) (*dto.EditPostResponse, error)
 	DeletePost(ctx context.Context, request *dto.DeletePostRequest, userID string) (*dto.DeletePostResponse, error)
 }
@@ -41,11 +41,17 @@ func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.CreateP
 		return nil, err
 	}
 
+	_, err = svc.db.LikeRepo.CreateLike(ctx, &core.Like{Subject: post.ID})
+	if err != nil {
+		svc.log.Errorf("CreateLike error: %s", err)
+		return nil, err
+	}
+
 	svc.log.Debugf("UserAddPost success; Current post ID: %s", post.ID)
 	return &dto.CreatePostResponse{}, nil
 }
 
-func (svc *postServiceImpl) GetPost(ctx context.Context, request *dto.GetPostRequest) (*dto.GetPostResponse, error) {
+func (svc *postServiceImpl) GetPost(ctx context.Context, request *dto.GetPostRequest, userID string) (*dto.GetPostResponse, error) {
 	post, err := svc.db.PostRepo.GetPostByID(ctx, request.PostID)
 	if err != nil {
 		svc.log.Errorf("GetPostByID error: %s", err)
@@ -55,10 +61,17 @@ func (svc *postServiceImpl) GetPost(ctx context.Context, request *dto.GetPostReq
 
 	author, err := svc.db.UserRepo.GetUserByID(ctx, post.AuthorID)
 	if err != nil {
+		svc.log.Errorf("GetUserByID error: %s", err)
 		return nil, err
 	}
 
-	return &dto.GetPostResponse{Post: convert.Post2DTO(post, author)}, nil
+	like, err := svc.db.LikeRepo.GetLikeBySubjectID(ctx, request.PostID)
+	if err != nil {
+		svc.log.Errorf("GetLikeBySubjectID error: %s", err)
+		return nil, err
+	}
+
+	return &dto.GetPostResponse{Post: convert.Post2DTO(post, author), Likes: convert.Like2DTO(like, userID)}, nil
 }
 
 func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostRequest, userID string) (*dto.EditPostResponse, error) {

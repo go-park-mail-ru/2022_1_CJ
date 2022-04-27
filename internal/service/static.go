@@ -45,6 +45,12 @@ func (svc *staticServiceImpl) UploadImage(ctx context.Context, fileHeader *multi
 		return "", err
 	}
 
+	_, err = svc.db.LikeRepo.CreateLike(ctx, &core.Like{Subject: filename})
+	if err != nil {
+		svc.log.Errorf("CreateLike error: %s", err)
+		return "", err
+	}
+
 	return filename, nil
 }
 

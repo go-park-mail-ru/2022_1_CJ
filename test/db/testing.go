@@ -49,7 +49,20 @@ func TestPost(t *testing.T) *core.Post {
 		CreatedAt: 1323123,
 	}
 }
-
+func TestLike(t *testing.T) *core.Like {
+	t.Helper()
+	return &core.Like{
+		ID:        "1",
+		Amount:    2,
+		Subject:   "1",
+		UserIDs:   []string{"1", "2"},
+		CreatedAt: 1323123,
+	}
+}
+func TestNullLike(t *testing.T) *core.Like {
+	t.Helper()
+	return &core.Like{}
+}
 func TestDialog(t *testing.T) *core.Dialog {
 	t.Helper()
 	return &core.Dialog{

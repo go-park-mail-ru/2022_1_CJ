@@ -52,6 +52,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	friendsCtrl := controllers.NewFriendsController(log, registry)
 	postCtrl := controllers.NewPostController(log, registry)
 	staticCtrl := controllers.NewStaticController(log, registry)
+	likeCtrl := controllers.NewLikeController(log, registry)
 	chatCtrl := controllers.NewChatController(log, repository, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
@@ -89,6 +90,13 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	postAPI.GET("/get", postCtrl.GetPost)
 	postAPI.PUT("/edit", postCtrl.EditPost)
 	postAPI.DELETE("/delete", postCtrl.DeletePost)
+
+	likeAPI := api.Group("/like", svc.AuthMiddleware())
+
+	likeAPI.POST("/increase", likeCtrl.IncreaseLike)
+	likeAPI.POST("/reduce", likeCtrl.ReduceLike)
+	likeAPI.GET("/post/get", likeCtrl.GetLikePost)
+	likeAPI.GET("/photo/get", likeCtrl.GetLikePhoto)
 
 	static := api.Group("/static")
 
