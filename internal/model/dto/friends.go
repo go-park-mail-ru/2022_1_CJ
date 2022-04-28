@@ -12,7 +12,7 @@ type AcceptFriendRequestRequest struct {
 }
 
 type AcceptFriendRequestResponse struct {
-	RequestsID []string `json:"requests_id"`
+	RequestsID []string `json:"request_ids"`
 }
 
 type DeleteFriendRequest struct {

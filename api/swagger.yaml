@@ -638,9 +638,7 @@ components:
       $ref: "#/components/schemas/Friends"
 
     GetFriendRequestsResponse:
-      type: array
-      items:
-        $ref: "#/components/schemas/FriendRequest"
+      $ref: "#/components/schemas/FriendRequests"
 
     GetUserFeedResponse:
       type: object
@@ -827,10 +825,16 @@ components:
                 type: string
               example: [ post_id1, post_id2 ]
 
+    FriendRequests:
+      type: array
+      items:
+        type: string
+      example: [request_id1, request_id2]
+
     FriendRequest:
       type: object
       properties:
-        user_id:
+        request_ids:
           type: string
 
     Friends:
