@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
+	"github.com/microcosm-cc/bluemonday"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -55,6 +56,16 @@ func (repo *chatRepositoryImpl) CreateDialog(ctx context.Context, userID string,
 		return nil, err
 	}
 	_, err := repo.coll.InsertOne(ctx, dialog)
+
+	// Sanitize
+	p := bluemonday.UGCPolicy()
+
+	dialog.Name = p.Sanitize(dialog.Name)
+
+	for i, _ := range dialog.Participants {
+		dialog.Participants[i] = p.Sanitize(dialog.Participants[i])
+	}
+
 	return dialog, err
 }
 
@@ -99,6 +110,20 @@ func (repo *chatRepositoryImpl) GetDialogByID(ctx context.Context, DialogID stri
 	dialog := new(core.Dialog)
 	filter := bson.D{{"_id", DialogID}}
 	err := repo.coll.FindOne(ctx, filter).Decode(dialog)
+
+	// Sanitize
+	p := bluemonday.UGCPolicy()
+
+	dialog.Name = p.Sanitize(dialog.Name)
+
+	for i, _ := range dialog.Messages {
+		dialog.Messages[i].Body = p.Sanitize(dialog.Messages[i].Body)
+	}
+
+	for i, _ := range dialog.Participants {
+		dialog.Participants[i] = p.Sanitize(dialog.Participants[i])
+	}
+
 	return dialog, wrapError(err)
 }
 

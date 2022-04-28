@@ -132,6 +132,7 @@ func (repo *friendsRepositoryImpl) GetFriendsByUserID(ctx context.Context, userI
 	return friends.Friends, wrapError(err)
 }
 
+// Возможно лишняя функция
 func (repo *friendsRepositoryImpl) GetFriendsByID(ctx context.Context, userID string) ([]string, error) {
 	friends := new(core.Friends)
 	filter := bson.M{"_id": userID}

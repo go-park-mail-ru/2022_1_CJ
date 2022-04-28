@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"github.com/microcosm-cc/bluemonday"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -43,6 +44,11 @@ func (repo *postRepositoryImpl) CreatePost(ctx context.Context, post *core.Post)
 		return nil, err
 	}
 	_, err := repo.coll.InsertOne(ctx, post)
+
+	// Sanitize
+	p := bluemonday.UGCPolicy()
+	post.Message = p.Sanitize(post.Message)
+
 	return post, err
 }
 
@@ -63,6 +69,13 @@ func (repo *postRepositoryImpl) GetPostsByUserID(ctx context.Context, userID str
 	} else {
 		err = cursor.All(ctx, &posts)
 	}
+
+	// Sanitize
+	p := bluemonday.UGCPolicy()
+	for i, _ := range posts {
+		posts[i].Message = p.Sanitize(posts[i].Message)
+	}
+
 	return posts, err
 }
 
@@ -87,6 +100,12 @@ func (repo *postRepositoryImpl) GetFeed(ctx context.Context, userID string) ([]c
 	var posts []core.Post
 	if err = cursor.All(ctx, &posts); err != nil {
 		return nil, err
+	}
+
+	// Sanitize
+	p := bluemonday.UGCPolicy()
+	for i, _ := range posts {
+		posts[i].Message = p.Sanitize(posts[i].Message)
 	}
 
 	return posts, err

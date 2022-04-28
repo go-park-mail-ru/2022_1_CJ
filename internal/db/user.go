@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"github.com/microcosm-cc/bluemonday"
 	"time"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
@@ -74,6 +75,10 @@ func (repo *userRepositoryImpl) GetUserByID(ctx context.Context, ID string) (*co
 	user := new(core.User)
 	filter := bson.M{"_id": ID}
 	err := repo.coll.FindOne(ctx, filter).Decode(user)
+
+	// Sanitize
+	userSanitize(user)
+
 	return user, wrapError(err)
 }
 
@@ -82,6 +87,10 @@ func (repo *userRepositoryImpl) GetUserByEmail(ctx context.Context, email string
 	user := new(core.User)
 	filter := bson.M{"email": email}
 	err := repo.coll.FindOne(ctx, filter).Decode(user)
+
+	// Sanitize
+	userSanitize(user)
+
 	return user, wrapError(err)
 }
 
@@ -142,8 +151,8 @@ func (repo *userRepositoryImpl) DeleteUser(ctx context.Context, user *core.User)
 	return err
 }
 
-func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string) ([]core.User, error) {
-	var users []core.User
+func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string) ([]*core.User, error) {
+	var users []*core.User
 
 	fuzzy := bson.M{"$regex": selector, "$options": "i"}
 	filter := bson.M{"$or": []bson.M{
@@ -159,6 +168,10 @@ func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string
 		return nil, err
 	} else {
 		err = cursor.All(ctx, &users)
+	}
+
+	for i, _ := range users {
+		userSanitize(users[i])
 	}
 
 	return users, err
@@ -203,4 +216,17 @@ func (repo *userRepositoryImpl) InitUser(user *core.User) error {
 	user.Image = "default.jpeg"
 	user.CreatedAt = time.Now().Unix()
 	return nil
+}
+
+// Help func for defense from XSS attacks
+func userSanitize(user *core.User) *core.User {
+	p := bluemonday.UGCPolicy()
+	user.Name.First = p.Sanitize(user.Name.First)
+	user.Name.Last = p.Sanitize(user.Name.Last)
+	user.Phone = p.Sanitize(user.Phone)
+	user.BirthDay = p.Sanitize(user.BirthDay)
+	user.Location = p.Sanitize(user.Location)
+	user.Email = p.Sanitize(user.Email)
+	user.Image = p.Sanitize(user.Image)
+	return user
 }
