@@ -40,6 +40,7 @@ var (
 	ErrBindRequest     = &CodedError{errors.New("failed to bind request"), http.StatusBadRequest}
 	ErrValidateRequest = &CodedError{errors.New("failed to validate request"), http.StatusBadRequest}
 	ErrDBNotFound      = &CodedError{errors.New("not found in the database"), http.StatusBadRequest}
+	ErrBadJson         = &CodedError{errors.New("bad json request"), http.StatusBadRequest}
 
 	// Internal
 	ErrSignToken      = &CodedError{errors.New("failed to sign token"), http.StatusInternalServerError}

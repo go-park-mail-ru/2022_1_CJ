@@ -19,7 +19,8 @@ type GetPostRequest struct {
 }
 
 type GetPostResponse struct {
-	Post Post `json:"post"`
+	Post  Post `json:"post"`
+	Likes Like `json:"likes"`
 }
 
 type EditPostRequest struct {

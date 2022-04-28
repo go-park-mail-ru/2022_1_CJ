@@ -11,13 +11,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type PostController struct {
+type LikeController struct {
 	log      *logrus.Entry
 	registry *service.Registry
 }
 
-func (c *PostController) CreatePost(ctx echo.Context) error {
-	request := new(dto.CreatePostRequest)
+func (c *LikeController) IncreaseLike(ctx echo.Context) error {
+	request := new(dto.IncreaseLikeRequest)
 	if err := ctx.Bind(request); err != nil {
 		c.log.Errorf("Bind error: %s", err)
 		return err
@@ -25,7 +25,7 @@ func (c *PostController) CreatePost(ctx echo.Context) error {
 
 	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.PostService.CreatePost(context.Background(), request, userID)
+	response, err := c.registry.LikeService.IncreaseLike(context.Background(), request, userID)
 	if err != nil {
 		return err
 	}
@@ -33,30 +33,16 @@ func (c *PostController) CreatePost(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (c *PostController) GetPost(ctx echo.Context) error {
-	request := new(dto.GetPostRequest)
-	if err := ctx.Bind(request); err != nil {
-		c.log.Errorf("Bind error: %s", err)
-		return err
-	}
-	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	response, err := c.registry.PostService.GetPost(context.Background(), request, userID)
-	if err != nil {
-		return err
-	}
-
-	return ctx.JSON(http.StatusOK, response)
-}
-
-func (c *PostController) EditPost(ctx echo.Context) error {
-	request := new(dto.EditPostRequest)
+func (c *LikeController) ReduceLike(ctx echo.Context) error {
+	request := new(dto.ReduceLikeRequest)
 	if err := ctx.Bind(request); err != nil {
 		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 
 	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	response, err := c.registry.PostService.EditPost(context.Background(), request, userID)
+
+	response, err := c.registry.LikeService.ReduceLike(context.Background(), request, userID)
 	if err != nil {
 		return err
 	}
@@ -64,15 +50,14 @@ func (c *PostController) EditPost(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (c *PostController) DeletePost(ctx echo.Context) error {
-	request := new(dto.DeletePostRequest)
+func (c *LikeController) GetLikePost(ctx echo.Context) error {
+	request := new(dto.GetLikePostRequest)
 	if err := ctx.Bind(request); err != nil {
 		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
-
 	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	response, err := c.registry.PostService.DeletePost(context.Background(), request, userID)
+	response, err := c.registry.LikeService.GetLikePost(context.Background(), request, userID)
 	if err != nil {
 		return err
 	}
@@ -80,6 +65,21 @@ func (c *PostController) DeletePost(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func NewPostController(log *logrus.Entry, registry *service.Registry) *PostController {
-	return &PostController{log: log, registry: registry}
+func (c *LikeController) GetLikePhoto(ctx echo.Context) error {
+	request := new(dto.GetLikePhotoRequest)
+	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
+		return err
+	}
+	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	response, err := c.registry.LikeService.GetLikePhoto(context.Background(), request, userID)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func NewLikeController(log *logrus.Entry, registry *service.Registry) *LikeController {
+	return &LikeController{log: log, registry: registry}
 }

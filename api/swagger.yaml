@@ -680,10 +680,16 @@ components:
             example: src/image.jpg
 
     PostEditResponse:
-      $ref: "#/components/schemas/Post"
+      $ref: "#/components/schemas/BasicResponse"
 
     GetPostResponse:
-      $ref: "#/components/schemas/Post"
+
+      type: object
+      properties:
+        post:
+          $ref: "#/components/schemas/Post"
+        likes:
+          $ref: "#/components/schemas/Like"
 
     SearchUsersResponse:
       properties:
@@ -749,10 +755,14 @@ components:
       $ref: "#/components/schemas/BasicResponse"
 
     GetLikePostResponse:
-      $ref: "#/components/schemas/Like"
+      properties:
+        likes:
+          $ref: "#/components/schemas/Like"
 
     GetLikePhotoResponse:
-      $ref: "#/components/schemas/Like"
+      properties:
+        likes:
+          $ref: "#/components/schemas/Like"
 
 
     # --------------------- Models --------------------- #
@@ -834,21 +844,16 @@ components:
     Post:
       type: object
       properties:
-        post:
-          type: object
-          properties:
-            id:
-              type: string
-            author_id:
-              type: string
-            message:
-              type: string
-            likes:
-              $ref: "#/components/schemas/Like"
-            images:
-              type: array
-              items:
-                type: string
+        id:
+          type: string
+        author_id:
+          type: string
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
     Dialog:
       type: object
       properties:
@@ -889,8 +894,6 @@ components:
     Like:
       type: object
       properties:
-        id:
-          type: string
         amount:
           type: integer
         my_like:

@@ -42,6 +42,14 @@ func TestCreatePost(t *testing.T) {
 		err error
 	}
 
+	type InputCreateLike struct {
+		like *core.Like
+	}
+	type OutputCreateLike struct {
+		like *core.Like
+		err  error
+	}
+
 	type Output struct {
 		res *dto.CreatePostResponse
 		err error
@@ -54,6 +62,8 @@ func TestCreatePost(t *testing.T) {
 		outputCreatePost  OutputCreatePost
 		inputUserAddPost  InputUserAddPost
 		outputUserAddPost OutputUserAddPost
+		inputCreateLike   InputCreateLike
+		outputCreateLike  OutputCreateLike
 		output            Output
 	}{
 		{
@@ -108,6 +118,8 @@ func TestCreatePost(t *testing.T) {
 				err: nil},
 			inputUserAddPost:  InputUserAddPost{userID: "1", postID: "1"},
 			outputUserAddPost: OutputUserAddPost{err: nil},
+			inputCreateLike:   InputCreateLike{like: &core.Like{Subject: "1"}},
+			outputCreateLike:  OutputCreateLike{like: nil, err: nil},
 			output:            Output{&dto.CreatePostResponse{}, nil},
 		},
 	}
@@ -120,6 +132,7 @@ func TestCreatePost(t *testing.T) {
 
 		testRepo.mockPostR.EXPECT().CreatePost(ctx, tests[2].inputCreatePost.post).Return(tests[2].outputCreatePost.post, tests[2].outputCreatePost.err),
 		testRepo.mockUserR.EXPECT().UserAddPost(ctx, tests[2].inputUserAddPost.userID, tests[2].inputUserAddPost.postID).Return(tests[2].outputUserAddPost.err),
+		testRepo.mockLikeR.EXPECT().CreateLike(ctx, tests[2].inputCreateLike.like).Return(tests[2].outputCreateLike.like, tests[2].outputCreateLike.err),
 	)
 
 	for _, test := range tests {
@@ -146,7 +159,8 @@ func TestGetPost(t *testing.T) {
 	ctx := context.Background()
 
 	type Input struct {
-		info *dto.GetPostRequest
+		info   *dto.GetPostRequest
+		userID string
 	}
 
 	type Output struct {
@@ -157,17 +171,26 @@ func TestGetPost(t *testing.T) {
 		post *core.Post
 		err  error
 	}
+	type InputCreateLike struct {
+		like *core.Like
+	}
+	type OutputCreateLike struct {
+		like *core.Like
+		err  error
+	}
 
 	tests := []struct {
-		name          string
-		input         Input
-		outputGetPost OutputGetPost
-		output        Output
+		name             string
+		input            Input
+		outputGetPost    OutputGetPost
+		inputCreateLike  InputCreateLike
+		outputCreateLike OutputCreateLike
+		output           Output
 	}{
 		{
 			name: "Can't find in postRepo",
 			input: Input{info: &dto.GetPostRequest{
-				PostID: "0"}},
+				PostID: "0"}, userID: "0"},
 			outputGetPost: OutputGetPost{post: nil, err: constants.ErrDBNotFound},
 
 			output: Output{nil, constants.ErrDBNotFound},
@@ -175,15 +198,32 @@ func TestGetPost(t *testing.T) {
 		{
 			name: "Success",
 			input: Input{info: &dto.GetPostRequest{
-				PostID: "677be1d2-9b64-48e9-9341-5ba0c2f57686"}},
+				PostID: "677be1d2-9b64-48e9-9341-5ba0c2f57686"}, userID: "1"},
 			outputGetPost: OutputGetPost{post: &core.Post{
 				AuthorID: "1",
 				Message:  "It's my second post!",
 				Images:   []string{"src/img.jpg"}}, err: nil},
+			inputCreateLike: InputCreateLike{like: &core.Like{Subject: "677be1d2-9b64-48e9-9341-5ba0c2f57686"}},
+			outputCreateLike: OutputCreateLike{
+				like: &core.Like{
+					ID:        "1",
+					Subject:   "677be1d2-9b64-48e9-9341-5ba0c2f57686",
+					Amount:    0,
+					UserIDs:   nil,
+					CreatedAt: 0,
+				},
+				err: nil,
+			},
 			output: Output{&dto.GetPostResponse{Post: convert.Post2DTO(&core.Post{
 				AuthorID: "1",
 				Message:  "It's my second post!",
-				Images:   []string{"src/img.jpg"}}, &core.User{ID: "1"})}, nil},
+				Images:   []string{"src/img.jpg"}}, &core.User{ID: "1"}), Likes: convert.Like2DTO(&core.Like{
+				ID:        "1",
+				Subject:   "677be1d2-9b64-48e9-9341-5ba0c2f57686",
+				Amount:    0,
+				UserIDs:   nil,
+				CreatedAt: 0,
+			}, "1")}, nil},
 		},
 	}
 
@@ -191,12 +231,13 @@ func TestGetPost(t *testing.T) {
 		testRepo.mockPostR.EXPECT().GetPostByID(ctx, tests[0].input.info.PostID).Return(tests[0].outputGetPost.post, tests[0].outputGetPost.err),
 		testRepo.mockPostR.EXPECT().GetPostByID(ctx, tests[1].input.info.PostID).Return(tests[1].outputGetPost.post, tests[1].outputGetPost.err),
 		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[1].outputGetPost.post.AuthorID).Return(&core.User{ID: "1"}, nil),
+		testRepo.mockLikeR.EXPECT().GetLikeBySubjectID(ctx, tests[1].inputCreateLike.like.Subject).Return(tests[1].outputCreateLike.like, tests[1].outputCreateLike.err),
 	)
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.PostService.GetPost(dbUserImpl, ctx, test.input.info)
+			res, errRes := service.PostService.GetPost(dbUserImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
