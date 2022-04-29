@@ -160,7 +160,7 @@ func (svc *userServiceImpl) SearchUsers(ctx context.Context, request *dto.Search
 
 	users := []dto.User{}
 	for _, userCore := range usersCore {
-		users = append(users, convert.User2DTO(&userCore))
+		users = append(users, convert.User2DTO(userCore))
 	}
 
 	return &dto.SearchUsersResponse{Users: users}, nil

@@ -28,7 +28,7 @@ type UserRepository interface {
 	UserCheckPost(ctx context.Context, user *core.User, postID string) error
 	UserDeletePost(ctx context.Context, userID string, postID string) error
 
-	SelectUsers(ctx context.Context, selector string) ([]core.User, error)
+	SelectUsers(ctx context.Context, selector string) ([]*core.User, error)
 
 	AddDialog(ctx context.Context, dialogID string, userID string) error
 	GetUserDialogs(ctx context.Context, userID string) ([]string, error)
