@@ -137,11 +137,26 @@ func (mr *MockUserRepositoryMockRecorder) GetUserDialogs(ctx, userID interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserDialogs", reflect.TypeOf((*MockUserRepository)(nil).GetUserDialogs), ctx, userID)
 }
 
+// IsUserInDialog mocks base method.
+func (m *MockUserRepository) IsUserInDialog(ctx context.Context, userID, dialogID string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsUserInDialog", ctx, userID, dialogID)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsUserInDialog indicates an expected call of IsUserInDialog.
+func (mr *MockUserRepositoryMockRecorder) IsUserInDialog(ctx, userID, dialogID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUserInDialog", reflect.TypeOf((*MockUserRepository)(nil).IsUserInDialog), ctx, userID, dialogID)
+}
+
 // SelectUsers mocks base method.
-func (m *MockUserRepository) SelectUsers(ctx context.Context, selector string) ([]core.User, error) {
+func (m *MockUserRepository) SelectUsers(ctx context.Context, selector string) ([]*core.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SelectUsers", ctx, selector)
-	ret0, _ := ret[0].([]core.User)
+	ret0, _ := ret[0].([]*core.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

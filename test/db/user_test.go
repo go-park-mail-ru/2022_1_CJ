@@ -318,7 +318,7 @@ func TestSelectUsers(t *testing.T) {
 		ctx := context.Background()
 		users, err := userCollection.SelectUsers(ctx, "Sash")
 		assert.Nil(t, err)
-		assert.Equal(t, []core.User{
+		assert.Equal(t, []*core.User{
 			{ID: expectedUser1.ID, Name: expectedUser1.Name},
 			{ID: expectedUser2.ID, Name: expectedUser2.Name},
 		}, users)
