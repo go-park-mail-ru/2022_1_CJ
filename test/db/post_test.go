@@ -88,14 +88,12 @@ func TestGetPostsByUserID(t *testing.T) {
 		expectedPost1 := core.Post{
 			ID:        "12345678",
 			AuthorID:  "123456789",
-			Message:   "Hi it's my first post",
 			Images:    []string{"src/image1.jpg"},
 			CreatedAt: 1323123,
 		}
 		first := mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
 			{"_id", expectedPost1.ID},
 			{"author_id", expectedPost1.AuthorID},
-			{"message", expectedPost1.Message},
 			{"images", expectedPost1.Images},
 			{"created_at", expectedPost1.CreatedAt},
 		})
@@ -103,14 +101,12 @@ func TestGetPostsByUserID(t *testing.T) {
 		expectedPost2 := core.Post{
 			ID:        "101010101",
 			AuthorID:  "123456789",
-			Message:   "Hi it's my second post",
 			Images:    []string{"src/image2.jpg"},
 			CreatedAt: 1323123,
 		}
 		second := mtest.CreateCursorResponse(1, "foo.bar", mtest.NextBatch, bson.D{
 			{"_id", expectedPost2.ID},
 			{"author_id", expectedPost2.AuthorID},
-			{"message", expectedPost2.Message},
 			{"images", expectedPost2.Images},
 			{"created_at", expectedPost2.CreatedAt},
 		})
@@ -122,8 +118,8 @@ func TestGetPostsByUserID(t *testing.T) {
 		posts, err := postCollection.GetPostsByUserID(ctx, "123456789")
 		assert.Nil(t, err)
 		assert.Equal(t, []core.Post{
-			{ID: expectedPost1.ID, AuthorID: expectedPost1.AuthorID, Message: expectedPost1.Message, Images: expectedPost1.Images, CreatedAt: expectedPost1.CreatedAt},
-			{ID: expectedPost2.ID, AuthorID: expectedPost2.AuthorID, Message: expectedPost2.Message, Images: expectedPost2.Images, CreatedAt: expectedPost2.CreatedAt},
+			{ID: expectedPost1.ID, AuthorID: expectedPost1.AuthorID, Images: expectedPost1.Images, CreatedAt: expectedPost1.CreatedAt},
+			{ID: expectedPost2.ID, AuthorID: expectedPost2.AuthorID, Images: expectedPost2.Images, CreatedAt: expectedPost2.CreatedAt},
 		}, posts)
 	})
 }
@@ -168,14 +164,12 @@ func TestGetFeed(t *testing.T) {
 		expectedPost1 := core.Post{
 			ID:        "12345678",
 			AuthorID:  "123456789",
-			Message:   "Hi it's my first post",
 			Images:    []string{"src/image1.jpg"},
 			CreatedAt: 1323123,
 		}
 		first := mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
 			{"_id", expectedPost1.ID},
 			{"author_id", expectedPost1.AuthorID},
-			{"message", expectedPost1.Message},
 			{"images", expectedPost1.Images},
 			{"created_at", expectedPost1.CreatedAt},
 		})
@@ -183,14 +177,12 @@ func TestGetFeed(t *testing.T) {
 		expectedPost2 := core.Post{
 			ID:        "101010101",
 			AuthorID:  "123456789",
-			Message:   "Hi it's my second post",
 			Images:    []string{"src/image2.jpg"},
 			CreatedAt: 1323123,
 		}
 		second := mtest.CreateCursorResponse(1, "foo.bar", mtest.NextBatch, bson.D{
 			{"_id", expectedPost2.ID},
 			{"author_id", expectedPost2.AuthorID},
-			{"message", expectedPost2.Message},
 			{"images", expectedPost2.Images},
 			{"created_at", expectedPost2.CreatedAt},
 		})
@@ -202,8 +194,8 @@ func TestGetFeed(t *testing.T) {
 		posts, err := postCollection.GetFeed(ctx, "12")
 		assert.Nil(t, err)
 		assert.Equal(t, []core.Post{
-			{ID: expectedPost1.ID, AuthorID: expectedPost1.AuthorID, Message: expectedPost1.Message, Images: expectedPost1.Images, CreatedAt: expectedPost1.CreatedAt},
-			{ID: expectedPost2.ID, AuthorID: expectedPost2.AuthorID, Message: expectedPost2.Message, Images: expectedPost2.Images, CreatedAt: expectedPost2.CreatedAt},
+			{ID: expectedPost1.ID, AuthorID: expectedPost1.AuthorID, Images: expectedPost1.Images, CreatedAt: expectedPost1.CreatedAt},
+			{ID: expectedPost2.ID, AuthorID: expectedPost2.AuthorID, Images: expectedPost2.Images, CreatedAt: expectedPost2.CreatedAt},
 		}, posts)
 	})
 }

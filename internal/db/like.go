@@ -47,18 +47,30 @@ func (repo *likeRepositoryImpl) GetLikeBySubjectID(ctx context.Context, subjectI
 }
 
 func (repo *likeRepositoryImpl) IncreaseLike(ctx context.Context, subjectID string, userID string) error {
-	filter := bson.M{"subject_id": subjectID}
-	update := bson.M{"$push": bson.D{{Key: "user_ids", Value: userID}}}
-	if err := repo.coll.FindOneAndUpdate(ctx, filter, update).Err(); err != nil {
+	filter1 := bson.M{"subject_id": subjectID}
+	update1 := bson.M{"$inc": bson.D{{Key: "amount", Value: 1}}}
+	if _, err := repo.coll.UpdateOne(ctx, filter1, update1); err != nil {
+		return err
+	}
+
+	filter2 := bson.M{"subject_id": subjectID}
+	update2 := bson.M{"$push": bson.D{{Key: "user_ids", Value: userID}}}
+	if err := repo.coll.FindOneAndUpdate(ctx, filter2, update2).Err(); err != nil {
 		return wrapError(err)
 	}
 	return nil
 }
 
 func (repo *likeRepositoryImpl) ReduceLike(ctx context.Context, subjectID string, userID string) error {
-	filter := bson.M{"subject_id": subjectID}
-	update := bson.M{"$pull": bson.D{{Key: "user_ids", Value: userID}}}
-	if err := repo.coll.FindOneAndUpdate(ctx, filter, update).Err(); err != nil {
+	filter1 := bson.M{"subject_id": subjectID}
+	update1 := bson.M{"$inc": bson.D{{Key: "amount", Value: -1}}}
+	if _, err := repo.coll.UpdateOne(ctx, filter1, update1); err != nil {
+		return err
+	}
+
+	filter2 := bson.M{"subject_id": subjectID}
+	update2 := bson.M{"$pull": bson.D{{Key: "user_ids", Value: userID}}}
+	if err := repo.coll.FindOneAndUpdate(ctx, filter2, update2).Err(); err != nil {
 		return wrapError(err)
 	}
 	return nil
