@@ -50,11 +50,16 @@ func (svc *userServiceImpl) GetUserPosts(ctx context.Context, userID string) (*d
 	}
 	svc.log.Debug("GetUserPosts success")
 
-	posts := []dto.Post{}
+	posts := []dto.GetPosts{}
 	for _, postCore := range postsCore {
-		posts = append(posts, convert.Post2DTO(&postCore, user))
-	}
+		like, err := svc.db.LikeRepo.GetLikeBySubjectID(ctx, postCore.ID)
+		if err != nil {
+			svc.log.Errorf("GetLikeBySubjectID error: %s", err)
+			return nil, err
+		}
 
+		posts = append(posts, dto.GetPosts{Post: convert.Post2DTO(&postCore, user), Likes: convert.Like2DTO(like, userID)})
+	}
 	return &dto.GetUserPostsResponse{Posts: posts}, nil
 }
 
@@ -72,15 +77,20 @@ func (svc *userServiceImpl) GetFeed(ctx context.Context, userID string) (*dto.Ge
 	}
 	svc.log.Debug("GetFeed success")
 
-	posts := []dto.Post{}
+	posts := []dto.GetPosts{}
 	for _, postCore := range postsCore {
 		author, err := svc.db.UserRepo.GetUserByID(ctx, postCore.AuthorID)
 		if err != nil {
 			return nil, err
 		}
-		posts = append(posts, convert.Post2DTO(&postCore, author))
-	}
+		like, err := svc.db.LikeRepo.GetLikeBySubjectID(ctx, postCore.ID)
+		if err != nil {
+			svc.log.Errorf("GetLikeBySubjectID error: %s", err)
+			return nil, err
+		}
 
+		posts = append(posts, dto.GetPosts{Post: convert.Post2DTO(&postCore, author), Likes: convert.Like2DTO(like, userID)})
+	}
 	return &dto.GetUserFeedResponse{Posts: posts}, nil
 }
 
