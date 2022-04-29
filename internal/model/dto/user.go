@@ -31,6 +31,11 @@ type EditProfile struct {
 	BirthDay string          `json:"birth_day"`
 }
 
+type GetPosts struct {
+	Post  Post `json:"post"`
+	Likes Like `json:"likes"`
+}
+
 type GetUserRequest struct {
 	UserID string `query:"user_id"`
 }
@@ -44,13 +49,13 @@ type GetUserPostsRequest struct {
 }
 
 type GetUserPostsResponse struct {
-	Posts []Post `json:"posts"`
+	Posts []GetPosts `json:"posts"`
 }
 
 type GetUserFeedRequest struct{}
 
 type GetUserFeedResponse struct {
-	Posts []Post `json:"posts"`
+	Posts []GetPosts `json:"posts"`
 }
 
 type GetProfileRequest struct {

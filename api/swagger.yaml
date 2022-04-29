@@ -584,7 +584,7 @@ components:
         posts:
           type: array
           items:
-            $ref: "#/components/schemas/Post"
+            $ref: "#/components/schemas/GetPosts"
 
     GetUserProfileResponse:
       $ref: "#/components/schemas/UserProfile"
@@ -646,7 +646,7 @@ components:
         posts:
           type: array
           items:
-            $ref: "#/components/schemas/Post"
+            $ref: "#/components/schemas/GetPosts"
 
     CreatePostRequest:
       type: object
@@ -850,8 +850,8 @@ components:
       properties:
         id:
           type: string
-        author_id:
-          type: string
+        author:
+          $ref: "#/components/schemas/User"
         message:
           type: string
         images:
@@ -906,3 +906,10 @@ components:
           type: array
           items:
             type: string
+    GetPosts:
+      type: object
+      properties:
+        post:
+          $ref: "#/components/schemas/Post"
+        likes:
+          $ref: "#/components/schemas/Like"
