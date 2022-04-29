@@ -17,6 +17,7 @@ func GenerateCSRFToken(userID string) (string, error) {
 	data := fmt.Sprintf("%s:%d", userID, viper.GetInt64(constants.ViperCSRFTTLKey))
 	h.Write([]byte(data))
 	token := hex.EncodeToString(h.Sum(nil)) + ":" + strconv.FormatInt(viper.GetInt64(constants.ViperCSRFTTLKey), 10)
+	//fmt.Print(strconv.FormatInt(viper.GetInt64(constants.ViperCSRFTTLKey, 10)))
 	return token, nil
 }
 
