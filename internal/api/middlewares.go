@@ -33,18 +33,17 @@ func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
 			ctx.Request().Header.Set(constants.HeaderKeyUserID, tw.UserID)
 
 			// CSRF
-			//cookieCSRF, err := ctx.Cookie(constants.CookieKeyCSRFToken)
-			//if len(cookieCSRF.Value) == 0 || err != nil {
-			//	return constants.ErrMissingCSRFCookie
-			//}
+			cookieCSRF, err := ctx.Cookie(constants.CookieKeyCSRFToken)
+			if len(cookieCSRF.Value) == 0 || err != nil {
+				return constants.ErrMissingCSRFCookie
+			}
+			tokenCSRF := ctx.QueryParam(constants.CookieKeyCSRFToken)
 
-			//isCorrect, err := utils.CheckCSRFToken(tw.UserID, cookieCSRF.Value)
-			//if err != nil {
-			//	return err
-			//}
-			//if !isCorrect {
-			//	return constants.ErrCSRFTokenWrong
-			//}
+			if tokenCSRF != cookieCSRF.Value {
+				svc.log.Errorf("Cookie token: %s; Query token: %s", cookieCSRF.Value, tokenCSRF)
+				return constants.ErrCSRFTokenWrong
+			}
+
 			return next(ctx)
 		}
 	}
