@@ -31,7 +31,9 @@ func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
 
 			ctx.Request().Header.Set(constants.HeaderKeyUserID, tw.UserID)
 
+			svc.log.Errorf("Time Auth: %d", tw.ExpiresAt)
 			authToken, err := utils.RefreshIfNeededAuthToken(tw)
+
 			if err != nil {
 				return err
 			}

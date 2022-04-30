@@ -38,7 +38,7 @@ func RefreshIfNeededCSRFToken(token string, userID string) (string, error) {
 		return "", constants.ErrCSRFTokenWrong
 	}
 
-	if tokenExp >= viper.GetInt64(constants.ViperCSRFTTLKey)/8 {
+	if tokenExp > time.Now().Unix()+viper.GetInt64(constants.ViperCSRFTTLKey)/2 {
 		return "", nil
 	}
 

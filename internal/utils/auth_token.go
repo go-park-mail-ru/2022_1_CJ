@@ -57,7 +57,7 @@ func ParseAuthToken(authToken string) (*AuthTokenWrapper, error) {
 }
 
 func RefreshIfNeededAuthToken(atw *AuthTokenWrapper) (string, error) {
-	if atw.ExpiresAt < viper.GetInt64(constants.ViperJWTTTLKey)/8 {
+	if atw.ExpiresAt > time.Now().Unix()+viper.GetInt64(constants.ViperJWTTTLKey)/2 {
 		t := time.Second * time.Duration(viper.GetInt64(constants.ViperJWTTTLKey))
 		atw.ExpiresAt = time.Now().Add(t).Unix()
 	} else {
