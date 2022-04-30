@@ -16,6 +16,19 @@ type CommunityService interface {
 	EditCommunity(ctx context.Context, request *dto.EditCommunityRequest, userID string) (*dto.EditCommunityResponse, error)
 	GetCommunity(ctx context.Context, request *dto.GetCommunityRequest) (*dto.GetCommunityResponse, error)
 	GetCommunityPosts(ctx context.Context, request *dto.GetCommunityPostsRequest, userID string) (*dto.GetCommunityPostsResponse, error)
+	GetUserCommunities(ctx context.Context, request *dto.GetUserCommunitiesRequest) (*dto.GetUserCommunitiesResponse, error)
+	GetUserManageCommunities(ctx context.Context, request *dto.GetUserManageCommunitiesRequest) (*dto.GetUserManageCommunitiesResponse, error)
+	JoinCommunity(ctx context.Context, request *dto.JoinCommunityRequest, userID string) (*dto.JoinCommunityResponse, error)
+	LeaveCommunity(ctx context.Context, request *dto.LeaveCommunityRequest, userID string) (*dto.LeaveCommunityResponse, error)
+	SearchCommunities(ctx context.Context, request *dto.SearchCommunitiesRequest) (*dto.SearchCommunitiesResponse, error)
+	GetFollowers(ctx context.Context, request *dto.GetFollowersRequest) (*dto.GetFollowersResponse, error)
+	GetCommunities(ctx context.Context) (*dto.GetCommunitiesResponse, error)
+	UpdatePhoto(ctx context.Context, request *dto.UpdatePhotoCommunityRequest, url string, userID string) (*dto.UpdatePhotoCommunityResponse, error)
+	GetMutualFriends(ctx context.Context, request *dto.GetMutualFriendsRequest, userID string) (*dto.GetMutualFriendsResponse, error)
+
+	CreatePostCommunity(ctx context.Context, request *dto.CreatePostCommunityRequest, userID string) (*dto.CreatePostCommunityResponse, error)
+	DeletePostCommunity(ctx context.Context, request *dto.DeletePostCommunityRequest, userID string) (*dto.DeletePostCommunityResponse, error)
+	EditPostCommunity(ctx context.Context, request *dto.EditPostCommunityRequest, userID string) (*dto.EditPostCommunityResponse, error)
 }
 
 type communityServiceImpl struct {
@@ -62,6 +75,202 @@ func (svc *communityServiceImpl) GetCommunity(ctx context.Context, request *dto.
 	}
 
 	return &dto.GetCommunityResponse{Community: convert.Community2DTOprofile(community, admins)}, nil
+}
+
+func (svc *communityServiceImpl) GetUserManageCommunities(ctx context.Context, request *dto.GetUserManageCommunitiesRequest) (*dto.GetUserManageCommunitiesResponse, error) {
+	user, err := svc.db.UserRepo.GetUserByID(ctx, request.UserID)
+	if err != nil {
+		svc.log.Errorf("GetUserByID error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+
+	var communities []dto.Community
+	for _, commID := range user.CommunityIDs {
+		comm, err := svc.db.CommunityRepo.GetCommunityByID(ctx, commID)
+		if err != nil {
+			svc.log.Errorf("GetCommunityByID error: %s", err)
+			return nil, constants.ErrDBNotFound
+		}
+
+		for _, id := range comm.AdminIDs {
+			if id == request.UserID {
+				communities = append(communities, convert.Community2DTO(comm))
+			}
+		}
+	}
+
+	return &dto.GetUserManageCommunitiesResponse{Communities: communities}, nil
+}
+
+func (svc *communityServiceImpl) GetCommunities(ctx context.Context) (*dto.GetCommunitiesResponse, error) {
+	communities, err := svc.db.CommunityRepo.GetAllCommunities(ctx)
+	if err != nil {
+		svc.log.Errorf("GetAllCommunities error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+	var res []dto.Community
+	for _, comm := range communities {
+		res = append(res, convert.Community2DTO(&comm))
+	}
+	return &dto.GetCommunitiesResponse{Communities: res}, nil
+}
+
+func (svc *communityServiceImpl) JoinCommunity(ctx context.Context, request *dto.JoinCommunityRequest, userID string) (*dto.JoinCommunityResponse, error) {
+	user, err := svc.db.UserRepo.GetUserByID(ctx, userID)
+	if err != nil {
+		svc.log.Errorf("GetUserByID error: %s", err)
+		return nil, err
+	}
+
+	for _, id := range user.CommunityIDs {
+		if id == request.CommunityID {
+			return nil, constants.ErrAlreadyFollower
+		}
+	}
+
+	err = svc.db.CommunityRepo.AddFollower(ctx, request.CommunityID, userID)
+	if err != nil {
+		svc.log.Errorf("AddFollower error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+
+	err = svc.db.UserRepo.UserAddCommunity(ctx, userID, request.CommunityID)
+	if err != nil {
+		svc.log.Errorf("UserAddCommunity error: %s", err)
+		return nil, err
+	}
+
+	return &dto.JoinCommunityResponse{}, nil
+}
+
+func (svc *communityServiceImpl) LeaveCommunity(ctx context.Context, request *dto.LeaveCommunityRequest, userID string) (*dto.LeaveCommunityResponse, error) {
+	err := svc.db.CommunityRepo.DeleteFollower(ctx, request.CommunityID, userID)
+	if err != nil {
+		svc.log.Errorf("DeleteFollower error: %s", err)
+		return nil, err
+	}
+
+	err = svc.db.UserRepo.UserDeleteCommunity(ctx, userID, request.CommunityID)
+	if err != nil {
+		svc.log.Errorf("UserDeleteCommunity error: %s", err)
+		return nil, err
+	}
+
+	return &dto.LeaveCommunityResponse{}, nil
+}
+
+func (svc *communityServiceImpl) GetFollowers(ctx context.Context, request *dto.GetFollowersRequest) (*dto.GetFollowersResponse, error) {
+	community, err := svc.db.CommunityRepo.GetCommunityByID(ctx, request.CommunityID)
+	if err != nil {
+		svc.log.Errorf("GetCommunityByID error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+	var followers []dto.User
+	for _, id := range community.FollowerIDs {
+		user, err := svc.db.UserRepo.GetUserByID(ctx, id)
+		if err != nil {
+			svc.log.Errorf("GetCommunityByID error: %s", err)
+			return nil, constants.ErrDBNotFound
+		}
+		followers = append(followers, convert.User2DTO(user))
+	}
+
+	return &dto.GetFollowersResponse{Amount: int64(len(community.FollowerIDs)), Followers: followers}, nil
+}
+func (svc *communityServiceImpl) GetMutualFriends(ctx context.Context, request *dto.GetMutualFriendsRequest, userID string) (*dto.GetMutualFriendsResponse, error) {
+	community, err := svc.db.CommunityRepo.GetCommunityByID(ctx, request.CommunityID)
+	if err != nil {
+		svc.log.Errorf("GetCommunityByID error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+	user, err := svc.db.UserRepo.GetUserByID(ctx, userID)
+	if err != nil {
+		svc.log.Errorf("GetCommunityByID error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+
+	friends, err := svc.db.FriendsRepo.GetFriendsByID(ctx, user.FriendsID)
+	if err != nil {
+		svc.log.Errorf("GetFriendsByID error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+
+	var followers []dto.User
+	for _, id1 := range friends {
+		for _, id2 := range community.FollowerIDs {
+			if id1 == id2 {
+				userFriend, err := svc.db.UserRepo.GetUserByID(ctx, id1)
+				if err != nil {
+					svc.log.Errorf("GetCommunityByID error: %s", err)
+					return nil, constants.ErrDBNotFound
+				}
+				followers = append(followers, convert.User2DTO(userFriend))
+			}
+		}
+	}
+
+	return &dto.GetMutualFriendsResponse{Amount: int64(len(followers)), Followers: followers}, nil
+}
+
+func (svc *communityServiceImpl) GetUserCommunities(ctx context.Context, request *dto.GetUserCommunitiesRequest) (*dto.GetUserCommunitiesResponse, error) {
+	user, err := svc.db.UserRepo.GetUserByID(ctx, request.UserID)
+	if err != nil {
+		svc.log.Errorf("GetUserByID error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+
+	var communities []dto.Community
+	for _, id := range user.CommunityIDs {
+		comm, err := svc.db.CommunityRepo.GetCommunityByID(ctx, id)
+		if err != nil {
+			svc.log.Errorf("GetCommunityByID error: %s", err)
+			return nil, constants.ErrDBNotFound
+		}
+		communities = append(communities, convert.Community2DTO(comm))
+	}
+	return &dto.GetUserCommunitiesResponse{Communities: communities}, nil
+}
+
+func (svc *communityServiceImpl) SearchCommunities(ctx context.Context, request *dto.SearchCommunitiesRequest) (*dto.SearchCommunitiesResponse, error) {
+	communities, err := svc.db.CommunityRepo.SearchCommunities(ctx, request.Selector)
+	if err != nil {
+		svc.log.Errorf("SearchCommunities error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+	var res []dto.Community
+	for _, comm := range communities {
+		res = append(res, convert.Community2DTO(&comm))
+	}
+	return &dto.SearchCommunitiesResponse{Communities: res}, nil
+}
+
+func (svc *communityServiceImpl) UpdatePhoto(ctx context.Context, request *dto.UpdatePhotoCommunityRequest, url string, userID string) (*dto.UpdatePhotoCommunityResponse, error) {
+	err := svc.db.UserRepo.UserCheckCommunity(ctx, userID, request.CommunityID)
+	if err != nil {
+		svc.log.Errorf("UserCheckCommunity error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+
+	community, err := svc.db.CommunityRepo.GetCommunityByID(ctx, request.CommunityID)
+	if err != nil {
+		svc.log.Errorf("GetCommunityByID error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+
+	for num, id := range community.AdminIDs {
+		if id == userID {
+			break
+		} else if num == (len(community.AdminIDs) - 1) {
+			return nil, constants.ErrAuthorIDMismatch
+		}
+	}
+
+	community.Image = url
+	if err = svc.db.CommunityRepo.EditCommunity(ctx, community); err != nil {
+		return nil, err
+	}
+
+	return &dto.UpdatePhotoCommunityResponse{URL: url}, nil
 }
 
 func (svc *communityServiceImpl) GetCommunityPosts(ctx context.Context, request *dto.GetCommunityPostsRequest, userID string) (*dto.GetCommunityPostsResponse, error) {
@@ -132,6 +341,128 @@ func (svc *communityServiceImpl) EditCommunity(ctx context.Context, request *dto
 	}
 
 	return &dto.EditCommunityResponse{}, nil
+}
+func (svc *communityServiceImpl) CreatePostCommunity(ctx context.Context, request *dto.CreatePostCommunityRequest, userID string) (*dto.CreatePostCommunityResponse, error) {
+	err := svc.db.UserRepo.UserCheckCommunity(ctx, userID, request.CommunityID)
+	if err != nil {
+		svc.log.Errorf("UserCheckCommunity error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+
+	community, err := svc.db.CommunityRepo.GetCommunityByID(ctx, request.CommunityID)
+	if err != nil {
+		svc.log.Errorf("GetCommunityByID error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+
+	for num, id := range community.AdminIDs {
+		if id == userID {
+			break
+		} else if num == (len(community.AdminIDs) - 1) {
+			return nil, constants.ErrAuthorIDMismatch
+		}
+	}
+	post, err := svc.db.PostRepo.CreatePost(ctx, &core.Post{
+		AuthorID: community.ID,
+		Message:  request.Message,
+		Images:   request.Images,
+		Type:     constants.CommunityPost,
+	})
+	if err != nil {
+		svc.log.Errorf("CreatePost error: %s", err)
+		return nil, err
+	}
+
+	err = svc.db.CommunityRepo.CommunityAddPost(ctx, community.ID, post.ID)
+	if err != nil {
+		svc.log.Errorf("UserAddPost error: %s", err)
+		return nil, err
+	}
+
+	_, err = svc.db.LikeRepo.CreateLike(ctx, &core.Like{Subject: post.ID})
+	if err != nil {
+		svc.log.Errorf("CreateLike error: %s", err)
+		return nil, err
+	}
+
+	return &dto.CreatePostCommunityResponse{}, nil
+}
+
+func (svc *communityServiceImpl) EditPostCommunity(ctx context.Context, request *dto.EditPostCommunityRequest, userID string) (*dto.EditPostCommunityResponse, error) {
+	err := svc.db.UserRepo.UserCheckCommunity(ctx, userID, request.CommunityID)
+	if err != nil {
+		svc.log.Errorf("UserCheckCommunity error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+
+	community, err := svc.db.CommunityRepo.GetCommunityByID(ctx, request.CommunityID)
+	if err != nil {
+		svc.log.Errorf("GetCommunityByID error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+
+	for num, id := range community.AdminIDs {
+		if id == userID {
+			break
+		} else if num == (len(community.AdminIDs) - 1) {
+			return nil, constants.ErrAuthorIDMismatch
+		}
+	}
+
+	_, err = svc.db.PostRepo.EditPost(ctx, &core.Post{
+		AuthorID: request.CommunityID,
+		ID:       request.PostID,
+		Message:  request.Message,
+		Images:   request.Images,
+	})
+	if err != nil {
+		svc.log.Errorf("EditPost error: %s", err)
+		return nil, err
+	}
+
+	return &dto.EditPostCommunityResponse{}, nil
+}
+
+func (svc *communityServiceImpl) DeletePostCommunity(ctx context.Context, request *dto.DeletePostCommunityRequest, userID string) (*dto.DeletePostCommunityResponse, error) {
+	err := svc.db.UserRepo.UserCheckCommunity(ctx, userID, request.CommunityID)
+	if err != nil {
+		svc.log.Errorf("UserCheckCommunity error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+
+	community, err := svc.db.CommunityRepo.GetCommunityByID(ctx, request.CommunityID)
+	if err != nil {
+		svc.log.Errorf("GetCommunityByID error: %s", err)
+		return nil, constants.ErrDBNotFound
+	}
+
+	for num, id := range community.AdminIDs {
+		if id == userID {
+			break
+		} else if num == (len(community.AdminIDs) - 1) {
+			return nil, constants.ErrAuthorIDMismatch
+		}
+	}
+
+	err = svc.db.PostRepo.DeletePost(ctx, request.PostID)
+	if err != nil {
+		svc.log.Errorf("DeletePost error: %s", err)
+		return nil, err
+	}
+
+	err = svc.db.CommunityRepo.CommunityDeletePost(ctx, community.ID, request.PostID)
+	if err != nil {
+		svc.log.Errorf("CommunityDeletePost error: %s", err)
+		return nil, err
+	}
+
+	err = svc.db.LikeRepo.DeleteLike(ctx, request.PostID)
+	if err != nil {
+		svc.log.Errorf("DeleteLike error: %s", err)
+		return nil, err
+	}
+
+	return &dto.DeletePostCommunityResponse{}, nil
 }
 
 func (svc *communityServiceImpl) DeleteCommunity(ctx context.Context, request *dto.DeleteCommunityRequest, userID string) (*dto.DeleteCommunityResponse, error) {

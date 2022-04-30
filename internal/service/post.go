@@ -95,7 +95,7 @@ func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostR
 	}
 	svc.log.Debugf("Post data befor edit: Message: %s; Images paths: %v", postBefore.Message, postBefore.Images)
 
-	post, err := svc.db.PostRepo.EditPost(ctx, &core.Post{
+	_, err = svc.db.PostRepo.EditPost(ctx, &core.Post{
 		AuthorID: userID,
 		ID:       request.PostID,
 		Message:  request.Message,
@@ -105,8 +105,6 @@ func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostR
 		svc.log.Errorf("EditPost error: %s", err)
 		return nil, err
 	}
-
-	svc.log.Debugf("Post data after edit: Message: %s; Images paths: %v", post.Message, post.Images)
 
 	return &dto.EditPostResponse{}, nil
 }
@@ -128,13 +126,19 @@ func (svc *postServiceImpl) DeletePost(ctx context.Context, request *dto.DeleteP
 		svc.log.Errorf("DeletePost error: %s", err)
 		return nil, err
 	}
-	svc.log.Debug("DeletePost success")
+
 	err = svc.db.UserRepo.UserDeletePost(ctx, userID, request.PostID)
 	if err != nil {
 		svc.log.Errorf("UserDeletePost error: %s", err)
 		return nil, err
 	}
-	svc.log.Debug("UserDeletePost success")
+
+	err = svc.db.LikeRepo.DeleteLike(ctx, request.PostID)
+	if err != nil {
+		svc.log.Errorf("DeleteLike error: %s", err)
+		return nil, err
+	}
+
 	return &dto.DeletePostResponse{}, nil
 }
 

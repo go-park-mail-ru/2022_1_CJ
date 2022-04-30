@@ -111,28 +111,28 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	chatAPI.POST("/create", chatCtrl.CreateDialog)
 	chatAPI.GET("/ws", chatCtrl.WsHandler)
 
-	communitiesAPI := api.Group("/communities", svc.AuthMiddleware())
+	communitiesAPI := api.Group("/communities", svc.AuthMiddleware(), svc.CSRFMiddleware())
 
 	communitiesAPI.GET("/get", communitiesCtrl.GetCommunity)
 	communitiesAPI.GET("/posts", communitiesCtrl.GetCommunityPosts)
-	//communitiesAPI.GET("/list", communitiesCtrl.GetUserCommunities)
-	//communitiesAPI.GET("/managed_list", communitiesCtrl.GetUserManageCommunities)
-	//communitiesAPI.GET("/full_list", communitiesCtrl.GetCommunities)
-	//communitiesAPI.GET("/search", communitiesAPI.SearchCommunities)
-	//communitiesAPI.GET("/join", communitiesCtrl.JoinCommunity)
-	//communitiesAPI.GET("/leave", communitiesCtrl.LeaveCommunity)
-	//communitiesAPI.GET("/followers", communitiesCtrl.GetFollowers)
-	//communitiesAPI.GET("/mutual_friends", communitiesCtrl.GetMutualFriends)
+	communitiesAPI.GET("/list", communitiesCtrl.GetUserCommunities)
+	communitiesAPI.GET("/managed_list", communitiesCtrl.GetUserManageCommunities)
+	communitiesAPI.GET("/full_list", communitiesCtrl.GetCommunities)
+	communitiesAPI.GET("/search", communitiesCtrl.SearchCommunities)
+	communitiesAPI.GET("/join", communitiesCtrl.JoinCommunity)
+	communitiesAPI.GET("/leave", communitiesCtrl.LeaveCommunity)
+	communitiesAPI.GET("/followers", communitiesCtrl.GetFollowers)
+	communitiesAPI.GET("/mutual_friends", communitiesCtrl.GetMutualFriends)
 
 	communitiesAPI.POST("/create", communitiesCtrl.CreateCommunity)
 	communitiesAPI.PUT("/edit", communitiesCtrl.EditCommunity)
 	communitiesAPI.DELETE("/delete", communitiesCtrl.DeleteCommunity)
-	//communitiesAPI.POST("/update_photo", communitiesCtrl.UpdatePhotoCommunity)
+	communitiesAPI.POST("/update_photo", communitiesCtrl.UpdatePhotoCommunity)
 
-	//communitiesPostAPI := communitiesAPI.Group("/post")
-	//communitiesPostAPI.POST("/create", communitiesCtrl.CreatePostCommunity)
-	//communitiesPostAPI.PUT("/edit", communitiesCtrl.EditPostCommunity)
-	//communitiesPostAPI.DELETE("/delete", communitiesCtrl.DeletePostCommunity)
+	communitiesPostAPI := communitiesAPI.Group("/post")
+	communitiesPostAPI.POST("/create", communitiesCtrl.CreatePostCommunity)
+	communitiesPostAPI.PUT("/edit", communitiesCtrl.EditPostCommunity)
+	communitiesPostAPI.DELETE("/delete", communitiesCtrl.DeletePostCommunity)
 
 	return svc, nil
 }

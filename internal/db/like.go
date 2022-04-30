@@ -12,6 +12,7 @@ import (
 
 type LikeRepository interface {
 	CreateLike(ctx context.Context, like *core.Like) (*core.Like, error)
+	DeleteLike(ctx context.Context, subjectID string) error
 	GetLikeBySubjectID(ctx context.Context, subjectID string) (*core.Like, error)
 	IncreaseLike(ctx context.Context, subjectID string, userID string) error
 	ReduceLike(ctx context.Context, subjectID string, userID string) error
@@ -37,6 +38,12 @@ func (repo *likeRepositoryImpl) CreateLike(ctx context.Context, like *core.Like)
 	}
 	_, err := repo.coll.InsertOne(ctx, like)
 	return like, err
+}
+
+func (repo *likeRepositoryImpl) DeleteLike(ctx context.Context, subjectID string) error {
+	filter := bson.M{"subject_id": subjectID}
+	_, err := repo.coll.DeleteOne(ctx, filter)
+	return err
 }
 
 func (repo *likeRepositoryImpl) GetLikeBySubjectID(ctx context.Context, subjectID string) (*core.Like, error) {

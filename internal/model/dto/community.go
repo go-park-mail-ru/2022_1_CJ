@@ -22,7 +22,7 @@ type GetCommunityRequest struct {
 }
 
 type GetCommunityResponse struct {
-	Community CommunityProfile `json:"community"`
+	Community CommunityProfile `json:"community,omitempty"`
 }
 
 type GetCommunityPostsRequest struct {
@@ -38,7 +38,7 @@ type GetUserCommunitiesRequest struct {
 }
 
 type GetUserCommunitiesResponse struct {
-	Communities []Community `json:"communities"`
+	Communities []Community `json:"communities,omitempty"`
 }
 
 type GetUserManageCommunitiesRequest struct {
@@ -46,13 +46,13 @@ type GetUserManageCommunitiesRequest struct {
 }
 
 type GetUserManageCommunitiesResponse struct {
-	Communities []Community `json:"communities"`
+	Communities []Community `json:"communities,omitempty"`
 }
 
 type GetCommunitiesRequest struct{}
 
 type GetCommunitiesResponse struct {
-	Communities []Community `json:"communities"`
+	Communities []Community `json:"communities,omitempty"`
 }
 
 type SearchCommunitiesRequest struct {
@@ -60,7 +60,15 @@ type SearchCommunitiesRequest struct {
 }
 
 type SearchCommunitiesResponse struct {
-	Communities []Community `json:"communities"`
+	Communities []Community `json:"communities,omitempty"`
+}
+
+type UpdatePhotoCommunityRequest struct {
+	CommunityID string `query:"community_id"`
+}
+
+type UpdatePhotoCommunityResponse struct {
+	URL string `json:"url"`
 }
 
 type JoinCommunityRequest struct {
@@ -90,7 +98,7 @@ type GetMutualFriendsRequest struct {
 
 type GetMutualFriendsResponse struct {
 	Amount    int64  `json:"amount"`
-	Followers []User `json:"followers"`
+	Followers []User `json:"followers,omitempty"`
 }
 
 type CreateCommunityRequest struct {
