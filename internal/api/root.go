@@ -54,6 +54,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	postCtrl := controllers.NewPostController(log, registry)
 	staticCtrl := controllers.NewStaticController(log, registry)
 	likeCtrl := controllers.NewLikeController(log, registry)
+	//communitiesCtrl := controllers.NewCommunitiesController(log, registry)
 	chatCtrl := controllers.NewChatController(log, repository, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler

@@ -19,7 +19,6 @@ import (
 func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) error {
-			svc.log.Info(ctx.Cookies())
 			cookieAuth, err := ctx.Cookie(constants.CookieKeyAuthToken)
 			if err != nil {
 				return constants.ErrMissingAuthCookie

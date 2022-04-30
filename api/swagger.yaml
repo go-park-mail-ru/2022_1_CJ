@@ -514,6 +514,313 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetLikePhotoResponse"
+
+  /communities/get:
+    get:
+      tags:
+        - community
+      summary: get community profile info
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCommunityResponse"
+
+  /communities/posts:
+    get:
+      tags:
+        - community
+      summary: get community posts
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCommunityPostsResponse"
+
+  /communities/list:
+    get:
+      tags:
+        - community
+      summary: get list communities of user
+      parameters:
+        - $ref: "#/components/parameters/userIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserCommunitiesResponse"
+
+  /communities/managed_list:
+    get:
+      tags:
+        - community
+      summary: get managed list communities of user
+      parameters:
+        - $ref: "#/components/parameters/userIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserManageCommunitiesResponse"
+
+  /communities/full_list:
+    get:
+      tags:
+        - community
+      summary: get list all communities
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCommunitiesResponse"
+
+  /communities/search:
+    get:
+      tags:
+        - community
+      summary: get serch communities
+      parameters:
+        - in: query
+          name: selector
+          schema:
+            type: string
+          required: true
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchCommunitiesResponse"
+
+  /communities/join:
+    get:
+      tags:
+        - community
+      summary: join community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JoinCommunityResponse"
+
+  /communities/leave:
+    get:
+      tags:
+        - community
+      summary: leave community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaveCommunityResponse"
+
+  /communities/followers:
+    get:
+      tags:
+        - community
+      summary: get followers of community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetFollowersResponse"
+
+  /communities/mutual_friends:
+    get:
+      tags:
+        - community
+      summary: get mutual friends of community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetMutualFriendsResponse"
+
+  /communities/create:
+    post:
+      tags:
+        - community
+      summary: create community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommunityRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCommunityResponse"
+  /communities/edit:
+    put:
+      tags:
+        - community
+      summary: edit community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditCommunityRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EditCommunityResponse"
+
+  /communities/delete:
+    delete:
+      tags:
+        - community
+      summary: delete community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteCommunityResponse"
+
+  /communities/post/create:
+    post:
+      tags:
+        - community
+      summary: create community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostCommunityRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatePostCommunityResponse"
+
+  /communities/post/edit:
+    put:
+      tags:
+        - community
+      summary: create community
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditPostCommunityRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EditPostCommunityResponse"
+
+  /communities/post/delete:
+    delete:
+      tags:
+        - community
+      summary: create community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/postIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletePostCommunityResponse"
+
 components:
   parameters:
     userIDParam:
@@ -527,6 +834,13 @@ components:
     postIDParam:
       in: query
       name: post_id
+      required: true
+      schema:
+        type: string
+
+    communityIDParam:
+      in: query
+      name: community_id
       required: true
       schema:
         type: string
@@ -762,7 +1076,142 @@ components:
         likes:
           $ref: "#/components/schemas/Like"
 
+    GetCommunityResponse:
+      properties:
+        community:
+          $ref: "#/components/schemas/CommunityProfile"
 
+    GetCommunityPostsResponse:
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetPosts"
+
+    GetUserCommunitiesResponse:
+      properties:
+        communities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Community"
+
+    GetUserManageCommunitiesResponse:
+      properties:
+        communities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Community"
+
+    GetCommunitiesResponse:
+      properties:
+        communities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Community"
+
+    SearchCommunitiesResponse:
+      properties:
+        communities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Community"
+
+    JoinCommunityResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    LeaveCommunityResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+
+    GetFollowersResponse:
+      properties:
+        amount:
+          type: integer
+        followers:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+
+    GetMutualFriendsResponse:
+      properties:
+        amount:
+          type: integer
+        followers:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+
+    CreateCommunityRequest:
+      properties:
+        name:
+          type: string
+        image:
+          type: string
+        info:
+          type: string
+        admins:
+          type: array
+          items:
+            type: string
+
+    CreateCommunityResponse:
+      $ref:  "#/components/schemas/BasicResponse"
+
+    EditCommunityRequest:
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+        info:
+          type: string
+        admins:
+          type: array
+          items:
+            type: string
+
+    EditCommunityResponse:
+      $ref:  "#/components/schemas/BasicResponse"
+
+    DeleteCommunityResponse:
+      $ref:  "#/components/schemas/BasicResponse"
+
+    CreatePostCommunityRequest:
+      properties:
+        community_id:
+          type: string
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+
+    CreatePostCommunityResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    EditPostCommunityRequest:
+      properties:
+        community_id:
+          type: string
+        post_id:
+          type: string
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+
+    EditPostCommunityResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    DeletePostCommunityResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    
     # --------------------- Models --------------------- #
 
     BasicResponse:
@@ -771,18 +1220,15 @@ components:
     User:
       type: object
       properties:
-        user:
-          type: object
-          properties:
-            id:
-              type: string
-            name:
-              $ref: "#/components/schemas/UserName"
-            email:
-              type: string
-              example: mail@example.com
-            image:
-              type: string
+        id:
+          type: string
+        name:
+          $ref: "#/components/schemas/UserName"
+        email:
+          type: string
+          example: mail@example.com
+        image:
+          type: string
 
     UserName:
       type: object
@@ -829,7 +1275,7 @@ components:
       type: array
       items:
         type: string
-      example: [request_id1, request_id2]
+      example: [ request_id1, request_id2 ]
 
     FriendRequest:
       type: object
@@ -851,13 +1297,23 @@ components:
         id:
           type: string
         author:
-          $ref: "#/components/schemas/User"
+          $ref: "#/components/schemas/Author"
         message:
           type: string
         images:
           type: array
           items:
             type: string
+    Author:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+
     Dialog:
       type: object
       properties:
@@ -913,3 +1369,32 @@ components:
           $ref: "#/components/schemas/Post"
         likes:
           $ref: "#/components/schemas/Like"
+
+    Community:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+
+    CommunityProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+        info:
+          type: string
+        followers:
+          type: integer
+        admins:
+          type: array
+          items:
+           $ref: "#/components/schemas/User"
+
