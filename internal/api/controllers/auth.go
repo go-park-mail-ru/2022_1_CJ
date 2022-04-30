@@ -32,7 +32,7 @@ func (c *AuthController) SignupUser(ctx echo.Context) error {
 		return err
 	}
 
-	ctx.SetCookie(utils.CreateCookie(constants.CookieKeyAuthToken, response.AuthToken, viper.GetInt64(constants.ViperJWTTTLKey)))
+	ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, response.AuthToken, viper.GetInt64(constants.ViperJWTTTLKey)))
 	ctx.SetCookie(utils.CreateCookie(constants.CookieKeyCSRFToken, response.CSRFToken, viper.GetInt64(constants.ViperCSRFTTLKey)))
 
 	return ctx.JSON(http.StatusOK, response)
@@ -51,14 +51,14 @@ func (c *AuthController) LoginUser(ctx echo.Context) error {
 		return err
 	}
 
-	ctx.SetCookie(utils.CreateCookie(constants.CookieKeyAuthToken, response.AuthToken, viper.GetInt64(constants.ViperJWTTTLKey)))
+	ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, response.AuthToken, viper.GetInt64(constants.ViperJWTTTLKey)))
 	ctx.SetCookie(utils.CreateCookie(constants.CookieKeyCSRFToken, response.CSRFToken, viper.GetInt64(constants.ViperCSRFTTLKey)))
 
 	return ctx.JSON(http.StatusOK, response)
 }
 
 func (c *AuthController) LogoutUser(ctx echo.Context) error {
-	ctx.SetCookie(utils.CreateCookie(constants.CookieKeyAuthToken, "", 0))
+	ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, "", 0))
 	ctx.SetCookie(utils.CreateCookie(constants.CookieKeyCSRFToken, "", 0))
 	return ctx.JSON(http.StatusOK, &dto.BasicResponse{})
 }
