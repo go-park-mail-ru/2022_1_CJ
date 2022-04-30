@@ -56,6 +56,23 @@ func ParseAuthToken(authToken string) (*AuthTokenWrapper, error) {
 	return atw, nil
 }
 
+func RefreshIfNeededAuthToken(atw *AuthTokenWrapper) (string, error) {
+	if atw.ExpiresAt < viper.GetInt64(constants.ViperJWTTTLKey)/8 {
+		t := time.Second * time.Duration(viper.GetInt64(constants.ViperJWTTTLKey))
+		atw.ExpiresAt = time.Now().Add(t).Unix()
+	} else {
+		return "", nil
+	}
+
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, atw)
+	authToken, err := jwtToken.SignedString([]byte(viper.GetString(constants.ViperJWTSecretKey)))
+	if err != nil {
+		return "", fmt.Errorf("%w: %v", constants.ErrSignToken, err)
+	}
+
+	return authToken, nil
+}
+
 // KeyFunc returns key function for validating a token
 func keyFunc(key []byte) func(token *jwt.Token) (interface{}, error) {
 	return func(token *jwt.Token) (interface{}, error) {

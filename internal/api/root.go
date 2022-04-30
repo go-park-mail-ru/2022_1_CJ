@@ -67,7 +67,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	authAPI.POST("/login", authCtrl.LoginUser)
 	authAPI.DELETE("/logout", authCtrl.LogoutUser)
 
-	userAPI := api.Group("/user", svc.AuthMiddleware())
+	userAPI := api.Group("/user", svc.AuthMiddleware(), svc.CSRFMiddleware())
 
 	userAPI.GET("/get", userCtrl.GetUserData)
 	userAPI.GET("/posts", userCtrl.GetUserPosts)
@@ -77,7 +77,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	userAPI.POST("/profile/edit", userCtrl.EditProfile)
 	userAPI.GET("/search", userCtrl.SearchUsers)
 
-	friendsAPI := api.Group("/friends", svc.AuthMiddleware())
+	friendsAPI := api.Group("/friends", svc.AuthMiddleware(), svc.CSRFMiddleware())
 
 	friendsAPI.POST("/request", friendsCtrl.SendFriendRequest)
 	friendsAPI.POST("/accept", friendsCtrl.AcceptFriendRequest)
@@ -85,14 +85,14 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	friendsAPI.GET("/get", friendsCtrl.GetFriendsByUserID)
 	friendsAPI.DELETE("/delete", friendsCtrl.DeleteFriend)
 
-	postAPI := api.Group("/post", svc.AuthMiddleware())
+	postAPI := api.Group("/post", svc.AuthMiddleware(), svc.CSRFMiddleware())
 
 	postAPI.POST("/create", postCtrl.CreatePost)
 	postAPI.GET("/get", postCtrl.GetPost)
 	postAPI.PUT("/edit", postCtrl.EditPost)
 	postAPI.DELETE("/delete", postCtrl.DeletePost)
 
-	likeAPI := api.Group("/like", svc.AuthMiddleware())
+	likeAPI := api.Group("/like", svc.AuthMiddleware(), svc.CSRFMiddleware())
 
 	likeAPI.POST("/increase", likeCtrl.IncreaseLike)
 	likeAPI.POST("/reduce", likeCtrl.ReduceLike)
@@ -101,9 +101,9 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 
 	static := api.Group("/static")
 
-	static.POST("/upload", staticCtrl.UploadImage, svc.AuthMiddleware())
+	static.POST("/upload", staticCtrl.UploadImage, svc.AuthMiddleware(), svc.CSRFMiddleware())
 
-	chatAPI := api.Group("/messenger", svc.AuthMiddleware())
+	chatAPI := api.Group("/messenger", svc.AuthMiddleware(), svc.CSRFMiddleware())
 
 	chatAPI.GET("/dialogs", chatCtrl.GetDialogs)
 	chatAPI.POST("/get", chatCtrl.GetDialog)

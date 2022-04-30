@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -18,7 +19,6 @@ import (
 func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) error {
-			// Auth
 			svc.log.Info(ctx.Cookies())
 			cookieAuth, err := ctx.Cookie(constants.CookieKeyAuthToken)
 			if err != nil {
@@ -32,7 +32,23 @@ func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
 
 			ctx.Request().Header.Set(constants.HeaderKeyUserID, tw.UserID)
 
-			// CSRF
+			authToken, err := utils.RefreshIfNeededAuthToken(tw)
+			if err != nil {
+				return err
+			}
+
+			if err == nil && len(authToken) != 0 {
+				ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, authToken, viper.GetInt64(constants.ViperJWTTTLKey)))
+			}
+
+			return next(ctx)
+		}
+	}
+}
+
+func (svc *APIService) CSRFMiddleware() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
 			cookieCSRF, err := ctx.Cookie(constants.CookieKeyCSRFToken)
 			if err != nil || len(cookieCSRF.Value) == 0 {
 				return constants.ErrMissingCSRFCookie
@@ -42,6 +58,15 @@ func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
 			if tokenCSRF != cookieCSRF.Value {
 				svc.log.Errorf("Cookie token: %s; Query token: %s", cookieCSRF.Value, tokenCSRF)
 				return constants.ErrCSRFTokenWrong
+			}
+
+			newTokenCSRF, err := utils.RefreshIfNeededCSRFToken(tokenCSRF, ctx.Request().Header.Get(constants.HeaderKeyUserID))
+			if err != nil {
+				return err
+			}
+
+			if err == nil && len(newTokenCSRF) != 0 {
+				ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyCSRFToken, newTokenCSRF, viper.GetInt64(constants.ViperCSRFTTLKey)))
 			}
 
 			return next(ctx)

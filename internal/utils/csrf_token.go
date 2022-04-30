@@ -8,6 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/spf13/viper"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -23,4 +24,23 @@ func GenerateCSRFToken(userID string) (string, error) {
 	token := hex.EncodeToString(h.Sum(nil)) + ":" + strconv.FormatInt(timeNow, 10)
 
 	return token, nil
+}
+
+func RefreshIfNeededCSRFToken(token string, userID string) (string, error) {
+	tokenData := strings.Split(token, ":")
+
+	if len(tokenData) != 2 {
+		return "", constants.ErrCSRFTokenWrong
+	}
+
+	tokenExp, err := strconv.ParseInt(tokenData[1], 10, 64)
+	if err != nil {
+		return "", constants.ErrCSRFTokenWrong
+	}
+
+	if tokenExp >= viper.GetInt64(constants.ViperCSRFTTLKey)/8 {
+		return "", nil
+	}
+
+	return GenerateCSRFToken(userID)
 }

@@ -32,8 +32,8 @@ func (c *AuthController) SignupUser(ctx echo.Context) error {
 		return err
 	}
 
-	ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, response.AuthToken, viper.GetInt64(constants.ViperJWTTTLKey)))
 	ctx.SetCookie(utils.CreateCookie(constants.CookieKeyCSRFToken, response.CSRFToken, viper.GetInt64(constants.ViperCSRFTTLKey)))
+	ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, response.AuthToken, viper.GetInt64(constants.ViperJWTTTLKey)))
 
 	return ctx.JSON(http.StatusOK, response)
 }
@@ -50,9 +50,9 @@ func (c *AuthController) LoginUser(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-
-	ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, response.AuthToken, viper.GetInt64(constants.ViperJWTTTLKey)))
+	c.log.Debugf("CSRF controller : %s", response.CSRFToken)
 	ctx.SetCookie(utils.CreateCookie(constants.CookieKeyCSRFToken, response.CSRFToken, viper.GetInt64(constants.ViperCSRFTTLKey)))
+	ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, response.AuthToken, viper.GetInt64(constants.ViperJWTTTLKey)))
 
 	return ctx.JSON(http.StatusOK, response)
 }
