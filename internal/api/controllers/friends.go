@@ -48,23 +48,6 @@ func (c *FriendsController) AcceptFriendRequest(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (c *FriendsController) DeleteFriend(ctx echo.Context) error {
-	request := new(dto.DeleteFriendRequest)
-	if err := ctx.Bind(request); err != nil {
-		c.log.Errorf("Bind error: %s", err)
-		return err
-	}
-	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-
-	// Можно обернуть ctx в Context(ctx), чтобы передавать UserID в котексте го
-	response, err := c.registry.FriendsService.DeleteFriend(context.Background(), request, UserID)
-	if err != nil {
-		return err
-	}
-
-	return ctx.JSON(http.StatusOK, response)
-}
-
 func (c *FriendsController) GetFriendsByUserID(ctx echo.Context) error {
 	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
@@ -80,6 +63,23 @@ func (c *FriendsController) GetFriendRequests(ctx echo.Context) error {
 	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
 	response, err := c.registry.FriendsService.GetFriendRequests(context.Background(), UserID)
+	if err != nil {
+		return err
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (c *FriendsController) DeleteFriend(ctx echo.Context) error {
+	request := new(dto.DeleteFriendRequest)
+	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
+		return err
+	}
+	UserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+
+	// Можно обернуть ctx в Context(ctx), чтобы передавать UserID в котексте го
+	response, err := c.registry.FriendsService.DeleteFriend(context.Background(), request, UserID)
 	if err != nil {
 		return err
 	}

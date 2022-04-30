@@ -80,6 +80,7 @@ paths:
       security: [ ]
       parameters:
         - $ref: "#/components/parameters/userIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -98,6 +99,7 @@ paths:
       summary: Get user's posts
       parameters:
         - $ref: "#/components/parameters/userIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -114,6 +116,8 @@ paths:
       tags:
         - User
       summary: Get feed
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -125,6 +129,34 @@ paths:
               schema:
                 $ref: "#/components/schemas/GetUserFeedResponse"
 
+  /user/update_photo:
+    post:
+      tags:
+        - User
+      summary: Change photo
+      security: [ ]
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatePhotoResponse"
+
   /user/profile:
     get:
       tags:
@@ -132,6 +164,7 @@ paths:
       summary: Get user profile
       parameters:
         - $ref: "#/components/parameters/userIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -148,6 +181,8 @@ paths:
       tags:
         - Profile
       summary: Edit info about user
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
@@ -164,13 +199,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EditUserProfileResponse"
-  
+
   /user/search:
     get:
       tags:
         - User
       summary: Search users
       parameters:
+        - $ref: "#/components/parameters/csrfToken"
         - in: query
           name: selector
           schema:
@@ -192,6 +228,8 @@ paths:
       tags:
         - Friends
       summary: Send a friend request
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
@@ -852,6 +890,14 @@ components:
       schema:
         type: string
 
+    csrfToken:
+      in: query
+      name: X-CSRF-Token
+      required: true
+      schema:
+        type: string
+      description: some_hash_data:some_time_in_unix
+
   securitySchemes:
     CookieAuth:
       type: apiKey
@@ -890,7 +936,10 @@ components:
       $ref: "#/components/schemas/BasicResponse"
 
     GetUserResponse:
-      $ref: "#/components/schemas/User"
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
 
     GetUserPostsResponse:
       type: object
@@ -899,6 +948,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GetPosts"
+
+
+    UpdatePhotoResponse:
+      properties:
+        url:
+          type: string
+          example: "img/profile.png"
+
 
     GetUserProfileResponse:
       $ref: "#/components/schemas/UserProfile"
@@ -1400,4 +1457,3 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/User"
-

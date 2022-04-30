@@ -16,7 +16,7 @@ type AcceptFriendRequestResponse struct {
 }
 
 type DeleteFriendRequest struct {
-	ExFriendID string `json:"ex_friend_id"`
+	ExFriendID string `query:"ex_friend_id"`
 }
 
 type DeleteFriendResponse struct {
