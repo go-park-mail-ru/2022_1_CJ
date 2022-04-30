@@ -133,10 +133,7 @@ func (repo *comunnityRepositoryImpl) SearchCommunities(ctx context.Context, sele
 	var communities []core.Community
 
 	fuzzy := bson.M{"$regex": selector, "$options": "i"}
-	filter := bson.M{"$or": []bson.M{
-		{"name.first": fuzzy},
-		{"name.last": fuzzy}},
-	}
+	filter := bson.D{{Key: "name", Value: fuzzy}}
 
 	cursor, err := repo.coll.Find(ctx, filter)
 	if err != nil {
