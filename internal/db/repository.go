@@ -7,11 +7,12 @@ import (
 )
 
 type Repository struct {
-	UserRepo    UserRepository
-	FriendsRepo FriendsRepository
-	PostRepo    PostRepository
-	ChatRepo    ChatRepository
-	LikeRepo    LikeRepository
+	UserRepo      UserRepository
+	FriendsRepo   FriendsRepository
+	PostRepo      PostRepository
+	ChatRepo      ChatRepository
+	LikeRepo      LikeRepository
+	CommunityRepo CommunityRepository
 }
 
 func NewRepository(dbConn *mongo.Database) (*Repository, error) {
@@ -40,7 +41,12 @@ func NewRepository(dbConn *mongo.Database) (*Repository, error) {
 
 	repository.LikeRepo, err = NewLikeRepository(dbConn)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create chats repository: %w", err)
+		return nil, fmt.Errorf("failed to create like repository: %w", err)
+	}
+
+	repository.CommunityRepo, err = NewCommunityRepository(dbConn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create community repository: %w", err)
 	}
 
 	return repository, nil

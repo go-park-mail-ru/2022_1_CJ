@@ -54,7 +54,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	postCtrl := controllers.NewPostController(log, registry)
 	staticCtrl := controllers.NewStaticController(log, registry)
 	likeCtrl := controllers.NewLikeController(log, registry)
-	//communitiesCtrl := controllers.NewCommunitiesController(log, registry)
+	communitiesCtrl := controllers.NewCommunityController(log, registry)
 	chatCtrl := controllers.NewChatController(log, repository, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
@@ -110,5 +110,29 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	chatAPI.POST("/get", chatCtrl.GetDialog)
 	chatAPI.POST("/create", chatCtrl.CreateDialog)
 	chatAPI.GET("/ws", chatCtrl.WsHandler)
+
+	communitiesAPI := api.Group("/communities", svc.AuthMiddleware())
+
+	communitiesAPI.GET("/get", communitiesCtrl.GetCommunity)
+	communitiesAPI.GET("/posts", communitiesCtrl.GetCommunityPosts)
+	//communitiesAPI.GET("/list", communitiesCtrl.GetUserCommunities)
+	//communitiesAPI.GET("/managed_list", communitiesCtrl.GetUserManageCommunities)
+	//communitiesAPI.GET("/full_list", communitiesCtrl.GetCommunities)
+	//communitiesAPI.GET("/search", communitiesAPI.SearchCommunities)
+	//communitiesAPI.GET("/join", communitiesCtrl.JoinCommunity)
+	//communitiesAPI.GET("/leave", communitiesCtrl.LeaveCommunity)
+	//communitiesAPI.GET("/followers", communitiesCtrl.GetFollowers)
+	//communitiesAPI.GET("/mutual_friends", communitiesCtrl.GetMutualFriends)
+
+	communitiesAPI.POST("/create", communitiesCtrl.CreateCommunity)
+	communitiesAPI.PUT("/edit", communitiesCtrl.EditCommunity)
+	communitiesAPI.DELETE("/delete", communitiesCtrl.DeleteCommunity)
+	//communitiesAPI.POST("/update_photo", communitiesCtrl.UpdatePhotoCommunity)
+
+	//communitiesPostAPI := communitiesAPI.Group("/post")
+	//communitiesPostAPI.POST("/create", communitiesCtrl.CreatePostCommunity)
+	//communitiesPostAPI.PUT("/edit", communitiesCtrl.EditPostCommunity)
+	//communitiesPostAPI.DELETE("/delete", communitiesCtrl.DeletePostCommunity)
+
 	return svc, nil
 }

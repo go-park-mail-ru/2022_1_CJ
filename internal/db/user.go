@@ -34,6 +34,10 @@ type UserRepository interface {
 	GetUserDialogs(ctx context.Context, userID string) ([]string, error)
 	IsUserInDialog(ctx context.Context, userID string, dialogID string) (bool, error)
 	UserCheckDialog(ctx context.Context, dialogID string, userID string) error
+
+	UserAddCommunity(ctx context.Context, userID string, communityID string) error
+	UserDeleteCommunity(ctx context.Context, userID string, communityID string) error
+	UserCheckCommunity(ctx context.Context, userID string, communityID string) error
 }
 
 type userRepositoryImpl struct {
@@ -123,9 +127,38 @@ func (repo *userRepositoryImpl) UserAddPost(ctx context.Context, userID string, 
 	return nil
 }
 
+// UserAddCommunity Add new user community
+func (repo *userRepositoryImpl) UserAddCommunity(ctx context.Context, userID string, communityID string) error {
+	if _, err := repo.coll.UpdateByID(ctx, userID, bson.M{"$push": bson.D{{Key: "community_ids", Value: communityID}}}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// UserDeletePost Add new user post
+func (repo *userRepositoryImpl) UserDeleteCommunity(ctx context.Context, userID string, communityID string) error {
+	filter := bson.M{"_id": userID, "community_ids": communityID}
+	if err := repo.coll.FindOne(ctx, filter).Err(); err == mongo.ErrNoDocuments {
+		return constants.ErrDBNotFound
+	}
+	if _, err := repo.coll.UpdateByID(ctx, userID, bson.M{"$pull": bson.M{"community_ids": communityID}}); err != nil {
+		return err
+	}
+	return nil
+}
+
 //UserCheckPost Check existing post in posts by User
 func (repo *userRepositoryImpl) UserCheckPost(ctx context.Context, user *core.User, postID string) error {
 	filter := bson.M{"_id": user.ID, "posts": postID}
+	if err := repo.coll.FindOne(ctx, filter).Err(); err == mongo.ErrNoDocuments {
+		return constants.ErrDBNotFound
+	}
+	return nil
+}
+
+//UserCheckCommunity Check existing community in User
+func (repo *userRepositoryImpl) UserCheckCommunity(ctx context.Context, userID string, communityID string) error {
+	filter := bson.M{"_id": userID, "community_ids": communityID}
 	if err := repo.coll.FindOne(ctx, filter).Err(); err == mongo.ErrNoDocuments {
 		return constants.ErrDBNotFound
 	}
@@ -219,7 +252,7 @@ func (repo *userRepositoryImpl) InitUser(user *core.User) error {
 }
 
 // Help func for defense from XSS attacks
-func userSanitize(user *core.User) *core.User {
+func userSanitize(user *core.User) {
 	p := bluemonday.UGCPolicy()
 	user.Name.First = p.Sanitize(user.Name.First)
 	user.Name.Last = p.Sanitize(user.Name.Last)
@@ -228,5 +261,4 @@ func userSanitize(user *core.User) *core.User {
 	user.Location = p.Sanitize(user.Location)
 	user.Email = p.Sanitize(user.Email)
 	user.Image = p.Sanitize(user.Image)
-	return user
 }

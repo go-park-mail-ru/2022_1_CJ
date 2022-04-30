@@ -1,8 +1,15 @@
 package dto
 
+type Author struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Image string `json:"image"`
+	Type  string `json:"type"`
+}
+
 type Post struct {
 	ID      string   `json:"id"`
-	Author  User     `json:"author"`
+	Author  Author   `json:"author"`
 	Message string   `json:"message"`
 	Images  []string `json:"images,omitempty"`
 }

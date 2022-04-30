@@ -1155,11 +1155,11 @@ components:
             type: string
 
     CreateCommunityResponse:
-      $ref:  "#/components/schemas/BasicResponse"
+      $ref: "#/components/schemas/BasicResponse"
 
     EditCommunityRequest:
       properties:
-        id:
+        community_id:
           type: string
         name:
           type: string
@@ -1173,10 +1173,10 @@ components:
             type: string
 
     EditCommunityResponse:
-      $ref:  "#/components/schemas/BasicResponse"
+      $ref: "#/components/schemas/BasicResponse"
 
     DeleteCommunityResponse:
-      $ref:  "#/components/schemas/BasicResponse"
+      $ref: "#/components/schemas/BasicResponse"
 
     CreatePostCommunityRequest:
       properties:
@@ -1313,6 +1313,9 @@ components:
           type: string
         image:
           type: string
+        type:
+          type: string
+          example: "community or user"
 
     Dialog:
       type: object
@@ -1396,5 +1399,5 @@ components:
         admins:
           type: array
           items:
-           $ref: "#/components/schemas/User"
+            $ref: "#/components/schemas/User"
 

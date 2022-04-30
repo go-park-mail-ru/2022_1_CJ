@@ -28,6 +28,7 @@ func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.CreateP
 		AuthorID: userID,
 		Message:  request.Message,
 		Images:   request.Images,
+		Type:     constants.UserPost,
 	})
 	if err != nil {
 		svc.log.Errorf("CreatePost error: %s", err)
@@ -71,7 +72,7 @@ func (svc *postServiceImpl) GetPost(ctx context.Context, request *dto.GetPostReq
 		return nil, err
 	}
 
-	return &dto.GetPostResponse{Post: convert.Post2DTO(post, author), Likes: convert.Like2DTO(like, userID)}, nil
+	return &dto.GetPostResponse{Post: convert.Post2DTOByUser(post, author), Likes: convert.Like2DTO(like, userID)}, nil
 }
 
 func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostRequest, userID string) (*dto.EditPostResponse, error) {

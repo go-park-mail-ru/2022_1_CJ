@@ -6,4 +6,5 @@ type Post struct {
 	Message   string   `bson:"message"`
 	Images    []string `bson:"images,omitempty"`
 	CreatedAt int64    `bson:"created_at"` // unix timestamp
+	Type      string   `bson:"type"`
 }

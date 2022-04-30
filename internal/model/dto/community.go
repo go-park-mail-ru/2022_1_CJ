@@ -103,11 +103,11 @@ type CreateCommunityRequest struct {
 type CreateCommunityResponse BasicResponse
 
 type EditCommunityRequest struct {
-	ID     string   `json:"id"`
-	Name   string   `json:"name"`
-	Image  string   `json:"image"`
-	Info   string   `json:"info"`
-	Admins []string `json:"admins"`
+	CommunityID string   `json:"community_id"`
+	Name        string   `json:"name"`
+	Image       string   `json:"image"`
+	Info        string   `json:"info"`
+	Admins      []string `json:"admins"`
 }
 
 type EditCommunityResponse BasicResponse

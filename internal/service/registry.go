@@ -6,13 +6,14 @@ import (
 )
 
 type Registry struct {
-	AuthService    AuthService
-	UserService    UserService
-	PostService    PostService
-	FriendsService FriendsService
-	StaticService  StaticService
-	ChatService    ChatService
-	LikeService    LikeService
+	AuthService      AuthService
+	UserService      UserService
+	PostService      PostService
+	FriendsService   FriendsService
+	StaticService    StaticService
+	ChatService      ChatService
+	LikeService      LikeService
+	CommunityService CommunityService
 }
 
 func NewRegistry(log *logrus.Entry, repository *db.Repository) *Registry {
@@ -25,6 +26,7 @@ func NewRegistry(log *logrus.Entry, repository *db.Repository) *Registry {
 	registry.StaticService = NewStaticService(log, repository)
 	registry.ChatService = NewChatService(log, repository)
 	registry.LikeService = NewLikeService(log, repository)
+	registry.CommunityService = NewCommunityService(log, repository)
 
 	return registry
 }

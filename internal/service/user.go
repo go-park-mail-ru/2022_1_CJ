@@ -3,6 +3,7 @@ package service
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 
 	"github.com/sirupsen/logrus"
 
@@ -58,7 +59,7 @@ func (svc *userServiceImpl) GetUserPosts(ctx context.Context, userID string) (*d
 			return nil, err
 		}
 
-		posts = append(posts, dto.GetPosts{Post: convert.Post2DTO(&postCore, user), Likes: convert.Like2DTO(like, userID)})
+		posts = append(posts, dto.GetPosts{Post: convert.Post2DTOByUser(&postCore, user), Likes: convert.Like2DTO(like, userID)})
 	}
 	return &dto.GetUserPostsResponse{Posts: posts}, nil
 }
@@ -77,19 +78,42 @@ func (svc *userServiceImpl) GetFeed(ctx context.Context, userID string) (*dto.Ge
 	}
 	svc.log.Debug("GetFeed success")
 
-	posts := []dto.GetPosts{}
+	var posts []dto.GetPosts
 	for _, postCore := range postsCore {
-		author, err := svc.db.UserRepo.GetUserByID(ctx, postCore.AuthorID)
-		if err != nil {
-			return nil, err
-		}
 		like, err := svc.db.LikeRepo.GetLikeBySubjectID(ctx, postCore.ID)
 		if err != nil {
 			svc.log.Errorf("GetLikeBySubjectID error: %s", err)
 			return nil, err
 		}
+		switch postCore.Type {
+		case constants.UserPost:
+			author, errUser := svc.db.UserRepo.GetUserByID(ctx, postCore.AuthorID)
+			if errUser != nil {
+				svc.log.Errorf("GetUserByID error: %s", err)
+				return nil, err
+			}
+			posts = append(posts, dto.GetPosts{Post: convert.Post2DTOByUser(&postCore, author), Likes: convert.Like2DTO(like, userID)})
 
-		posts = append(posts, dto.GetPosts{Post: convert.Post2DTO(&postCore, author), Likes: convert.Like2DTO(like, userID)})
+		case constants.CommunityPost:
+			community, errComm := svc.db.CommunityRepo.GetCommunityByID(ctx, postCore.AuthorID)
+			if errComm != nil {
+				svc.log.Errorf("GetUserByID error: %s", err)
+				return nil, err
+			}
+			var admins []dto.User
+			for _, id := range community.AdminIDs {
+				user, err := svc.db.UserRepo.GetUserByID(ctx, id)
+				if err != nil {
+					svc.log.Errorf("GetCommunityByID error: %s", err)
+					return nil, constants.ErrDBNotFound
+				}
+				admins = append(admins, convert.User2DTO(user))
+			}
+			posts = append(posts, dto.GetPosts{Post: convert.Post2DTOByCommunity(&postCore, community, admins), Likes: convert.Like2DTO(like, userID)})
+		default:
+			return nil, constants.ErrDBNotFound
+		}
+
 	}
 	return &dto.GetUserFeedResponse{Posts: posts}, nil
 }
