@@ -16,7 +16,7 @@ func Community2DTOprofile(community *core.Community, admins []dto.User) dto.Comm
 	}
 }
 
-func Community2DTO(community *core.Community, admins []dto.User) dto.Community {
+func Community2DTO(community *core.Community) dto.Community {
 	return dto.Community{
 		ID:    community.ID,
 		Name:  community.Name,

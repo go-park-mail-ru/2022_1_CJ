@@ -63,6 +63,14 @@ type SearchCommunitiesResponse struct {
 	Communities []Community `json:"communities"`
 }
 
+type UpdatePhotoCommunityRequest struct {
+	CommunityID string `query:"community_id"`
+}
+
+type UpdatePhotoCommunityResponse struct {
+	URL string `json:"url"`
+}
+
 type JoinCommunityRequest struct {
 	CommunityID string `query:"community_id"`
 }
