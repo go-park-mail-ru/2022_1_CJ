@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.9"
 services:
   app:
     build:
@@ -7,8 +7,6 @@ services:
     image: cj:latest
     ports:
       - 8080:8080
-    networks:
-      - mongo-go
     volumes:
       - ./var/www/images:/opt/pics
     env_file:
@@ -17,8 +15,6 @@ services:
   mongodb_container:
     image: mongo:latest
     restart: unless-stopped
-    networks:
-      - mongo-go
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootpassword
@@ -30,20 +26,16 @@ services:
   adminer:
     image: mongo-express:latest
     restart: unless-stopped
-    networks:
-      - mongo-go
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: rootpassword
       ME_CONFIG_MONGODB_SERVER: mongodb_container
     ports:
       - 18081:8081
-  
+
   webp:
     image: webpsh/webp-server-go
     restart: unless-stopped
-    networks:
-      - mongo-go
     volumes:
       - ./var/www/images:/opt/pics
       - ./var/www/cache:/opt/exhaust
@@ -55,8 +47,9 @@ services:
           memory: 200M
 
 networks:
-  mongo-go:
-    name: cj-backend
+  default:
+    name: api
+    external: true
 
 volumes:
   mongodb_data_container:

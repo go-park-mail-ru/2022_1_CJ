@@ -18,7 +18,7 @@ import (
 func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) error {
-			// AUTH
+			// Auth
 			svc.log.Info(ctx.Cookies())
 			cookieAuth, err := ctx.Cookie(constants.CookieKeyAuthToken)
 			if err != nil {
@@ -34,7 +34,7 @@ func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
 
 			// CSRF
 			cookieCSRF, err := ctx.Cookie(constants.CookieKeyCSRFToken)
-			if len(cookieCSRF.Value) == 0 || err != nil {
+			if err != nil || len(cookieCSRF.Value) == 0 {
 				return constants.ErrMissingCSRFCookie
 			}
 			tokenCSRF := ctx.QueryParam(constants.CookieKeyCSRFToken)
