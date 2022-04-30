@@ -45,4 +45,5 @@ mock:
 	&& mockgen -source=internal/db/post.go -destination=mocks/post_db_mock.go \
 	&& mockgen -source=internal/db/user.go -destination=mocks/user_db_mock.go \
 	&& mockgen -source=internal/db/chat.go -destination=mocks/chat_db_mock.go \
-	&& mockgen -source=internal/db/like.go -destination=mocks/like_db_mock.go
+	&& mockgen -source=internal/db/like.go -destination=mocks/like_db_mock.go \
+	&& mockgen -source=internal/db/community.go -destination=mocks/community_db_mock.go

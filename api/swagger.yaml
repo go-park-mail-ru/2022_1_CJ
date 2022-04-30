@@ -871,7 +871,7 @@ paths:
     post:
       tags:
         - Community
-      summary: create community
+      summary: create post community
       parameters:
         - $ref: "#/components/parameters/csrfToken"
       requestBody:
@@ -895,7 +895,7 @@ paths:
     put:
       tags:
         - Community
-      summary: create community
+      summary: edit post community
       parameters:
         - $ref: "#/components/parameters/csrfToken"
       requestBody:
@@ -919,7 +919,7 @@ paths:
     delete:
       tags:
         - Community
-      summary: create community
+      summary: delete post community
       parameters:
         - $ref: "#/components/parameters/communityIDParam"
         - $ref: "#/components/parameters/postIDParam"
@@ -934,6 +934,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DeletePostCommunityResponse"
+
+  /communities/update_photo:
+    post:
+      tags:
+        - Community
+      summary: update photo of community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatePhotoCommunityResponse"
 
 components:
   parameters:
@@ -1085,7 +1113,7 @@ components:
           type: array
           items:
             type: string
-            example: [friend_id1, friend_id2]
+            example: [ friend_id1, friend_id2 ]
 
     GetFriendsResponse:
       $ref: "#/components/schemas/Friends"
@@ -1330,6 +1358,11 @@ components:
 
     CreatePostCommunityResponse:
       $ref: "#/components/schemas/BasicResponse"
+
+    UpdatePhotoCommunityResponse:
+      properties:
+        url:
+          type: string
 
     EditPostCommunityRequest:
       properties:
