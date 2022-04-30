@@ -252,6 +252,8 @@ paths:
       tags:
         - Friends
       summary: Accept friend request
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
@@ -274,6 +276,8 @@ paths:
       tags:
         - Friends
       summary: Get my requests
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -290,6 +294,8 @@ paths:
       tags:
         - Friends
       summary: Get my friends
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -307,10 +313,12 @@ paths:
         - Friends
       summary: Delete friend
       parameters:
+        - $ref: "#/components/parameters/csrfToken"
         - in: query
-          name: user_id
+          name: ex_friend_id
           schema:
             type: string
+            example: user_id
       responses:
         "500":
           description: Internal error
@@ -327,6 +335,8 @@ paths:
       tags:
         - Post
       summary: Create new post
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
@@ -350,6 +360,7 @@ paths:
         - Post
       summary: Get post
       parameters:
+        - $ref: "#/components/parameters/csrfToken"
         - $ref: "#/components/parameters/postIDParam"
       responses:
         "500":
@@ -367,6 +378,8 @@ paths:
       tags:
         - Post
       summary: Edit post
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
@@ -390,6 +403,7 @@ paths:
         - Post
       summary: Delete post
       parameters:
+        - $ref: "#/components/parameters/csrfToken"
         - $ref: "#/components/parameters/postIDParam"
       responses:
         "500":
@@ -405,8 +419,10 @@ paths:
   /messenger/dialogs:
     get:
       tags:
-        - messenger
+        - Messenger
       summary: get all dialogs
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -421,8 +437,10 @@ paths:
   /messenger/get:
     post:
       tags:
-        - messenger
+        - Messenger
       summary: get dialog
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
@@ -443,8 +461,10 @@ paths:
   /messenger/create:
     post:
       tags:
-        - messenger
+        - Messenger
       summary: create dialog
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
@@ -465,8 +485,10 @@ paths:
   /messenger/ws:
     get:
       tags:
-        - messenger
+        - Messenger
       summary: websocket chat
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -477,8 +499,10 @@ paths:
   /like/increase:
     post:
       tags:
-        - like
+        - Like
       summary: increase like
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
@@ -499,8 +523,10 @@ paths:
   /like/reduce:
     post:
       tags:
-        - like
+        - Like
       summary: reduce like
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
@@ -521,10 +547,11 @@ paths:
   /like/post/get:
     get:
       tags:
-        - like
+        - Like
       summary: get post likes
       parameters:
         - $ref: "#/components/parameters/postIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -538,10 +565,11 @@ paths:
   /like/photo/get:
     get:
       tags:
-        - like
+        - Like
       summary: get photo likes
       parameters:
         - $ref: "#/components/parameters/photoIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -553,13 +581,42 @@ paths:
               schema:
                 $ref: "#/components/schemas/GetLikePhotoResponse"
 
+  /static/upload:
+    post:
+      tags:
+        - Upload
+      summary: Upload photo
+      security: [ ]
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatePhotoResponse"
+
   /communities/get:
     get:
       tags:
-        - community
+        - Community
       summary: get community profile info
       parameters:
         - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -574,10 +631,11 @@ paths:
   /communities/posts:
     get:
       tags:
-        - community
+        - Community
       summary: get community posts
       parameters:
         - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -592,10 +650,11 @@ paths:
   /communities/list:
     get:
       tags:
-        - community
+        - Community
       summary: get list communities of user
       parameters:
         - $ref: "#/components/parameters/userIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -610,10 +669,11 @@ paths:
   /communities/managed_list:
     get:
       tags:
-        - community
+        - Community
       summary: get managed list communities of user
       parameters:
         - $ref: "#/components/parameters/userIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -628,8 +688,10 @@ paths:
   /communities/full_list:
     get:
       tags:
-        - community
+        - Community
       summary: get list all communities
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -644,9 +706,10 @@ paths:
   /communities/search:
     get:
       tags:
-        - community
+        - Community
       summary: get serch communities
       parameters:
+        - $ref: "#/components/parameters/csrfToken"
         - in: query
           name: selector
           schema:
@@ -666,10 +729,11 @@ paths:
   /communities/join:
     get:
       tags:
-        - community
+        - Community
       summary: join community
       parameters:
         - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -684,10 +748,11 @@ paths:
   /communities/leave:
     get:
       tags:
-        - community
+        - Community
       summary: leave community
       parameters:
         - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -702,7 +767,7 @@ paths:
   /communities/followers:
     get:
       tags:
-        - community
+        - Community
       summary: get followers of community
       parameters:
         - $ref: "#/components/parameters/communityIDParam"
@@ -720,10 +785,11 @@ paths:
   /communities/mutual_friends:
     get:
       tags:
-        - community
+        - Community
       summary: get mutual friends of community
       parameters:
         - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -738,8 +804,10 @@ paths:
   /communities/create:
     post:
       tags:
-        - community
+        - Community
       summary: create community
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
@@ -759,8 +827,10 @@ paths:
   /communities/edit:
     put:
       tags:
-        - community
+        - Community
       summary: edit community
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
@@ -781,10 +851,11 @@ paths:
   /communities/delete:
     delete:
       tags:
-        - community
+        - Community
       summary: delete community
       parameters:
         - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -799,8 +870,10 @@ paths:
   /communities/post/create:
     post:
       tags:
-        - community
+        - Community
       summary: create community
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
@@ -821,8 +894,10 @@ paths:
   /communities/post/edit:
     put:
       tags:
-        - community
+        - Community
       summary: create community
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
@@ -843,11 +918,12 @@ paths:
   /communities/post/delete:
     delete:
       tags:
-        - community
+        - Community
       summary: create community
       parameters:
         - $ref: "#/components/parameters/communityIDParam"
         - $ref: "#/components/parameters/postIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -1003,7 +1079,13 @@ components:
         $ref: "#/components/schemas/FriendRequest"
 
     DeleteFriendResponse:
-      $ref: "#/components/schemas/BasicResponse"
+      type: object
+      properties:
+        friend_ids:
+          type: array
+          items:
+            type: string
+            example: [friend_id1, friend_id2]
 
     GetFriendsResponse:
       $ref: "#/components/schemas/Friends"
@@ -1268,7 +1350,7 @@ components:
     DeletePostCommunityResponse:
       $ref: "#/components/schemas/BasicResponse"
 
-    
+
     # --------------------- Models --------------------- #
 
     BasicResponse:

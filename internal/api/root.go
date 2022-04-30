@@ -123,13 +123,13 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	communitiesAPI.GET("/leave", communitiesCtrl.LeaveCommunity)
 	communitiesAPI.GET("/followers", communitiesCtrl.GetFollowers)
 	communitiesAPI.GET("/mutual_friends", communitiesCtrl.GetMutualFriends)
-
 	communitiesAPI.POST("/create", communitiesCtrl.CreateCommunity)
 	communitiesAPI.PUT("/edit", communitiesCtrl.EditCommunity)
 	communitiesAPI.DELETE("/delete", communitiesCtrl.DeleteCommunity)
 	communitiesAPI.POST("/update_photo", communitiesCtrl.UpdatePhotoCommunity)
 
 	communitiesPostAPI := communitiesAPI.Group("/post")
+
 	communitiesPostAPI.POST("/create", communitiesCtrl.CreatePostCommunity)
 	communitiesPostAPI.PUT("/edit", communitiesCtrl.EditPostCommunity)
 	communitiesPostAPI.DELETE("/delete", communitiesCtrl.DeletePostCommunity)
