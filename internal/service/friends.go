@@ -69,8 +69,6 @@ func (svc *friendsServiceImpl) DeleteFriend(ctx context.Context, request *dto.De
 		return nil, err
 	}
 
-	svc.log.Debug("DeleteFriend success")
-
 	friends, err := svc.db.FriendsRepo.GetFriendsByUserID(ctx, UserID)
 	if err != nil {
 		svc.log.Errorf("GetRequestsByUserID error: %s", err)
