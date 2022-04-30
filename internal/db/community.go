@@ -24,6 +24,7 @@ type CommunityRepository interface {
 
 	AddFollower(ctx context.Context, communityID string, userID string) error
 	DeleteFollower(ctx context.Context, communityID string, userID string) error
+	DeleteAdmin(ctx context.Context, communityID string, userID string) error
 
 	CommunityAddPost(ctx context.Context, communityID string, postID string) error
 	CommunityDeletePost(ctx context.Context, communityID string, postID string) error
@@ -92,6 +93,16 @@ func (repo *comunnityRepositoryImpl) DeleteFollower(ctx context.Context, communi
 		return constants.ErrDBNotFound
 	}
 	if _, err := repo.coll.UpdateByID(ctx, communityID, bson.M{"$pull": bson.M{"followers": userID}}); err != nil {
+		return err
+	}
+	return nil
+}
+func (repo *comunnityRepositoryImpl) DeleteAdmin(ctx context.Context, communityID string, userID string) error {
+	filter := bson.M{"_id": communityID, "followers": userID}
+	if err := repo.coll.FindOne(ctx, filter).Err(); err == mongo.ErrNoDocuments {
+		return constants.ErrDBNotFound
+	}
+	if _, err := repo.coll.UpdateByID(ctx, communityID, bson.M{"$pull": bson.M{"admins": userID}}); err != nil {
 		return err
 	}
 	return nil

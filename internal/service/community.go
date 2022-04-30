@@ -49,10 +49,12 @@ func (svc *communityServiceImpl) CreateCommunity(ctx context.Context, request *d
 		svc.log.Errorf("CreateCommunity error: %s", err)
 		return nil, err
 	}
-	err = svc.db.UserRepo.UserAddCommunity(ctx, userID, community.ID)
-	if err != nil {
-		svc.log.Errorf("UserAddCommunity error: %s", err)
-		return nil, err
+	for _, id := range request.Admins {
+		err = svc.db.UserRepo.UserAddCommunity(ctx, id, community.ID)
+		if err != nil {
+			svc.log.Errorf("UserAddCommunity error: %s", err)
+			return nil, err
+		}
 	}
 	return &dto.CreateCommunityResponse{}, nil
 }
@@ -144,7 +146,25 @@ func (svc *communityServiceImpl) JoinCommunity(ctx context.Context, request *dto
 }
 
 func (svc *communityServiceImpl) LeaveCommunity(ctx context.Context, request *dto.LeaveCommunityRequest, userID string) (*dto.LeaveCommunityResponse, error) {
-	err := svc.db.CommunityRepo.DeleteFollower(ctx, request.CommunityID, userID)
+	community, err := svc.db.CommunityRepo.GetCommunityByID(ctx, request.CommunityID)
+	if err != nil {
+		svc.log.Errorf("DeleteFollower error: %s", err)
+		return nil, err
+	}
+
+	actualList := len(community.AdminIDs)
+	for _, id := range community.AdminIDs {
+		if id == userID {
+			actualList -= 1
+			err = svc.db.CommunityRepo.DeleteAdmin(ctx, request.CommunityID, id)
+			if err != nil {
+				svc.log.Errorf("DeleteAdmin error: %s", err)
+				return nil, err
+			}
+		}
+	}
+
+	err = svc.db.CommunityRepo.DeleteFollower(ctx, request.CommunityID, userID)
 	if err != nil {
 		svc.log.Errorf("DeleteFollower error: %s", err)
 		return nil, err
@@ -154,6 +174,14 @@ func (svc *communityServiceImpl) LeaveCommunity(ctx context.Context, request *dt
 	if err != nil {
 		svc.log.Errorf("UserDeleteCommunity error: %s", err)
 		return nil, err
+	}
+
+	if actualList == 0 {
+		_, err := svc.DeleteCommunity(ctx, &dto.DeleteCommunityRequest{CommunityID: request.CommunityID}, userID)
+		if err != nil {
+			svc.log.Errorf("DeleteCommunity error: %s", err)
+			return nil, err
+		}
 	}
 
 	return &dto.LeaveCommunityResponse{}, nil
@@ -487,7 +515,6 @@ func (svc *communityServiceImpl) DeleteCommunity(ctx context.Context, request *d
 	}
 
 	err = svc.db.CommunityRepo.DeleteCommunity(ctx, request.CommunityID)
-
 	if err != nil {
 		svc.log.Errorf("DeleteCommunity error: %s", err)
 		return nil, err
@@ -497,6 +524,20 @@ func (svc *communityServiceImpl) DeleteCommunity(ctx context.Context, request *d
 		err = svc.db.UserRepo.UserDeleteCommunity(ctx, id, request.CommunityID)
 		if err != nil {
 			svc.log.Errorf("UserDeleteCommunity error: %s", err)
+			return nil, err
+		}
+	}
+
+	for _, id := range community.PostIDs {
+		err = svc.db.PostRepo.DeletePost(ctx, id)
+		if err != nil {
+			svc.log.Errorf("DeletePost error: %s", err)
+			return nil, err
+		}
+
+		err = svc.db.LikeRepo.DeleteLike(ctx, id)
+		if err != nil {
+			svc.log.Errorf("DeleteLike error: %s", err)
 			return nil, err
 		}
 	}
