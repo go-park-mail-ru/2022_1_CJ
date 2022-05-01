@@ -100,6 +100,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/userIDParam"
         - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
       responses:
         "500":
           description: Internal error
@@ -118,6 +120,8 @@ paths:
       summary: Get feed
       parameters:
         - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
       responses:
         "500":
           description: Internal error
@@ -212,6 +216,8 @@ paths:
           schema:
             type: string
           required: true
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
       responses:
         500:
           description: Internal error
@@ -423,6 +429,8 @@ paths:
       summary: get all dialogs
       parameters:
         - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
       responses:
         "500":
           description: Internal error
@@ -441,6 +449,8 @@ paths:
       summary: get dialog
       parameters:
         - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
       requestBody:
         content:
           application/json:
@@ -1002,6 +1012,23 @@ components:
         type: string
       description: some_hash_data:some_time_in_unix
 
+    limit:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+      description: number elements in page
+
+    page:
+      in: query
+      name: page
+      required: false
+      schema:
+        type: integer
+      description: number of page
+
+
   securitySchemes:
     CookieAuth:
       type: apiKey
@@ -1052,7 +1079,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GetPosts"
-
+        total:
+          type: integer
+          example: 123
+        amount_pages:
+          type: integer
+          example: 13
 
     UpdatePhotoResponse:
       properties:
@@ -1128,6 +1160,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GetPosts"
+        total:
+          type: integer
+          example: 123
+        amount_pages:
+          type: integer
+          example: 13
 
     CreatePostRequest:
       type: object
@@ -1176,6 +1214,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/User"
+        total:
+          type: integer
+          example: 123
+        amount_pages:
+          type: integer
+          example: 13
 
     GetDialogsResponse:
       properties:
@@ -1183,6 +1227,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Dialog"
+        total:
+          type: integer
+          example: 123
+        amount_pages:
+          type: integer
+          example: 13
 
     GetDialogRequest:
       properties:
@@ -1198,6 +1248,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/MessageInfo"
+        total:
+          type: integer
+          example: 123
+        amount_pages:
+          type: integer
+          example: 13
 
     CreateDialogRequest:
       properties:
@@ -1432,16 +1488,6 @@ components:
             birth_day:
               type: string
               example: 01.02.2018
-            friend_ids:
-              type: array
-              items:
-                type: string
-              example: [ friend_id1, friend_id2 ]
-            post_ids:
-              type: array
-              items:
-                type: string
-              example: [ post_id1, post_id2 ]
 
     FriendRequests:
       type: array
