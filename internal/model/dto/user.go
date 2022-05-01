@@ -91,5 +91,5 @@ type SearchUsersRequest struct {
 type SearchUsersResponse struct {
 	Users       []User `json:"users"`
 	Total       int64  `json:"total"`
-	AmountPages int64  `json:"amount_page"`
+	AmountPages int64  `json:"amount_pages"`
 }

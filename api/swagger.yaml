@@ -206,7 +206,8 @@ paths:
         - User
       summary: Search users
       parameters:
-        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
         - in: query
           name: selector
           schema:
@@ -979,6 +980,17 @@ components:
       required: true
       schema:
         type: string
+
+    limit:
+      in: query
+      name: limit
+      schema:
+        type: integer
+    page:
+      in: query
+      name: page
+      schema:
+        type: integer
 
     communityIDParam:
       in: query
