@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"github.com/microcosm-cc/bluemonday"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
@@ -28,7 +29,7 @@ type UserRepository interface {
 	UserCheckPost(ctx context.Context, user *core.User, postID string) error
 	UserDeletePost(ctx context.Context, userID string, postID string) error
 
-	SelectUsers(ctx context.Context, selector string) ([]*core.User, error)
+	SelectUsers(ctx context.Context, selector string, pageNumber int64) ([]*core.User, error)
 
 	AddDialog(ctx context.Context, dialogID string, userID string) error
 	GetUserDialogs(ctx context.Context, userID string) ([]string, error)
@@ -184,7 +185,7 @@ func (repo *userRepositoryImpl) DeleteUser(ctx context.Context, user *core.User)
 	return err
 }
 
-func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string) ([]*core.User, error) {
+func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string, pageNumber int64) ([]*core.User, error) {
 	var users []*core.User
 
 	fuzzy := bson.M{"$regex": selector, "$options": "i"}
@@ -193,7 +194,14 @@ func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string
 		{"name.last": fuzzy}},
 	}
 
-	cursor, err := repo.coll.Find(ctx, filter)
+	findOptions := options.Find()
+	var perPage int64 = 10
+	findOptions.SetSkip((int64(pageNumber) - 1) * perPage)
+	findOptions.SetLimit(perPage)
+
+	//total, _ := repo.coll.CountDocuments(ctx, filter)
+
+	cursor, err := repo.coll.Find(ctx, filter, findOptions)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return users, nil

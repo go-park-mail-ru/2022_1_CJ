@@ -187,12 +187,12 @@ func (svc *userServiceImpl) UpdatePhoto(ctx context.Context, url string, userID 
 }
 
 func (svc *userServiceImpl) SearchUsers(ctx context.Context, request *dto.SearchUsersRequest) (*dto.SearchUsersResponse, error) {
-	usersCore, err := svc.db.UserRepo.SelectUsers(ctx, request.Selector)
+	usersCore, err := svc.db.UserRepo.SelectUsers(ctx, request.Selector, request.Page)
 	if err != nil {
 		return nil, err
 	}
 
-	users := []dto.User{}
+	var users []dto.User
 	for _, userCore := range usersCore {
 		users = append(users, convert.User2DTO(userCore))
 	}

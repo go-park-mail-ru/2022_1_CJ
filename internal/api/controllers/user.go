@@ -128,6 +128,10 @@ func (c *UserController) SearchUsers(ctx echo.Context) error {
 		return err
 	}
 
+	if request.Page <= 0 {
+		request.Page = 1
+	}
+
 	response, err := c.registry.UserService.SearchUsers(context.Background(), request)
 	if err != nil {
 		return err
