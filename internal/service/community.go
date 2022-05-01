@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -22,7 +23,7 @@ type CommunityService interface {
 	LeaveCommunity(ctx context.Context, request *dto.LeaveCommunityRequest, userID string) (*dto.LeaveCommunityResponse, error)
 	SearchCommunities(ctx context.Context, request *dto.SearchCommunitiesRequest) (*dto.SearchCommunitiesResponse, error)
 	GetFollowers(ctx context.Context, request *dto.GetFollowersRequest) (*dto.GetFollowersResponse, error)
-	GetCommunities(ctx context.Context) (*dto.GetCommunitiesResponse, error)
+	GetCommunities(ctx context.Context, request *dto.GetCommunitiesRequest) (*dto.GetCommunitiesResponse, error)
 	UpdatePhoto(ctx context.Context, request *dto.UpdatePhotoCommunityRequest, url string, userID string) (*dto.UpdatePhotoCommunityResponse, error)
 	GetMutualFriends(ctx context.Context, request *dto.GetMutualFriendsRequest, userID string) (*dto.GetMutualFriendsResponse, error)
 
@@ -86,8 +87,9 @@ func (svc *communityServiceImpl) GetUserManageCommunities(ctx context.Context, r
 		return nil, constants.ErrDBNotFound
 	}
 
+	communityIDs, total, pages := utils.GetLimitArray(&user.CommunityIDs, request.Limit, request.Page)
 	var communities []dto.Community
-	for _, commID := range user.CommunityIDs {
+	for _, commID := range communityIDs {
 		comm, err := svc.db.CommunityRepo.GetCommunityByID(ctx, commID)
 		if err != nil {
 			svc.log.Errorf("GetCommunityByID error: %s", err)
@@ -101,11 +103,11 @@ func (svc *communityServiceImpl) GetUserManageCommunities(ctx context.Context, r
 		}
 	}
 
-	return &dto.GetUserManageCommunitiesResponse{Communities: communities}, nil
+	return &dto.GetUserManageCommunitiesResponse{Communities: communities, Total: total, AmountPages: pages}, nil
 }
 
-func (svc *communityServiceImpl) GetCommunities(ctx context.Context) (*dto.GetCommunitiesResponse, error) {
-	communities, err := svc.db.CommunityRepo.GetAllCommunities(ctx)
+func (svc *communityServiceImpl) GetCommunities(ctx context.Context, request *dto.GetCommunitiesRequest) (*dto.GetCommunitiesResponse, error) {
+	communities, page, err := svc.db.CommunityRepo.GetAllCommunities(ctx, request.Limit, request.Page)
 	if err != nil {
 		svc.log.Errorf("GetAllCommunities error: %s", err)
 		return nil, constants.ErrDBNotFound
@@ -114,7 +116,7 @@ func (svc *communityServiceImpl) GetCommunities(ctx context.Context) (*dto.GetCo
 	for _, comm := range communities {
 		res = append(res, convert.Community2DTO(&comm))
 	}
-	return &dto.GetCommunitiesResponse{Communities: res}, nil
+	return &dto.GetCommunitiesResponse{Communities: res, Total: page.Total, AmountPages: page.AmountPages}, nil
 }
 
 func (svc *communityServiceImpl) JoinCommunity(ctx context.Context, request *dto.JoinCommunityRequest, userID string) (*dto.JoinCommunityResponse, error) {
@@ -193,8 +195,10 @@ func (svc *communityServiceImpl) GetFollowers(ctx context.Context, request *dto.
 		svc.log.Errorf("GetCommunityByID error: %s", err)
 		return nil, constants.ErrDBNotFound
 	}
+
+	followerIDs, total, pages := utils.GetLimitArray(&community.FollowerIDs, request.Limit, request.Page)
 	var followers []dto.User
-	for _, id := range community.FollowerIDs {
+	for _, id := range followerIDs {
 		user, err := svc.db.UserRepo.GetUserByID(ctx, id)
 		if err != nil {
 			svc.log.Errorf("GetCommunityByID error: %s", err)
@@ -203,7 +207,7 @@ func (svc *communityServiceImpl) GetFollowers(ctx context.Context, request *dto.
 		followers = append(followers, convert.User2DTO(user))
 	}
 
-	return &dto.GetFollowersResponse{Amount: int64(len(community.FollowerIDs)), Followers: followers}, nil
+	return &dto.GetFollowersResponse{Amount: int64(len(community.FollowerIDs)), Followers: followers, AmountPages: pages, Total: total}, nil
 }
 func (svc *communityServiceImpl) GetMutualFriends(ctx context.Context, request *dto.GetMutualFriendsRequest, userID string) (*dto.GetMutualFriendsResponse, error) {
 	community, err := svc.db.CommunityRepo.GetCommunityByID(ctx, request.CommunityID)
@@ -223,8 +227,10 @@ func (svc *communityServiceImpl) GetMutualFriends(ctx context.Context, request *
 		return nil, constants.ErrDBNotFound
 	}
 
+	friendsIDs, total, pages := utils.GetLimitArray(&friends, request.Limit, request.Page)
+
 	var followers []dto.User
-	for _, id1 := range friends {
+	for _, id1 := range friendsIDs {
 		for _, id2 := range community.FollowerIDs {
 			if id1 == id2 {
 				userFriend, err := svc.db.UserRepo.GetUserByID(ctx, id1)
@@ -237,7 +243,7 @@ func (svc *communityServiceImpl) GetMutualFriends(ctx context.Context, request *
 		}
 	}
 
-	return &dto.GetMutualFriendsResponse{Amount: int64(len(followers)), Followers: followers}, nil
+	return &dto.GetMutualFriendsResponse{Amount: int64(len(followers)), Followers: followers, Total: total, AmountPages: pages}, nil
 }
 
 func (svc *communityServiceImpl) GetUserCommunities(ctx context.Context, request *dto.GetUserCommunitiesRequest) (*dto.GetUserCommunitiesResponse, error) {
@@ -247,8 +253,9 @@ func (svc *communityServiceImpl) GetUserCommunities(ctx context.Context, request
 		return nil, constants.ErrDBNotFound
 	}
 
+	communityIDs, total, pages := utils.GetLimitArray(&user.CommunityIDs, request.Limit, request.Page)
 	var communities []dto.Community
-	for _, id := range user.CommunityIDs {
+	for _, id := range communityIDs {
 		comm, err := svc.db.CommunityRepo.GetCommunityByID(ctx, id)
 		if err != nil {
 			svc.log.Errorf("GetCommunityByID error: %s", err)
@@ -256,11 +263,11 @@ func (svc *communityServiceImpl) GetUserCommunities(ctx context.Context, request
 		}
 		communities = append(communities, convert.Community2DTO(comm))
 	}
-	return &dto.GetUserCommunitiesResponse{Communities: communities}, nil
+	return &dto.GetUserCommunitiesResponse{Communities: communities, Total: total, AmountPages: pages}, nil
 }
 
 func (svc *communityServiceImpl) SearchCommunities(ctx context.Context, request *dto.SearchCommunitiesRequest) (*dto.SearchCommunitiesResponse, error) {
-	communities, err := svc.db.CommunityRepo.SearchCommunities(ctx, request.Selector)
+	communities, page, err := svc.db.CommunityRepo.SearchCommunities(ctx, request.Selector, request.Limit, request.Page)
 	if err != nil {
 		svc.log.Errorf("SearchCommunities error: %s", err)
 		return nil, constants.ErrDBNotFound
@@ -269,7 +276,7 @@ func (svc *communityServiceImpl) SearchCommunities(ctx context.Context, request 
 	for _, comm := range communities {
 		res = append(res, convert.Community2DTO(&comm))
 	}
-	return &dto.SearchCommunitiesResponse{Communities: res}, nil
+	return &dto.SearchCommunitiesResponse{Communities: res, AmountPages: page.AmountPages, Total: page.Total}, nil
 }
 
 func (svc *communityServiceImpl) UpdatePhoto(ctx context.Context, request *dto.UpdatePhotoCommunityRequest, url string, userID string) (*dto.UpdatePhotoCommunityResponse, error) {
@@ -307,9 +314,9 @@ func (svc *communityServiceImpl) GetCommunityPosts(ctx context.Context, request 
 		svc.log.Errorf("GetCommunityByID error: %s", err)
 		return nil, constants.ErrDBNotFound
 	}
-
+	postIDs, total, pages := utils.GetLimitArray(&community.PostIDs, request.Limit, request.Page)
 	var posts []dto.GetPosts
-	for _, id := range community.PostIDs {
+	for _, id := range postIDs {
 		post, err := svc.db.PostRepo.GetPostByID(ctx, id)
 		if err != nil {
 			svc.log.Errorf("GetPostByID error: %s", err)
@@ -320,19 +327,10 @@ func (svc *communityServiceImpl) GetCommunityPosts(ctx context.Context, request 
 			svc.log.Errorf("GetLikeBySubjectID error: %s", err)
 			return nil, err
 		}
-		var admins []dto.User
-		for _, id := range community.AdminIDs {
-			user, err := svc.db.UserRepo.GetUserByID(ctx, id)
-			if err != nil {
-				svc.log.Errorf("GetCommunityByID error: %s", err)
-				return nil, constants.ErrDBNotFound
-			}
-			admins = append(admins, convert.User2DTO(user))
-		}
-		posts = append(posts, dto.GetPosts{Post: convert.Post2DTOByCommunity(post, community, admins), Likes: convert.Like2DTO(like, userID)})
+		posts = append(posts, dto.GetPosts{Post: convert.Post2DTOByCommunity(post, community), Likes: convert.Like2DTO(like, userID)})
 	}
 
-	return &dto.GetCommunityPostsResponse{}, nil
+	return &dto.GetCommunityPostsResponse{Posts: posts, Total: total, AmountPages: pages}, nil
 }
 
 func (svc *communityServiceImpl) EditCommunity(ctx context.Context, request *dto.EditCommunityRequest, userID string) (*dto.EditCommunityResponse, error) {

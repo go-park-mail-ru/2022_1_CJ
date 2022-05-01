@@ -89,7 +89,13 @@ func (c *CommunityController) GetCommunityPosts(ctx echo.Context) error {
 		return err
 	}
 	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
 
+	if request.Page <= 0 {
+		request.Page = 1
+	}
 	response, err := c.registry.CommunityService.GetCommunityPosts(context.Background(), request, userID)
 	if err != nil {
 		return err
@@ -106,6 +112,13 @@ func (c *CommunityController) GetUserCommunities(ctx echo.Context) error {
 	}
 	if len(request.UserID) == 0 {
 		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	}
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
+
+	if request.Page <= 0 {
+		request.Page = 1
 	}
 
 	response, err := c.registry.CommunityService.GetUserCommunities(context.Background(), request)
@@ -126,6 +139,14 @@ func (c *CommunityController) GetUserManageCommunities(ctx echo.Context) error {
 		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
 	}
 
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
+
+	if request.Page <= 0 {
+		request.Page = 1
+	}
+
 	response, err := c.registry.CommunityService.GetUserManageCommunities(context.Background(), request)
 	if err != nil {
 		return err
@@ -140,8 +161,15 @@ func (c *CommunityController) GetCommunities(ctx echo.Context) error {
 		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
 
-	response, err := c.registry.CommunityService.GetCommunities(context.Background())
+	if request.Page <= 0 {
+		request.Page = 1
+	}
+
+	response, err := c.registry.CommunityService.GetCommunities(context.Background(), request)
 	if err != nil {
 		return err
 	}
@@ -186,6 +214,13 @@ func (c *CommunityController) SearchCommunities(ctx echo.Context) error {
 	if err := ctx.Bind(request); err != nil {
 		c.log.Errorf("Bind error: %s", err)
 		return err
+	}
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
+
+	if request.Page <= 0 {
+		request.Page = 1
 	}
 	response, err := c.registry.CommunityService.SearchCommunities(context.Background(), request)
 	if err != nil {
@@ -243,6 +278,13 @@ func (c *CommunityController) GetFollowers(ctx echo.Context) error {
 		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
+
+	if request.Page <= 0 {
+		request.Page = 1
+	}
 
 	response, err := c.registry.CommunityService.GetFollowers(context.Background(), request)
 	if err != nil {
@@ -259,6 +301,13 @@ func (c *CommunityController) GetMutualFriends(ctx echo.Context) error {
 		return err
 	}
 	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
+
+	if request.Page <= 0 {
+		request.Page = 1
+	}
 	response, err := c.registry.CommunityService.GetMutualFriends(context.Background(), request, userID)
 	if err != nil {
 		return err

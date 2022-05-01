@@ -210,8 +210,6 @@ paths:
         - User
       summary: Search users
       parameters:
-        - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/page"
         - in: query
           name: selector
           schema:
@@ -628,6 +626,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/communityIDParam"
         - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
       responses:
         "500":
           description: Internal error
@@ -647,6 +647,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/communityIDParam"
         - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
       responses:
         "500":
           description: Internal error
@@ -666,6 +668,9 @@ paths:
       parameters:
         - $ref: "#/components/parameters/userIDParam"
         - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+
       responses:
         "500":
           description: Internal error
@@ -685,6 +690,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/userIDParam"
         - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
       responses:
         "500":
           description: Internal error
@@ -703,6 +710,8 @@ paths:
       summary: get list all communities
       parameters:
         - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
       responses:
         "500":
           description: Internal error
@@ -721,6 +730,8 @@ paths:
       summary: get serch communities
       parameters:
         - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
         - in: query
           name: selector
           schema:
@@ -782,6 +793,8 @@ paths:
       summary: get followers of community
       parameters:
         - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
       responses:
         "500":
           description: Internal error
@@ -1304,6 +1317,10 @@ components:
       properties:
         community:
           $ref: "#/components/schemas/CommunityProfile"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
 
     GetCommunityPostsResponse:
       properties:
@@ -1311,6 +1328,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GetPosts"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
 
     GetUserCommunitiesResponse:
       properties:
@@ -1318,6 +1339,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Community"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
 
     GetUserManageCommunitiesResponse:
       properties:
@@ -1325,6 +1350,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Community"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
 
     GetCommunitiesResponse:
       properties:
@@ -1332,6 +1361,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Community"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
 
     SearchCommunitiesResponse:
       properties:
@@ -1339,6 +1372,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Community"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
 
     JoinCommunityResponse:
       $ref: "#/components/schemas/BasicResponse"
@@ -1355,6 +1392,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/User"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
 
     GetMutualFriendsResponse:
       properties:

@@ -27,40 +27,61 @@ type GetCommunityResponse struct {
 
 type GetCommunityPostsRequest struct {
 	CommunityID string `query:"community_id"`
+	Limit       int64  `query:"limit,omitempty"`
+	Page        int64  `query:"page,omitempty"`
 }
 
 type GetCommunityPostsResponse struct {
-	Posts []GetPosts `json:"posts"`
+	Posts       []GetPosts `json:"posts"`
+	Total       int64      `json:"total"`
+	AmountPages int64      `json:"amount_pages"`
 }
 
 type GetUserCommunitiesRequest struct {
 	UserID string `query:"user_id"`
+	Limit  int64  `query:"limit,omitempty"`
+	Page   int64  `query:"page,omitempty"`
 }
 
 type GetUserCommunitiesResponse struct {
 	Communities []Community `json:"communities,omitempty"`
+	Total       int64       `json:"total"`
+	AmountPages int64       `json:"amount_pages"`
 }
 
 type GetUserManageCommunitiesRequest struct {
 	UserID string `query:"user_id"`
+	Limit  int64  `query:"limit,omitempty"`
+	Page   int64  `query:"page,omitempty"`
 }
 
 type GetUserManageCommunitiesResponse struct {
 	Communities []Community `json:"communities,omitempty"`
+	Total       int64       `json:"total"`
+	AmountPages int64       `json:"amount_pages"`
 }
 
-type GetCommunitiesRequest struct{}
+type GetCommunitiesRequest struct {
+	Limit int64 `query:"limit,omitempty"`
+	Page  int64 `query:"page,omitempty"`
+}
 
 type GetCommunitiesResponse struct {
 	Communities []Community `json:"communities,omitempty"`
+	Total       int64       `json:"total"`
+	AmountPages int64       `json:"amount_pages"`
 }
 
 type SearchCommunitiesRequest struct {
 	Selector string `query:"selector" validate:"required"`
+	Limit    int64  `query:"limit,omitempty"`
+	Page     int64  `query:"page,omitempty"`
 }
 
 type SearchCommunitiesResponse struct {
 	Communities []Community `json:"communities,omitempty"`
+	Total       int64       `json:"total"`
+	AmountPages int64       `json:"amount_pages"`
 }
 
 type UpdatePhotoCommunityRequest struct {
@@ -85,20 +106,28 @@ type LeaveCommunityResponse BasicResponse
 
 type GetFollowersRequest struct {
 	CommunityID string `query:"community_id"`
+	Limit       int64  `query:"limit,omitempty"`
+	Page        int64  `query:"page,omitempty"`
 }
 
 type GetFollowersResponse struct {
-	Amount    int64  `json:"amount"`
-	Followers []User `json:"followers"`
+	Amount      int64  `json:"amount"`
+	Followers   []User `json:"followers"`
+	Total       int64  `json:"total"`
+	AmountPages int64  `json:"amount_pages"`
 }
 
 type GetMutualFriendsRequest struct {
 	CommunityID string `query:"community_id"`
+	Limit       int64  `query:"limit,omitempty"`
+	Page        int64  `query:"page,omitempty"`
 }
 
 type GetMutualFriendsResponse struct {
-	Amount    int64  `json:"amount"`
-	Followers []User `json:"followers,omitempty"`
+	Amount      int64  `json:"amount"`
+	Followers   []User `json:"followers,omitempty"`
+	Total       int64  `json:"total"`
+	AmountPages int64  `json:"amount_pages"`
 }
 
 type CreateCommunityRequest struct {

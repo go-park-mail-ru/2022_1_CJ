@@ -100,16 +100,7 @@ func (svc *userServiceImpl) GetFeed(ctx context.Context, userID string, request 
 				svc.log.Errorf("GetUserByID error: %s", err)
 				return nil, err
 			}
-			var admins []dto.User
-			for _, id := range community.AdminIDs {
-				user, err := svc.db.UserRepo.GetUserByID(ctx, id)
-				if err != nil {
-					svc.log.Errorf("GetCommunityByID error: %s", err)
-					return nil, constants.ErrDBNotFound
-				}
-				admins = append(admins, convert.User2DTO(user))
-			}
-			posts = append(posts, dto.GetPosts{Post: convert.Post2DTOByCommunity(&postCore, community, admins), Likes: convert.Like2DTO(like, userID)})
+			posts = append(posts, dto.GetPosts{Post: convert.Post2DTOByCommunity(&postCore, community), Likes: convert.Like2DTO(like, userID)})
 		default:
 			return nil, constants.ErrDBNotFound
 		}
