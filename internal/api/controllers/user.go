@@ -128,6 +128,10 @@ func (c *UserController) SearchUsers(ctx echo.Context) error {
 		return err
 	}
 
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
+
 	if request.Page <= 0 {
 		request.Page = 1
 	}

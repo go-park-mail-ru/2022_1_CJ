@@ -187,7 +187,7 @@ func (svc *userServiceImpl) UpdatePhoto(ctx context.Context, url string, userID 
 }
 
 func (svc *userServiceImpl) SearchUsers(ctx context.Context, request *dto.SearchUsersRequest) (*dto.SearchUsersResponse, error) {
-	usersCore, err := svc.db.UserRepo.SelectUsers(ctx, request.Selector, request.Page)
+	usersCore, pages, err := svc.db.UserRepo.SelectUsers(ctx, request.Selector, request.Page, request.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -196,8 +196,7 @@ func (svc *userServiceImpl) SearchUsers(ctx context.Context, request *dto.Search
 	for _, userCore := range usersCore {
 		users = append(users, convert.User2DTO(userCore))
 	}
-
-	return &dto.SearchUsersResponse{Users: users}, nil
+	return &dto.SearchUsersResponse{Users: users, Total: pages.Total, AmountPages: pages.Total}, nil
 }
 
 func NewUserService(log *logrus.Entry, db *db.Repository) UserService {

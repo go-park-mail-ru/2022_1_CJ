@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	"github.com/microcosm-cc/bluemonday"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
@@ -29,7 +30,7 @@ type UserRepository interface {
 	UserCheckPost(ctx context.Context, user *core.User, postID string) error
 	UserDeletePost(ctx context.Context, userID string, postID string) error
 
-	SelectUsers(ctx context.Context, selector string, pageNumber int64) ([]*core.User, error)
+	SelectUsers(ctx context.Context, selector string, pageNumber int64, limit int64) ([]*core.User, *common.PageResponse, error)
 
 	AddDialog(ctx context.Context, dialogID string, userID string) error
 	GetUserDialogs(ctx context.Context, userID string) ([]string, error)
@@ -185,7 +186,7 @@ func (repo *userRepositoryImpl) DeleteUser(ctx context.Context, user *core.User)
 	return err
 }
 
-func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string, pageNumber int64) ([]*core.User, error) {
+func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string, pageNumber int64, limit int64) ([]*core.User, *common.PageResponse, error) {
 	var users []*core.User
 
 	fuzzy := bson.M{"$regex": selector, "$options": "i"}
@@ -195,27 +196,42 @@ func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string
 	}
 
 	findOptions := options.Find()
-	var perPage int64 = 10
-	findOptions.SetSkip((int64(pageNumber) - 1) * perPage)
-	findOptions.SetLimit(perPage)
 
-	//total, _ := repo.coll.CountDocuments(ctx, filter)
-
+	if limit != -1 {
+		findOptions.SetSkip((pageNumber - 1) * limit)
+		findOptions.SetLimit(limit)
+	}
 	cursor, err := repo.coll.Find(ctx, filter, findOptions)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return users, nil
+			return users, &common.PageResponse{}, nil
 		}
-		return nil, err
+		return nil, nil, err
 	} else {
 		err = cursor.All(ctx, &users)
+	}
+
+	isLarge := func(res bool) int64 {
+		if res {
+			return 1
+		} else {
+			return 0
+		}
+	}
+	total, _ := repo.coll.CountDocuments(ctx, filter)
+	res := &common.PageResponse{
+		Total:       total,
+		AmountPages: total/limit + isLarge(total%limit > 0),
+	}
+	if limit == -1 {
+		res.AmountPages = 1
 	}
 
 	for i, _ := range users {
 		userSanitize(users[i])
 	}
 
-	return users, err
+	return users, res, err
 }
 
 func (repo *userRepositoryImpl) AddDialog(ctx context.Context, dialogID string, userID string) error {

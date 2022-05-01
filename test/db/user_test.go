@@ -316,7 +316,7 @@ func TestSelectUsers(t *testing.T) {
 		mt.AddMockResponses(first, second, killCursors)
 
 		ctx := context.Background()
-		users, err := userCollection.SelectUsers(ctx, "Sash")
+		users, _, err := userCollection.SelectUsers(ctx, "Sash", 1, 10)
 		assert.Nil(t, err)
 		assert.Equal(t, []*core.User{
 			{ID: expectedUser1.ID, Name: expectedUser1.Name},

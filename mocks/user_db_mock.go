@@ -153,18 +153,18 @@ func (mr *MockUserRepositoryMockRecorder) IsUserInDialog(ctx, userID, dialogID i
 }
 
 // SelectUsers mocks base method.
-func (m *MockUserRepository) SelectUsers(ctx context.Context, selector string) ([]*core.User, error) {
+func (m *MockUserRepository) SelectUsers(ctx context.Context, selector string, pageNumber int64) ([]*core.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SelectUsers", ctx, selector)
+	ret := m.ctrl.Call(m, "SelectUsers", ctx, selector, pageNumber)
 	ret0, _ := ret[0].([]*core.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // SelectUsers indicates an expected call of SelectUsers.
-func (mr *MockUserRepositoryMockRecorder) SelectUsers(ctx, selector interface{}) *gomock.Call {
+func (mr *MockUserRepositoryMockRecorder) SelectUsers(ctx, selector, pageNumber interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUsers", reflect.TypeOf((*MockUserRepository)(nil).SelectUsers), ctx, selector)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUsers", reflect.TypeOf((*MockUserRepository)(nil).SelectUsers), ctx, selector, pageNumber)
 }
 
 // UpdateUser mocks base method.

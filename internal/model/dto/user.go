@@ -84,11 +84,12 @@ type UpdatePhotoResponse struct {
 
 type SearchUsersRequest struct {
 	Selector string `query:"selector" validate:"required"`
+	Limit    int64  `query:"limit,omitempty"`
 	Page     int64  `query:"page,omitempty"`
 }
 
 type SearchUsersResponse struct {
-	Users    []User `json:"users"`
-	Total    int64  `json:"total"`
-	LastPage int64  `json:"last_page"`
+	Users       []User `json:"users"`
+	Total       int64  `json:"total"`
+	AmountPages int64  `json:"amount_page"`
 }

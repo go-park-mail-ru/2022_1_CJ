@@ -8,3 +8,8 @@ type UserName struct {
 func (un *UserName) Full() string {
 	return un.First + un.Last
 }
+
+type PageResponse struct {
+	Total       int64
+	AmountPages int64
+}
