@@ -181,6 +181,20 @@ func (mr *MockUserRepositoryMockRecorder) UpdateUser(ctx, user interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockUserRepository)(nil).UpdateUser), ctx, user)
 }
 
+// UserAddCommunity mocks base method.
+func (m *MockUserRepository) UserAddCommunity(ctx context.Context, userID, communityID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UserAddCommunity", ctx, userID, communityID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UserAddCommunity indicates an expected call of UserAddCommunity.
+func (mr *MockUserRepositoryMockRecorder) UserAddCommunity(ctx, userID, communityID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserAddCommunity", reflect.TypeOf((*MockUserRepository)(nil).UserAddCommunity), ctx, userID, communityID)
+}
+
 // UserAddPost mocks base method.
 func (m *MockUserRepository) UserAddPost(ctx context.Context, userID, postID string) error {
 	m.ctrl.T.Helper()
@@ -193,6 +207,20 @@ func (m *MockUserRepository) UserAddPost(ctx context.Context, userID, postID str
 func (mr *MockUserRepositoryMockRecorder) UserAddPost(ctx, userID, postID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserAddPost", reflect.TypeOf((*MockUserRepository)(nil).UserAddPost), ctx, userID, postID)
+}
+
+// UserCheckCommunity mocks base method.
+func (m *MockUserRepository) UserCheckCommunity(ctx context.Context, userID, communityID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UserCheckCommunity", ctx, userID, communityID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UserCheckCommunity indicates an expected call of UserCheckCommunity.
+func (mr *MockUserRepositoryMockRecorder) UserCheckCommunity(ctx, userID, communityID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserCheckCommunity", reflect.TypeOf((*MockUserRepository)(nil).UserCheckCommunity), ctx, userID, communityID)
 }
 
 // UserCheckDialog mocks base method.
@@ -221,6 +249,20 @@ func (m *MockUserRepository) UserCheckPost(ctx context.Context, user *core.User,
 func (mr *MockUserRepositoryMockRecorder) UserCheckPost(ctx, user, postID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserCheckPost", reflect.TypeOf((*MockUserRepository)(nil).UserCheckPost), ctx, user, postID)
+}
+
+// UserDeleteCommunity mocks base method.
+func (m *MockUserRepository) UserDeleteCommunity(ctx context.Context, userID, communityID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UserDeleteCommunity", ctx, userID, communityID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UserDeleteCommunity indicates an expected call of UserDeleteCommunity.
+func (mr *MockUserRepositoryMockRecorder) UserDeleteCommunity(ctx, userID, communityID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UserDeleteCommunity", reflect.TypeOf((*MockUserRepository)(nil).UserDeleteCommunity), ctx, userID, communityID)
 }
 
 // UserDeletePost mocks base method.

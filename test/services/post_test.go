@@ -75,6 +75,7 @@ func TestCreatePost(t *testing.T) {
 			inputCreatePost: InputCreatePost{post: &core.Post{
 				AuthorID: "0",
 				Message:  "It's my first post!",
+				Type:     constants.UserPost,
 				Images:   []string{"src/img.jpg"}}},
 			outputCreatePost: OutputCreatePost{post: nil,
 				err: err},
@@ -89,6 +90,7 @@ func TestCreatePost(t *testing.T) {
 			inputCreatePost: InputCreatePost{post: &core.Post{
 				AuthorID: "1",
 				Message:  "It's my second post!",
+				Type:     constants.UserPost,
 				Images:   []string{"src/img.jpg"}}},
 			outputCreatePost: OutputCreatePost{post: &core.Post{
 				ID:       "1",
@@ -109,6 +111,7 @@ func TestCreatePost(t *testing.T) {
 			inputCreatePost: InputCreatePost{post: &core.Post{
 				AuthorID: "1",
 				Message:  "It's my second post!",
+				Type:     constants.UserPost,
 				Images:   []string{"src/img.jpg"}}},
 			outputCreatePost: OutputCreatePost{post: &core.Post{
 				ID:       "1",
@@ -214,7 +217,7 @@ func TestGetPost(t *testing.T) {
 				},
 				err: nil,
 			},
-			output: Output{&dto.GetPostResponse{Post: convert.Post2DTO(&core.Post{
+			output: Output{&dto.GetPostResponse{Post: convert.Post2DTOByUser(&core.Post{
 				AuthorID: "1",
 				Message:  "It's my second post!",
 				Images:   []string{"src/img.jpg"}}, &core.User{ID: "1"}), Likes: convert.Like2DTO(&core.Like{
@@ -525,6 +528,7 @@ func TestDeletePost(t *testing.T) {
 		testRepo.mockPostR.EXPECT().GetPostByID(ctx, tests[4].inputGetPostByID.postID).Return(tests[4].outputGetPostByID.post, tests[4].outputGetPostByID.err),
 		testRepo.mockPostR.EXPECT().DeletePost(ctx, tests[4].inputDeletePost.postID).Return(tests[4].outputDeletePost.err),
 		testRepo.mockUserR.EXPECT().UserDeletePost(ctx, tests[4].inputUserDeletePost.userID, tests[4].inputUserDeletePost.postID).Return(tests[4].outputUserDeletePost.err),
+		testRepo.mockLikeR.EXPECT().DeleteLike(ctx, tests[4].inputUserDeletePost.postID).Return(nil),
 	)
 
 	for _, test := range tests {
