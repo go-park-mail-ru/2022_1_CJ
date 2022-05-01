@@ -67,7 +67,7 @@ func (svc *APIService) CSRFMiddleware() echo.MiddlewareFunc {
 			}
 
 			if err == nil && len(newTokenCSRF) != 0 {
-				ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyCSRFToken, newTokenCSRF, viper.GetInt64(constants.ViperCSRFTTLKey)))
+				ctx.SetCookie(utils.CreateCookie(constants.CookieKeyCSRFToken, newTokenCSRF, viper.GetInt64(constants.ViperCSRFTTLKey)))
 			}
 
 			return next(ctx)
