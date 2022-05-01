@@ -16,6 +16,14 @@ func Community2DTOprofile(community *core.Community, admins []dto.User) dto.Comm
 	}
 }
 
+func Community2DTOSmallProfile(community *core.Community) dto.CommunityProfile {
+	return dto.CommunityProfile{
+		ID:    community.ID,
+		Name:  community.Name,
+		Image: community.Image,
+	}
+}
+
 func Community2DTO(community *core.Community) dto.Community {
 	return dto.Community{
 		ID:    community.ID,

@@ -23,10 +23,10 @@ func Post2DTOByUser(post *core.Post, author *core.User) dto.Post {
 	}
 }
 
-func Post2DTOByCommunity(post *core.Post, community *core.Community, admins []dto.User) dto.Post {
+func Post2DTOByCommunity(post *core.Post, community *core.Community) dto.Post {
 	return dto.Post{
 		ID:      post.ID,
-		Author:  CommunityProfile2Author(Community2DTOprofile(community, admins)),
+		Author:  CommunityProfile2Author(Community2DTOSmallProfile(community)),
 		Message: post.Message,
 		Images:  post.Images,
 	}

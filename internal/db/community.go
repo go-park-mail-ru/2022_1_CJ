@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	"github.com/microcosm-cc/bluemonday"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
@@ -19,8 +20,8 @@ type CommunityRepository interface {
 	GetCommunityByID(ctx context.Context, communityID string) (*core.Community, error)
 	DeleteCommunity(ctx context.Context, communityID string) error
 
-	SearchCommunities(ctx context.Context, selector string) ([]core.Community, error)
-	GetAllCommunities(ctx context.Context) ([]core.Community, error)
+	SearchCommunities(ctx context.Context, selector string, limit, pageNumber int64) ([]core.Community, *common.PageResponse, error)
+	GetAllCommunities(ctx context.Context, limit, pageNumber int64) ([]core.Community, *common.PageResponse, error)
 
 	AddFollower(ctx context.Context, communityID string, userID string) error
 	DeleteFollower(ctx context.Context, communityID string, userID string) error
@@ -123,44 +124,85 @@ func (repo *comunnityRepositoryImpl) GetCommunityByID(ctx context.Context, commu
 	return community, wrapError(err)
 }
 
-func (repo *comunnityRepositoryImpl) GetAllCommunities(ctx context.Context) ([]core.Community, error) {
+func (repo *comunnityRepositoryImpl) GetAllCommunities(ctx context.Context, limit, pageNumber int64) ([]core.Community, *common.PageResponse, error) {
 	opts := options.Find()
 	opts.SetSort(bson.D{{Key: "created_at", Value: -1}})
+	if limit != -1 {
+		opts.SetSkip((pageNumber - 1) * limit)
+		opts.SetLimit(limit)
+	}
 	cursor, err := repo.coll.Find(ctx, bson.M{}, opts)
-
 	var communities []core.Community
-	if err = cursor.All(ctx, &communities); err != nil {
-		return nil, err
-	}
-
-	for _, comm := range communities {
-		comunnitySanitize(&comm)
-	}
-
-	return communities, err
-}
-
-func (repo *comunnityRepositoryImpl) SearchCommunities(ctx context.Context, selector string) ([]core.Community, error) {
-	var communities []core.Community
-
-	fuzzy := bson.M{"$regex": selector, "$options": "i"}
-	filter := bson.D{{Key: "name", Value: fuzzy}}
-
-	cursor, err := repo.coll.Find(ctx, filter)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return communities, nil
+			return communities, &common.PageResponse{}, nil
 		}
-		return nil, err
+		return nil, nil, err
 	} else {
 		err = cursor.All(ctx, &communities)
 	}
+	total, _ := repo.coll.CountDocuments(ctx, bson.M{})
 
+	isLarge := func(res bool) int64 {
+		if res {
+			return 1
+		} else {
+			return 0
+		}
+	}
+	res := &common.PageResponse{
+		Total:       total,
+		AmountPages: total/limit + isLarge(total%limit > 0),
+	}
+	if limit == -1 {
+		res.AmountPages = 1
+	}
 	for _, comm := range communities {
 		comunnitySanitize(&comm)
 	}
+	return communities, res, err
+}
 
-	return communities, err
+func (repo *comunnityRepositoryImpl) SearchCommunities(ctx context.Context, selector string, limit, pageNumber int64) ([]core.Community, *common.PageResponse, error) {
+	fuzzy := bson.M{"$regex": selector, "$options": "i"}
+	filter := bson.D{{Key: "name", Value: fuzzy}}
+
+	opts := options.Find()
+	opts.SetSort(bson.D{{Key: "created_at", Value: -1}})
+	if limit != -1 {
+		opts.SetSkip((pageNumber - 1) * limit)
+		opts.SetLimit(limit)
+	}
+	cursor, err := repo.coll.Find(ctx, filter, opts)
+	var communities []core.Community
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return communities, &common.PageResponse{}, nil
+		}
+		return nil, nil, err
+	} else {
+		err = cursor.All(ctx, &communities)
+	}
+	total, _ := repo.coll.CountDocuments(ctx, filter)
+
+	isLarge := func(res bool) int64 {
+		if res {
+			return 1
+		} else {
+			return 0
+		}
+	}
+	res := &common.PageResponse{
+		Total:       total,
+		AmountPages: total/limit + isLarge(total%limit > 0),
+	}
+	if limit == -1 {
+		res.AmountPages = 1
+	}
+	for _, comm := range communities {
+		comunnitySanitize(&comm)
+	}
+	return communities, res, err
 }
 
 func (repo *comunnityRepositoryImpl) InitCommunity(community *core.Community) error {

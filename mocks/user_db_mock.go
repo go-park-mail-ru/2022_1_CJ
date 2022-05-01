@@ -8,6 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	common "github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	core "github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	gomock "github.com/golang/mock/gomock"
 )
@@ -153,18 +154,19 @@ func (mr *MockUserRepositoryMockRecorder) IsUserInDialog(ctx, userID, dialogID i
 }
 
 // SelectUsers mocks base method.
-func (m *MockUserRepository) SelectUsers(ctx context.Context, selector string, pageNumber int64) ([]*core.User, error) {
+func (m *MockUserRepository) SelectUsers(ctx context.Context, selector string, pageNumber, limit int64) ([]*core.User, *common.PageResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SelectUsers", ctx, selector, pageNumber)
+	ret := m.ctrl.Call(m, "SelectUsers", ctx, selector, pageNumber, limit)
 	ret0, _ := ret[0].([]*core.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(*common.PageResponse)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // SelectUsers indicates an expected call of SelectUsers.
-func (mr *MockUserRepositoryMockRecorder) SelectUsers(ctx, selector, pageNumber interface{}) *gomock.Call {
+func (mr *MockUserRepositoryMockRecorder) SelectUsers(ctx, selector, pageNumber, limit interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUsers", reflect.TypeOf((*MockUserRepository)(nil).SelectUsers), ctx, selector, pageNumber)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUsers", reflect.TypeOf((*MockUserRepository)(nil).SelectUsers), ctx, selector, pageNumber, limit)
 }
 
 // UpdateUser mocks base method.
