@@ -32,8 +32,7 @@ type friendsRepositoryImpl struct {
 }
 
 func (repo *friendsRepositoryImpl) CreateFriends(ctx context.Context, userID string) error {
-	friends := core.Friends{}
-	friends.ID = userID
+	friends := core.Friends{ID: userID}
 	_, err := repo.coll.InsertOne(ctx, friends)
 	return err
 }
@@ -121,14 +120,14 @@ func (repo *friendsRepositoryImpl) DeleteFriend(ctx context.Context, exFriendID1
 func (repo *friendsRepositoryImpl) GetRequestsByUserID(ctx context.Context, userID string) ([]string, error) {
 	friends := core.Friends{}
 	filter := bson.M{"_id": userID}
-	err := repo.coll.FindOne(ctx, filter).Decode(friends)
+	err := repo.coll.FindOne(ctx, filter).Decode(&friends)
 	return friends.Requests, wrapError(err)
 }
 
 func (repo *friendsRepositoryImpl) GetFriendsByUserID(ctx context.Context, userID string) ([]string, error) {
 	friends := core.Friends{}
 	filter := bson.M{"_id": userID}
-	err := repo.coll.FindOne(ctx, filter).Decode(friends)
+	err := repo.coll.FindOne(ctx, filter).Decode(&friends)
 	return friends.Friends, wrapError(err)
 }
 
@@ -136,7 +135,7 @@ func (repo *friendsRepositoryImpl) GetFriendsByUserID(ctx context.Context, userI
 func (repo *friendsRepositoryImpl) GetFriendsByID(ctx context.Context, userID string) ([]string, error) {
 	friends := core.Friends{}
 	filter := bson.M{"_id": userID}
-	err := repo.coll.FindOne(ctx, filter).Decode(friends)
+	err := repo.coll.FindOne(ctx, filter).Decode(&friends)
 	return friends.Friends, wrapError(err)
 }
 
