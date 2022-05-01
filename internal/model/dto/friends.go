@@ -20,13 +20,13 @@ type DeleteFriendRequest struct {
 }
 
 type DeleteFriendResponse struct {
-	FriendsID []string `json:"friends_id"`
+	FriendsID []string `json:"friend_ids"`
 }
 
 type GetFriendsRequests struct{}
 
 type GetFriendsResponse struct {
-	FriendsID []string `json:"friends_id"`
+	FriendsID []string `json:"friend_ids"`
 }
 
 type GetRequestsRequests struct{}
