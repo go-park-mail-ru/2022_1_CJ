@@ -7,6 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -119,6 +120,9 @@ func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDial
 		svc.log.Errorf("GetUserDialogs error: %s", err)
 		return nil, err
 	}
+
+	ids, total, page := utils.GetLimitArray(&ids, request.Limit, request.Page)
+
 	var dialogs []dto.Dialog
 	for _, id := range ids {
 		dInf, err := svc.db.ChatRepo.GetDialogByID(ctx, id)
@@ -127,7 +131,7 @@ func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDial
 		}
 		dialogs = append(dialogs, convert.Dialog2DTO(dInf, request.UserID))
 	}
-	return &dto.GetDialogsResponse{Dialogs: dialogs}, err
+	return &dto.GetDialogsResponse{Dialogs: dialogs, Total: total, AmountPages: page}, err
 }
 
 func (svc *chatServiceImpl) CheckDialog(ctx context.Context, request *dto.CheckDialogRequest) error {
@@ -159,9 +163,11 @@ func (svc *chatServiceImpl) GetDialog(ctx context.Context, request *dto.GetDialo
 		return nil, err
 	}
 
-	// function limit array
+	var total int64
+	var page int64
+	dialog.Messages, total, page = utils.GetLimitMessage(&dialog.Messages, request.Limit, request.Page)
 
-	return &dto.GetDialogResponse{Dialog: convert.Dialog2DTO(dialog, request.UserID), Messages: convert.Messages2DTO(dialog.Messages, request.UserID)}, err
+	return &dto.GetDialogResponse{Dialog: convert.Dialog2DTO(dialog, request.UserID), Messages: convert.Messages2DTO(dialog.Messages, request.UserID), Total: total, AmountPages: page}, err
 }
 
 func NewChatService(log *logrus.Entry, db *db.Repository) ChatService {
