@@ -50,22 +50,30 @@ type ReadMessageRequest struct {
 
 type ReadMessageResponse struct{}
 
-type GetDialogsRequest struct {
-	UserID string `json:"user_id"`
+type GetDialogsRequest struct { //
+	UserID string `query:"user_id"`
+	Limit  int64  `query:"limit,omitempty"`
+	Page   int64  `query:"page,omitempty"`
 }
 
 type GetDialogsResponse struct {
-	Dialogs []Dialog `json:"dialogs"`
+	Dialogs     []Dialog `json:"dialogs"`
+	Total       int64    `json:"total"`
+	AmountPages int64    `json:"amount_pages"`
 }
 
-type GetDialogRequest struct {
+type GetDialogRequest struct { //
 	UserID   string `json:"user_id"`
 	DialogID string `json:"dialog_id"`
+	Limit    int64  `query:"limit,omitempty"`
+	Page     int64  `query:"page,omitempty"`
 }
 
 type GetDialogResponse struct {
-	Dialog   Dialog        `json:"dialog"`
-	Messages []MessageInfo `json:"messages"`
+	Dialog      Dialog        `json:"dialog"`
+	Messages    []MessageInfo `json:"messages"`
+	Total       int64         `json:"total"`
+	AmountPages int64         `json:"amount_pages"`
 }
 
 type CheckDialogRequest struct {

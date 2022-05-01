@@ -47,7 +47,15 @@ func (c *UserController) GetUserPosts(ctx echo.Context) error {
 		request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
 	}
 
-	response, err := c.registry.UserService.GetUserPosts(context.Background(), request.UserID)
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
+
+	if request.Page <= 0 {
+		request.Page = 1
+	}
+
+	response, err := c.registry.UserService.GetUserPosts(context.Background(), request)
 	if err != nil {
 		return err
 	}
@@ -56,9 +64,23 @@ func (c *UserController) GetUserPosts(ctx echo.Context) error {
 }
 
 func (c *UserController) GetFeed(ctx echo.Context) error {
+	request := new(dto.GetUserFeedRequest)
+	if err := ctx.Bind(request); err != nil {
+		c.log.Errorf("Bind error: %s", err)
+		return err
+	}
+
 	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 
-	response, err := c.registry.UserService.GetFeed(context.Background(), userID)
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
+
+	if request.Page <= 0 {
+		request.Page = 1
+	}
+
+	response, err := c.registry.UserService.GetFeed(context.Background(), userID, request)
 	if err != nil {
 		return err
 	}

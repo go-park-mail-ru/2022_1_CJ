@@ -2,7 +2,9 @@ package db
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	"github.com/microcosm-cc/bluemonday"
+	"math"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -17,12 +19,12 @@ type PostRepository interface {
 	CreatePost(ctx context.Context, post *core.Post) (*core.Post, error)
 
 	GetPostByID(ctx context.Context, postID string) (*core.Post, error)
-	GetPostsByUserID(ctx context.Context, userID string) ([]core.Post, error)
+	GetPostsByUserID(ctx context.Context, userID string, pageNumber int64, limit int64) ([]core.Post, *common.PageResponse, error)
 
 	EditPost(ctx context.Context, post *core.Post) (*core.Post, error)
 	DeletePost(ctx context.Context, postID string) error
 
-	GetFeed(ctx context.Context, userID string) ([]core.Post, error)
+	GetFeed(ctx context.Context, userID string, pageNumber int64, limit int64) ([]core.Post, *common.PageResponse, error)
 }
 
 type postRepositoryImpl struct {
@@ -59,15 +61,36 @@ func (repo *postRepositoryImpl) GetPostByID(ctx context.Context, postID string) 
 	return post, wrapError(err)
 }
 
-// TODO: add pagination
-func (repo *postRepositoryImpl) GetPostsByUserID(ctx context.Context, userID string) ([]core.Post, error) {
+func (repo *postRepositoryImpl) GetPostsByUserID(ctx context.Context, userID string, pageNumber int64, limit int64) ([]core.Post, *common.PageResponse, error) {
 	var posts []core.Post
 	filter := bson.M{"author_id": userID}
-	cursor, err := repo.coll.Find(ctx, filter)
+
+	findOptions := options.Find()
+
+	findOptions.SetSort(bson.D{{"created_at", -1}})
+
+	if limit != -1 {
+		findOptions.SetSkip((pageNumber - 1) * limit)
+		findOptions.SetLimit(limit)
+	}
+
+	cursor, err := repo.coll.Find(ctx, filter, findOptions)
 	if err != nil {
-		return posts, err
+		if err == mongo.ErrNoDocuments {
+			return posts, &common.PageResponse{}, nil
+		}
+		return nil, nil, err
 	} else {
 		err = cursor.All(ctx, &posts)
+	}
+
+	total, _ := repo.coll.CountDocuments(ctx, filter)
+	res := &common.PageResponse{
+		Total:       total,
+		AmountPages: int64(math.Ceil(float64(total / limit))),
+	}
+	if limit == -1 {
+		res.AmountPages = 1
 	}
 
 	// Sanitize
@@ -76,7 +99,7 @@ func (repo *postRepositoryImpl) GetPostsByUserID(ctx context.Context, userID str
 		posts[i].Message = p.Sanitize(posts[i].Message)
 	}
 
-	return posts, err
+	return posts, res, err
 }
 
 func (repo *postRepositoryImpl) EditPost(ctx context.Context, post *core.Post) (*core.Post, error) {
@@ -91,15 +114,35 @@ func (repo *postRepositoryImpl) DeletePost(ctx context.Context, postID string) e
 	return err
 }
 
-// TODO: refactor
-func (repo *postRepositoryImpl) GetFeed(ctx context.Context, userID string) ([]core.Post, error) {
+func (repo *postRepositoryImpl) GetFeed(ctx context.Context, userID string, pageNumber int64, limit int64) ([]core.Post, *common.PageResponse, error) {
+	filter := bson.M{}
 	opts := options.Find()
 	opts.SetSort(bson.D{{Key: "created_at", Value: -1}})
-	cursor, err := repo.coll.Find(ctx, bson.M{}, opts)
+
+	if limit != -1 {
+		opts.SetSkip((pageNumber - 1) * limit)
+		opts.SetLimit(limit)
+	}
+
+	cursor, err := repo.coll.Find(ctx, filter, opts)
 
 	var posts []core.Post
-	if err = cursor.All(ctx, &posts); err != nil {
-		return nil, err
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return posts, &common.PageResponse{}, nil
+		}
+		return nil, nil, err
+	} else {
+		err = cursor.All(ctx, &posts)
+	}
+
+	total, _ := repo.coll.CountDocuments(ctx, filter)
+	res := &common.PageResponse{
+		Total:       total,
+		AmountPages: int64(math.Ceil(float64(total / limit))),
+	}
+	if limit == -1 {
+		res.AmountPages = 1
 	}
 
 	// Sanitize
@@ -108,7 +151,7 @@ func (repo *postRepositoryImpl) GetFeed(ctx context.Context, userID string) ([]c
 		posts[i].Message = p.Sanitize(posts[i].Message)
 	}
 
-	return posts, err
+	return posts, res, err
 }
 
 func (repo *postRepositoryImpl) InitPost(post *core.Post) error {

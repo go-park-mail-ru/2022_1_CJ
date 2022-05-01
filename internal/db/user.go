@@ -5,6 +5,7 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	"github.com/microcosm-cc/bluemonday"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"math"
 	"time"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
@@ -211,17 +212,10 @@ func (repo *userRepositoryImpl) SelectUsers(ctx context.Context, selector string
 		err = cursor.All(ctx, &users)
 	}
 
-	isLarge := func(res bool) int64 {
-		if res {
-			return 1
-		} else {
-			return 0
-		}
-	}
 	total, _ := repo.coll.CountDocuments(ctx, filter)
 	res := &common.PageResponse{
 		Total:       total,
-		AmountPages: total/limit + isLarge(total%limit > 0),
+		AmountPages: int64(math.Ceil(float64(total / limit))),
 	}
 	if limit == -1 {
 		res.AmountPages = 1

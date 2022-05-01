@@ -23,7 +23,16 @@ func (c *ChatController) GetDialogs(ctx echo.Context) error {
 	if err := ctx.Bind(request); err != nil {
 		return err
 	}
+
 	request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
+
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
+
+	if request.Page <= 0 {
+		request.Page = 1
+	}
 
 	response, err := c.registry.ChatService.GetDialogs(context.Background(), request)
 	if err != nil {
@@ -38,7 +47,16 @@ func (c *ChatController) GetDialog(ctx echo.Context) error {
 	if err := ctx.Bind(request); err != nil {
 		return err
 	}
+
 	request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
+
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
+
+	if request.Page <= 0 {
+		request.Page = 1
+	}
 
 	response, err := c.registry.ChatService.GetDialog(context.Background(), request)
 	if err != nil {

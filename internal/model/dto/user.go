@@ -12,15 +12,13 @@ type User struct {
 
 // Add status
 type UserProfile struct {
-	ID        string          `json:"id"`
-	Email     string          `json:"email"`
-	Name      common.UserName `json:"name"`
-	Avatar    string          `json:"avatar"`
-	Phone     string          `json:"phone"`
-	Location  string          `json:"location"`
-	BirthDay  string          `json:"birth_day"`
-	FriendIDs []string        `json:"friend_ids"`
-	PostIDs   []string        `json:"post_ids"`
+	ID       string          `json:"id"`
+	Email    string          `json:"email"`
+	Name     common.UserName `json:"name"`
+	Avatar   string          `json:"avatar"`
+	Phone    string          `json:"phone"`
+	Location string          `json:"location"`
+	BirthDay string          `json:"birth_day"`
 }
 
 type EditProfile struct {
@@ -46,16 +44,25 @@ type GetUserResponse struct {
 
 type GetUserPostsRequest struct {
 	UserID string `query:"user_id"`
+	Limit  int64  `query:"limit,omitempty"`
+	Page   int64  `query:"page,omitempty"`
 }
 
 type GetUserPostsResponse struct {
-	Posts []GetPosts `json:"posts"`
+	Posts       []GetPosts `json:"posts"`
+	Total       int64      `json:"total"`
+	AmountPages int64      `json:"amount_pages"`
 }
 
-type GetUserFeedRequest struct{}
+type GetUserFeedRequest struct {
+	Limit int64 `query:"limit,omitempty"`
+	Page  int64 `query:"page,omitempty"`
+}
 
 type GetUserFeedResponse struct {
-	Posts []GetPosts `json:"posts"`
+	Posts       []GetPosts `json:"posts"`
+	Total       int64      `json:"total"`
+	AmountPages int64      `json:"amount_pages"`
 }
 
 type GetProfileRequest struct {
@@ -91,5 +98,5 @@ type SearchUsersRequest struct {
 type SearchUsersResponse struct {
 	Users       []User `json:"users"`
 	Total       int64  `json:"total"`
-	AmountPages int64  `json:"amount_page"`
+	AmountPages int64  `json:"amount_pages"`
 }

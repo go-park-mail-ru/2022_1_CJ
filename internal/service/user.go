@@ -14,8 +14,8 @@ import (
 
 type UserService interface {
 	GetUserData(ctx context.Context, userID string) (*dto.GetUserResponse, error)
-	GetUserPosts(ctx context.Context, userID string) (*dto.GetUserPostsResponse, error)
-	GetFeed(ctx context.Context, userID string) (*dto.GetUserFeedResponse, error)
+	GetUserPosts(ctx context.Context, request *dto.GetUserPostsRequest) (*dto.GetUserPostsResponse, error)
+	GetFeed(ctx context.Context, userID string, request *dto.GetUserFeedRequest) (*dto.GetUserFeedResponse, error)
 	GetProfile(ctx context.Context, request *dto.GetProfileRequest) (*dto.GetProfileResponse, error)
 	EditProfile(ctx context.Context, request *dto.EditProfileRequest, userID string) (*dto.EditProfileResponse, error)
 	UpdatePhoto(ctx context.Context, url string, userID string) (*dto.UpdatePhotoResponse, error)
@@ -37,21 +37,21 @@ func (svc *userServiceImpl) GetUserData(ctx context.Context, userID string) (*dt
 	return &dto.GetUserResponse{User: convert.User2DTO(user)}, nil
 }
 
-func (svc *userServiceImpl) GetUserPosts(ctx context.Context, userID string) (*dto.GetUserPostsResponse, error) {
-	user, err := svc.db.UserRepo.GetUserByID(ctx, userID)
+func (svc *userServiceImpl) GetUserPosts(ctx context.Context, request *dto.GetUserPostsRequest) (*dto.GetUserPostsResponse, error) {
+	user, err := svc.db.UserRepo.GetUserByID(ctx, request.UserID)
 	if err != nil {
 		svc.log.Errorf("GetUserByID error: %s", err)
 		return nil, err
 	}
 
-	postsCore, err := svc.db.PostRepo.GetPostsByUserID(ctx, userID)
+	postsCore, pages, err := svc.db.PostRepo.GetPostsByUserID(ctx, request.UserID, request.Page, request.Limit)
 	if err != nil {
 		svc.log.Errorf("GetPostsByUser error: %s", err)
 		return nil, err
 	}
 	svc.log.Debug("GetUserPosts success")
 
-	posts := []dto.GetPosts{}
+	var posts []dto.GetPosts
 	for _, postCore := range postsCore {
 		like, err := svc.db.LikeRepo.GetLikeBySubjectID(ctx, postCore.ID)
 		if err != nil {
@@ -59,19 +59,19 @@ func (svc *userServiceImpl) GetUserPosts(ctx context.Context, userID string) (*d
 			return nil, err
 		}
 
-		posts = append(posts, dto.GetPosts{Post: convert.Post2DTOByUser(&postCore, user), Likes: convert.Like2DTO(like, userID)})
+		posts = append(posts, dto.GetPosts{Post: convert.Post2DTOByUser(&postCore, user), Likes: convert.Like2DTO(like, request.UserID)})
 	}
-	return &dto.GetUserPostsResponse{Posts: posts}, nil
+	return &dto.GetUserPostsResponse{Posts: posts, Total: pages.Total, AmountPages: pages.AmountPages}, nil
 }
 
-func (svc *userServiceImpl) GetFeed(ctx context.Context, userID string) (*dto.GetUserFeedResponse, error) {
+func (svc *userServiceImpl) GetFeed(ctx context.Context, userID string, request *dto.GetUserFeedRequest) (*dto.GetUserFeedResponse, error) {
 	_, err := svc.db.UserRepo.GetUserByID(ctx, userID)
 	if err != nil {
 		svc.log.Errorf("GetUserByID error: %s", err)
 		return nil, err
 	}
 
-	postsCore, err := svc.db.PostRepo.GetFeed(ctx, userID)
+	postsCore, page, err := svc.db.PostRepo.GetFeed(ctx, userID, request.Page, request.Limit)
 	if err != nil {
 		svc.log.Errorf("GetFeed error: %s", err)
 		return nil, err
@@ -115,7 +115,7 @@ func (svc *userServiceImpl) GetFeed(ctx context.Context, userID string) (*dto.Ge
 		}
 
 	}
-	return &dto.GetUserFeedResponse{Posts: posts}, nil
+	return &dto.GetUserFeedResponse{Posts: posts, Total: page.Total, AmountPages: page.AmountPages}, nil
 }
 
 func (svc *userServiceImpl) GetProfile(ctx context.Context, request *dto.GetProfileRequest) (*dto.GetProfileResponse, error) {
@@ -125,13 +125,8 @@ func (svc *userServiceImpl) GetProfile(ctx context.Context, request *dto.GetProf
 		return nil, err
 	}
 
-	friends, err := svc.db.FriendsRepo.GetFriendsByID(ctx, user.ID)
-	if err != nil {
-		svc.log.Errorf("GetFriendsByID error: %s", err)
-		return nil, err
-	}
 	svc.log.Debug("GetProfile success")
-	return &dto.GetProfileResponse{UserProfile: convert.Profile2DTO(user, friends)}, nil
+	return &dto.GetProfileResponse{UserProfile: convert.Profile2DTO(user)}, nil
 }
 
 func (svc *userServiceImpl) EditProfile(ctx context.Context, request *dto.EditProfileRequest, userID string) (*dto.EditProfileResponse, error) {

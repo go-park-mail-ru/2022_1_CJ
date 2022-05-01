@@ -159,6 +159,8 @@ func (svc *chatServiceImpl) GetDialog(ctx context.Context, request *dto.GetDialo
 		return nil, err
 	}
 
+	// function limit array
+
 	return &dto.GetDialogResponse{Dialog: convert.Dialog2DTO(dialog, request.UserID), Messages: convert.Messages2DTO(dialog.Messages, request.UserID)}, err
 }
 
