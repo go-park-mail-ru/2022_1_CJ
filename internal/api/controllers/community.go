@@ -96,6 +96,7 @@ func (c *CommunityController) GetCommunityPosts(ctx echo.Context) error {
 	if request.Page <= 0 {
 		request.Page = 1
 	}
+
 	response, err := c.registry.CommunityService.GetCommunityPosts(context.Background(), request, userID)
 	if err != nil {
 		return err

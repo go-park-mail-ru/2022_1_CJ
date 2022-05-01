@@ -115,7 +115,7 @@ func TestGetPostsByUserID(t *testing.T) {
 		mt.AddMockResponses(first, second, killCursors)
 
 		ctx := context.Background()
-		posts, err := postCollection.GetPostsByUserID(ctx, "123456789")
+		posts, _, err := postCollection.GetPostsByUserID(ctx, "123456789", 1, -1)
 		assert.Nil(t, err)
 		assert.Equal(t, []core.Post{
 			{ID: expectedPost1.ID, AuthorID: expectedPost1.AuthorID, Images: expectedPost1.Images, CreatedAt: expectedPost1.CreatedAt},
@@ -191,7 +191,7 @@ func TestGetFeed(t *testing.T) {
 		mt.AddMockResponses(first, second, killCursors)
 
 		ctx := context.Background()
-		posts, err := postCollection.GetFeed(ctx, "12")
+		posts, _, err := postCollection.GetFeed(ctx, "12", 1, -1)
 		assert.Nil(t, err)
 		assert.Equal(t, []core.Post{
 			{ID: expectedPost1.ID, AuthorID: expectedPost1.AuthorID, Images: expectedPost1.Images, CreatedAt: expectedPost1.CreatedAt},
