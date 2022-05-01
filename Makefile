@@ -19,7 +19,7 @@ down:
 
 build:
 	cp ${CONFIG_PATH} ${CONFIG}
-	${DOCKER_BUILD_KIT} docker-compose build --no-cache --pull --build-arg CONFIG=${CONFIG}
+	${DOCKER_BUILD_KIT} docker-compose build --build-arg CONFIG=${CONFIG}
 	
 build-debug:
 	cp ${CONFIG_PATH} ${CONFIG}
