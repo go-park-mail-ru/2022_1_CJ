@@ -119,7 +119,7 @@ func (repo *friendsRepositoryImpl) DeleteFriend(ctx context.Context, ExFriendID1
 }
 
 func (repo *friendsRepositoryImpl) GetRequestsByUserID(ctx context.Context, userID string) ([]string, error) {
-	friends := new(core.Friends)
+	friends := core.Friends{}
 	filter := bson.M{"_id": userID}
 	err := repo.coll.FindOne(ctx, filter).Decode(friends)
 	return friends.Requests, wrapError(err)
