@@ -51,6 +51,7 @@ var (
 	ErrEmailAlreadyTaken = &CodedError{errors.New("email is taken already by other user"), http.StatusConflict}
 
 	// Not Uniq
+	ErrAddYourself         = &CodedError{errors.New("can't make yourself friend"), http.StatusConflict}
 	ErrRequestAlreadyExist = &CodedError{errors.New("your request already was sent"), http.StatusConflict}
 	ErrAlreadyFriends      = &CodedError{errors.New("your already friend with this person"), http.StatusConflict}
 	ErrAlreadyFollower     = &CodedError{errors.New("you already in community"), http.StatusConflict}

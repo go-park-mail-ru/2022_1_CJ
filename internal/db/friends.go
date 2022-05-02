@@ -14,13 +14,16 @@ type FriendsRepository interface {
 	IsUniqRequest(ctx context.Context, userID string, personID string) error
 	IsNotFriend(ctx context.Context, userID string, personID string) error
 
-	MakeRequest(ctx context.Context, userID string, personID string) error
+	MakeOutcomingRequest(ctx context.Context, userID string, personID string) error
+	MakeIncomingRequest(ctx context.Context, userID string, personID string) error
 	MakeFriends(ctx context.Context, userID string, personID string) error
 
-	DeleteRequest(ctx context.Context, userID string, personID string) error
+	DeleteOutcomingRequest(ctx context.Context, userID string, personID string) error
+	DeleteIncomingRequest(ctx context.Context, userID string, personID string) error
 	DeleteFriend(ctx context.Context, exFriendID1 string, exFriendID2 string) error
 
-	GetRequestsByUserID(ctx context.Context, userID string) ([]string, error)
+	GetOutcomingRequestsByUserID(ctx context.Context, userID string) ([]string, error)
+	GetIncomingRequestsByUserID(ctx context.Context, userID string) ([]string, error)
 	GetFriendsByUserID(ctx context.Context, userID string) ([]string, error)
 
 	GetFriendsByID(ctx context.Context, userID string) ([]string, error)
@@ -63,9 +66,19 @@ func (repo *friendsRepositoryImpl) IsNotFriend(ctx context.Context, userID strin
 	return nil
 }
 
-func (repo *friendsRepositoryImpl) MakeRequest(ctx context.Context, userID string, personID string) error {
+func (repo *friendsRepositoryImpl) MakeOutcomingRequest(ctx context.Context, userID string, personID string) error {
 	filter := bson.M{"_id": userID}
 	update := bson.M{"$push": bson.D{{Key: "requests", Value: personID}}}
+
+	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *friendsRepositoryImpl) MakeIncomingRequest(ctx context.Context, userID string, personID string) error {
+	filter := bson.M{"_id": personID}
+	update := bson.M{"$push": bson.D{{Key: "incoming_requests", Value: userID}}}
 
 	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
 		return err
@@ -91,10 +104,18 @@ func (repo *friendsRepositoryImpl) MakeFriends(ctx context.Context, userID strin
 	return nil
 }
 
-func (repo *friendsRepositoryImpl) DeleteRequest(ctx context.Context, userID string, personID string) error {
-	// first friend
+func (repo *friendsRepositoryImpl) DeleteOutcomingRequest(ctx context.Context, userID string, personID string) error {
 	filter := bson.M{"_id": userID}
-	update := bson.M{"$pull": bson.M{"requests": personID}} // Проверить на работу
+	update := bson.M{"$pull": bson.M{"requests": personID}}
+	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (repo *friendsRepositoryImpl) DeleteIncomingRequest(ctx context.Context, userID string, personID string) error {
+	filter := bson.M{"_id": personID}
+	update := bson.M{"$pull": bson.M{"incoming_requests": userID}}
 	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
 		return err
 	}
@@ -117,11 +138,18 @@ func (repo *friendsRepositoryImpl) DeleteFriend(ctx context.Context, exFriendID1
 	return nil
 }
 
-func (repo *friendsRepositoryImpl) GetRequestsByUserID(ctx context.Context, userID string) ([]string, error) {
+func (repo *friendsRepositoryImpl) GetOutcomingRequestsByUserID(ctx context.Context, userID string) ([]string, error) {
 	friends := core.Friends{}
 	filter := bson.M{"_id": userID}
 	err := repo.coll.FindOne(ctx, filter).Decode(&friends)
-	return friends.Requests, wrapError(err)
+	return friends.OutcomingRequests, wrapError(err)
+}
+
+func (repo *friendsRepositoryImpl) GetIncomingRequestsByUserID(ctx context.Context, userID string) ([]string, error) {
+	friends := core.Friends{}
+	filter := bson.M{"_id": userID}
+	err := repo.coll.FindOne(ctx, filter).Decode(&friends)
+	return friends.IncomingRequest, wrapError(err)
 }
 
 func (repo *friendsRepositoryImpl) GetFriendsByUserID(ctx context.Context, userID string) ([]string, error) {
@@ -131,7 +159,6 @@ func (repo *friendsRepositoryImpl) GetFriendsByUserID(ctx context.Context, userI
 	return friends.Friends, wrapError(err)
 }
 
-// Возможно лишняя функция
 func (repo *friendsRepositoryImpl) GetFriendsByID(ctx context.Context, userID string) ([]string, error) {
 	friends := core.Friends{}
 	filter := bson.M{"_id": userID}

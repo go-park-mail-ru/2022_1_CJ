@@ -29,8 +29,14 @@ type GetFriendsResponse struct {
 	FriendsID []string `json:"friend_ids"`
 }
 
-type GetRequestsRequests struct{}
+type GetOutcomingRequestsRequest struct{}
 
-type GetRequestsResponse struct {
+type GetOutcomingRequestsResponse struct {
+	RequestIDs []string `json:"request_ids"`
+}
+
+type GetIncomingRequestsRequest struct{}
+
+type GetIncomingRequestsResponse struct {
 	RequestIDs []string `json:"request_ids"`
 }

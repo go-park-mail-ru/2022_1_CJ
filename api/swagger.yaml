@@ -276,11 +276,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/AcceptFriendRequestRequestResponse"
 
-  /friends/requests:
+  /friends/requests/outcoming:
     get:
       tags:
         - Friends
-      summary: Get my requests
+      summary: Get my outcomming requests
       parameters:
         - $ref: "#/components/parameters/csrfToken"
       responses:
@@ -292,7 +292,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetFriendRequestsResponse"
+                $ref: "#/components/schemas/GetOutcomingRequestsResponse"
+
+  /friends/requests/incoming:
+    get:
+      tags:
+        - Friends
+      summary: Get my incoming requests
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetIncomingRequestsResponse"
 
   /friends/get:
     get:
@@ -1164,7 +1182,10 @@ components:
     GetFriendsResponse:
       $ref: "#/components/schemas/Friends"
 
-    GetFriendRequestsResponse:
+    GetOutcomingRequestsResponse:
+      $ref: "#/components/schemas/FriendRequests"
+
+    GetIncomingRequestsResponse:
       $ref: "#/components/schemas/FriendRequests"
 
     GetUserFeedResponse:

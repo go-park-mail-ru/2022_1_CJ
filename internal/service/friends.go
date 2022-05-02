@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
@@ -13,7 +14,8 @@ type FriendsService interface {
 	AcceptFriendRequest(ctx context.Context, request *dto.AcceptFriendRequestRequest, userID string) (*dto.AcceptFriendRequestResponse, error)
 	DeleteFriend(ctx context.Context, request *dto.DeleteFriendRequest, userID string) (*dto.DeleteFriendResponse, error)
 	GetFriendsByUserID(ctx context.Context, userID string) (*dto.GetFriendsResponse, error)
-	GetFriendRequests(ctx context.Context, userID string) (*dto.GetRequestsResponse, error)
+	GetOutcomingRequests(ctx context.Context, userID string) (*dto.GetOutcomingRequestsResponse, error)
+	GetIncomingRequests(ctx context.Context, userID string) (*dto.GetIncomingRequestsResponse, error)
 }
 
 type friendsServiceImpl struct {
@@ -30,27 +32,40 @@ func (svc *friendsServiceImpl) SendFriendRequest(ctx context.Context, request *d
 		return nil, err
 	}
 
-	if err := svc.db.FriendsRepo.MakeRequest(ctx, request.UserID, userID); err != nil {
+	if err := svc.db.FriendsRepo.MakeOutcomingRequest(ctx, request.UserID, userID); err != nil {
+		return nil, err
+	}
+
+	if err := svc.db.FriendsRepo.MakeIncomingRequest(ctx, request.UserID, userID); err != nil {
 		return nil, err
 	}
 
 	return &dto.SendFriendRequestResponse{}, nil
 }
 
-// Проверить на самого себя!
 func (svc *friendsServiceImpl) AcceptFriendRequest(ctx context.Context, request *dto.AcceptFriendRequestRequest, userID string) (*dto.AcceptFriendRequestResponse, error) {
+	if request.UserID == userID {
+		svc.log.Errorf("DeleteRequest error: %s", constants.ErrAddYourself)
+		return nil, constants.ErrAddYourself
+	}
+
 	if request.IsAccepted {
 		if err := svc.db.FriendsRepo.MakeFriends(ctx, userID, request.UserID); err != nil {
 			return nil, err
 		}
 	}
 
-	if err := svc.db.FriendsRepo.DeleteRequest(ctx, userID, request.UserID); err != nil {
+	if err := svc.db.FriendsRepo.DeleteOutcomingRequest(ctx, userID, request.UserID); err != nil {
 		svc.log.Errorf("DeleteRequest error: %s", err)
 		return nil, err
 	}
 
-	requests, err := svc.db.FriendsRepo.GetRequestsByUserID(ctx, userID)
+	if err := svc.db.FriendsRepo.DeleteIncomingRequest(ctx, userID, request.UserID); err != nil {
+		svc.log.Errorf("DeleteRequest error: %s", err)
+		return nil, err
+	}
+
+	requests, err := svc.db.FriendsRepo.GetOutcomingRequestsByUserID(ctx, userID)
 	if err != nil {
 		svc.log.Errorf("GetRequestsByUserID error: %s", err)
 		return nil, err
@@ -83,13 +98,22 @@ func (svc *friendsServiceImpl) GetFriendsByUserID(ctx context.Context, userID st
 	return &dto.GetFriendsResponse{FriendsID: friends}, nil
 }
 
-func (svc *friendsServiceImpl) GetFriendRequests(ctx context.Context, userID string) (*dto.GetRequestsResponse, error) {
-	requests, err := svc.db.FriendsRepo.GetRequestsByUserID(ctx, userID)
+func (svc *friendsServiceImpl) GetOutcomingRequests(ctx context.Context, userID string) (*dto.GetOutcomingRequestsResponse, error) {
+	requests, err := svc.db.FriendsRepo.GetOutcomingRequestsByUserID(ctx, userID)
 	if err != nil {
-		svc.log.Errorf("GetRequestsByUserID error: %s", err)
+		svc.log.Errorf("GetOutcomingRequestsByUserID error: %s", err)
 		return nil, err
 	}
-	return &dto.GetRequestsResponse{RequestIDs: requests}, nil
+	return &dto.GetOutcomingRequestsResponse{RequestIDs: requests}, nil
+}
+
+func (svc *friendsServiceImpl) GetIncomingRequests(ctx context.Context, userID string) (*dto.GetIncomingRequestsResponse, error) {
+	requests, err := svc.db.FriendsRepo.GetIncomingRequestsByUserID(ctx, userID)
+	if err != nil {
+		svc.log.Errorf("GetIncomingRequestsByUserID error: %s", err)
+		return nil, err
+	}
+	return &dto.GetIncomingRequestsResponse{RequestIDs: requests}, nil
 }
 
 func NewFriendsService(log *logrus.Entry, db *db.Repository) FriendsService {
