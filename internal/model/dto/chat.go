@@ -63,8 +63,8 @@ type GetDialogsResponse struct {
 }
 
 type GetDialogRequest struct { //
-	UserID   string `json:"user_id"`
-	DialogID string `json:"dialog_id"`
+	UserID   string
+	DialogID string `query:"dialog_id"`
 	Limit    int64  `query:"limit,omitempty"`
 	Page     int64  `query:"page,omitempty"`
 }

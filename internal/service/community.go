@@ -209,6 +209,7 @@ func (svc *communityServiceImpl) GetFollowers(ctx context.Context, request *dto.
 
 	return &dto.GetFollowersResponse{Amount: int64(len(community.FollowerIDs)), Followers: followers, AmountPages: pages, Total: total}, nil
 }
+
 func (svc *communityServiceImpl) GetMutualFriends(ctx context.Context, request *dto.GetMutualFriendsRequest, userID string) (*dto.GetMutualFriendsResponse, error) {
 	community, err := svc.db.CommunityRepo.GetCommunityByID(ctx, request.CommunityID)
 	if err != nil {
@@ -368,6 +369,7 @@ func (svc *communityServiceImpl) EditCommunity(ctx context.Context, request *dto
 
 	return &dto.EditCommunityResponse{}, nil
 }
+
 func (svc *communityServiceImpl) CreatePostCommunity(ctx context.Context, request *dto.CreatePostCommunityRequest, userID string) (*dto.CreatePostCommunityResponse, error) {
 	err := svc.db.UserRepo.UserCheckCommunity(ctx, userID, request.CommunityID)
 	if err != nil {

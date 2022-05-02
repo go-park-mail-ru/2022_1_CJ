@@ -328,7 +328,7 @@ func TestEditPost(t *testing.T) {
 			output:            Output{nil, constants.ErrDBNotFound},
 		},
 		{
-			name: "Don't find posts in user by UserId",
+			name: "Don't find posts in post by UserId",
 			input: Input{info: &dto.EditPostRequest{
 				PostID:  "1",
 				Message: "It's my first post!",
@@ -490,7 +490,7 @@ func TestDeletePost(t *testing.T) {
 			output:            Output{res: nil, err: err},
 		},
 		{
-			name:                 "Can't delete post in user",
+			name:                 "Can't delete post in post",
 			input:                Input{info: &dto.DeletePostRequest{PostID: "3"}, userID: "3"},
 			inputGetPostByID:     InputGetPostByID{postID: "3"},
 			outputGetPostByID:    OutputGetPostByID{post: &core.Post{ID: "3", AuthorID: "3"}, err: nil},
