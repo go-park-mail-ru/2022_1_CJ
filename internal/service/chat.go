@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
@@ -29,11 +30,9 @@ type chatServiceImpl struct {
 func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.CreateDialogRequest) (*dto.CreateDialogResponse, error) {
 	switch {
 	case len(request.AuthorIDs) < 1:
-		svc.log.Errorf("%s", constants.ErrSingleChat)
 		return nil, constants.ErrSingleChat
 	case len(request.AuthorIDs) == 1:
 		if request.AuthorIDs[0] == request.UserID {
-			svc.log.Errorf("%s", constants.ErrSingleChat)
 			return nil, constants.ErrSingleChat
 		}
 		if err := svc.db.ChatRepo.IsUniqDialog(ctx, request.UserID, request.AuthorIDs[0]); err != nil {

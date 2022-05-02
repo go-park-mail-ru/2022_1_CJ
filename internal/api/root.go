@@ -107,7 +107,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	chatAPI := api.Group("/messenger", svc.AuthMiddleware(), svc.CSRFMiddleware())
 
 	chatAPI.GET("/dialogs", chatCtrl.GetDialogs)
-	chatAPI.POST("/get", chatCtrl.GetDialog)
+	chatAPI.GET("/get", chatCtrl.GetDialog)
 	chatAPI.POST("/create", chatCtrl.CreateDialog)
 	chatAPI.GET("/ws", chatCtrl.WsHandler)
 
