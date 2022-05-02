@@ -2,14 +2,15 @@ package chat
 
 import (
 	"context"
+	"sync"
+	"time"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
-	"sync"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -270,12 +271,12 @@ func (c *Conn) Emit(msg *dto.Message) {
 }
 
 // NewConnection Upgrades an HTTP connection and creates a new Conn type.
-func NewConnection(ctx *echo.Context, log *logrus.Entry, registry *service.Registry, userID string) *Conn {
+func NewConnection(ctx *echo.Context, log *logrus.Entry, registry *service.Registry, userID string) (*Conn, error) {
 	socket, err := constants.Upgrader.Upgrade((*ctx).Response(), (*ctx).Request(), nil)
 	if err != nil {
-		return nil
+		return nil, err
 	}
-	c := &Conn{
+	conn := &Conn{
 		Socket:  socket,
 		ID:      userID,
 		Send:    make(chan dto.Message),
@@ -284,18 +285,21 @@ func NewConnection(ctx *echo.Context, log *logrus.Entry, registry *service.Regis
 		reg:     registry,
 	}
 	ConnManager.Lock()
-	ConnManager.Conns[c.ID] = c
+	ConnManager.Conns[conn.ID] = conn
 	ConnManager.Unlock()
-	return c
+	return conn, nil
 }
 
 // SocketHandler Calls NewConnection, starts the returned Conn's writer, joins the root room, and finally starts the Conn's reader.
 func SocketHandler(ctx *echo.Context, log *logrus.Entry, registry *service.Registry, userID string) error {
-	c := NewConnection(ctx, log, registry, userID)
-	if c != nil {
-		go c.writePump()
-		go c.readPump()
-		c.log.Infof("new user: %s", c.ID)
+	conn, err := NewConnection(ctx, log, registry, userID)
+	if err != nil {
+		return err
 	}
+
+	go conn.writePump()
+	go conn.readPump()
+	conn.log.Infof("new user: %s", conn.ID)
+
 	return nil
 }
