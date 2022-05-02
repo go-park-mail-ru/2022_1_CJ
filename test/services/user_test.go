@@ -162,7 +162,7 @@ func TestGetUserData(t *testing.T) {
 //
 //	ctx := context.Background()
 //	type GetUserByID struct {
-//		user *core.User
+//		post *core.User
 //		err  error
 //	}
 //	type FriendsByID struct {
@@ -196,9 +196,9 @@ func TestGetUserData(t *testing.T) {
 //	}
 //
 //	gomock.InOrder(
-//		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[0].input.UserID).Return(tests[0].resultGetUserByID.user, tests[0].resultGetUserByID.err),
-//		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[1].input.UserID).Return(tests[1].resultGetUserByID.user, tests[1].resultGetUserByID.err),
-//		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[2].input.UserID).Return(tests[2].resultGetUserByID.user, tests[2].resultGetUserByID.err),
+//		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[0].input.UserID).Return(tests[0].resultGetUserByID.post, tests[0].resultGetUserByID.err),
+//		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[1].input.UserID).Return(tests[1].resultGetUserByID.post, tests[1].resultGetUserByID.err),
+//		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[2].input.UserID).Return(tests[2].resultGetUserByID.post, tests[2].resultGetUserByID.err),
 //	)
 //
 //	for _, test := range tests {

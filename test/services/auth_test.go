@@ -78,7 +78,7 @@ func TestSignupUser(t *testing.T) {
 		//											Password: "12 34"}},
 		//	inputCheckUserEmailExistence:  InputCheckUserEmailExistence{email: "SashaWeb@mail.ru"},
 		//	outputCheckUserEmailExistence: OutputCheckUserEmailExistence{exists: false, err: nil},
-		//	inputCreateUser: InputCreateUser{user: &core.User{
+		//	inputCreateUser: InputCreateUser{post: &core.User{
 		//											Name: common.UserName{First: "Sasha", Last: "Web"},
 		//											Email: "SashaWeb@mail.ru"}},
 		//	outputCreateUser: OutputCreateUser{},
@@ -137,7 +137,7 @@ func TestLoginUser(t *testing.T) {
 		output                Output
 	}{
 		{
-			name:                  "With wrong user",
+			name:                  "With wrong post",
 			input:                 Input{info: &dto.LoginUserRequest{Email: "wrong", Password: "1234"}},
 			inputGetUserByEmail:   InputGetUserByEmail{email: "wrong"},
 			outputGetUserByEmaile: OutputGetUserByEmail{user: nil, err: constants.ErrDBNotFound},

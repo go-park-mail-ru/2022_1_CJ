@@ -390,7 +390,7 @@ func TestReadMessage(t *testing.T) {
 //	}
 //
 //	type InputGetUserDialogs struct {
-//		userID string
+//		postID string
 //	}
 //	type OutputGetUserDialogs struct {
 //		ids []string
@@ -422,14 +422,14 @@ func TestReadMessage(t *testing.T) {
 //		{
 //			name:                 "Don't found in DB",
 //			input:                Input{info: &dto.GetDialogsRequest{UserID: "0"}},
-//			inputGetUserDialogs:  InputGetUserDialogs{userID: "0"},
+//			inputGetUserDialogs:  InputGetUserDialogs{postID: "0"},
 //			outputGetUserDialogs: OutputGetUserDialogs{ids: nil, err: mongo.ErrNoDocuments},
 //			output:               Output{nil, mongo.ErrNoDocuments},
 //		},
 //		{
 //			name:                 "success",
 //			input:                Input{info: &dto.GetDialogsRequest{UserID: "1"}},
-//			inputGetUserDialogs:  InputGetUserDialogs{userID: "1"},
+//			inputGetUserDialogs:  InputGetUserDialogs{postID: "1"},
 //			outputGetUserDialogs: OutputGetUserDialogs{ids: []string{"1"}, err: nil},
 //			inputGetDialogByID:   InputGetDialogByID{dialogID: "1"},
 //			outputGetDialogByID: OutputGetDialogByID{
@@ -449,10 +449,10 @@ func TestReadMessage(t *testing.T) {
 //	}
 //
 //	gomock.InOrder(
-//		testRepo.mockUserR.EXPECT().GetUserDialogs(ctx, tests[0].inputGetUserDialogs.userID).Return(tests[0].outputGetUserDialogs.ids,
+//		testRepo.mockUserR.EXPECT().GetUserDialogs(ctx, tests[0].inputGetUserDialogs.postID).Return(tests[0].outputGetUserDialogs.ids,
 //			tests[0].outputGetUserDialogs.err),
 //
-//		testRepo.mockUserR.EXPECT().GetUserDialogs(ctx, tests[1].inputGetUserDialogs.userID).Return(tests[1].outputGetUserDialogs.ids,
+//		testRepo.mockUserR.EXPECT().GetUserDialogs(ctx, tests[1].inputGetUserDialogs.postID).Return(tests[1].outputGetUserDialogs.ids,
 //			tests[1].outputGetUserDialogs.err),
 //		testRepo.mockChatR.EXPECT().GetDialogByID(ctx, tests[1].inputGetDialogByID.dialogID).Return(tests[1].outputGetDialogByID.dialog,
 //			tests[1].outputGetDialogByID.err),
@@ -526,7 +526,7 @@ func TestCheckDialog(t *testing.T) {
 			output: Output{mongo.ErrNoDocuments},
 		},
 		{
-			name:               "Don't found user in dialog",
+			name:               "Don't found post in dialog",
 			input:              Input{info: &dto.CheckDialogRequest{UserID: "1", DialogID: "1"}},
 			inputGetDialogByID: InputGetDialogByID{dialogID: "1"},
 			outputGetDialogByID: OutputGetDialogByID{
@@ -599,7 +599,7 @@ func TestCheckDialog(t *testing.T) {
 //
 //	type InputUserCheckDialog struct {
 //		dialogID string
-//		userID   string
+//		postID   string
 //	}
 //
 //	type OutputUserCheckDialog struct {
@@ -633,7 +633,7 @@ func TestCheckDialog(t *testing.T) {
 //		{
 //			name:                 "Don't found in DB",
 //			input:                Input{info: &dto.GetDialogRequest{UserID: "0", DialogID: "0"}},
-//			inputUserCheckDialog: InputUserCheckDialog{dialogID: "0", userID: "0"},
+//			inputUserCheckDialog: InputUserCheckDialog{dialogID: "0", postID: "0"},
 //			outputUserCheckDialog: OutputUserCheckDialog{
 //				err: constants.ErrDBNotFound,
 //			},
@@ -642,7 +642,7 @@ func TestCheckDialog(t *testing.T) {
 //		{
 //			name:                 "success",
 //			input:                Input{info: &dto.GetDialogRequest{UserID: "1", DialogID: "1"}},
-//			inputUserCheckDialog: InputUserCheckDialog{dialogID: "1", userID: "1"},
+//			inputUserCheckDialog: InputUserCheckDialog{dialogID: "1", postID: "1"},
 //			outputUserCheckDialog: OutputUserCheckDialog{
 //				err: nil,
 //			},
@@ -656,8 +656,8 @@ func TestCheckDialog(t *testing.T) {
 //	}
 //
 //	gomock.InOrder(
-//		testRepo.mockUserR.EXPECT().UserCheckDialog(ctx, tests[0].inputUserCheckDialog.dialogID, tests[0].inputUserCheckDialog.userID).Return(tests[0].outputUserCheckDialog.err),
-//		testRepo.mockUserR.EXPECT().UserCheckDialog(ctx, tests[1].inputUserCheckDialog.dialogID, tests[1].inputUserCheckDialog.userID).Return(tests[1].outputUserCheckDialog.err),
+//		testRepo.mockUserR.EXPECT().UserCheckDialog(ctx, tests[0].inputUserCheckDialog.dialogID, tests[0].inputUserCheckDialog.postID).Return(tests[0].outputUserCheckDialog.err),
+//		testRepo.mockUserR.EXPECT().UserCheckDialog(ctx, tests[1].inputUserCheckDialog.dialogID, tests[1].inputUserCheckDialog.postID).Return(tests[1].outputUserCheckDialog.err),
 //		testRepo.mockChatR.EXPECT().GetDialogByID(ctx, tests[1].inputGetDialogByID.dialogID).Return(tests[1].outputGetDialogByID.dialog, tests[1].outputGetDialogByID.err),
 //	)
 //
