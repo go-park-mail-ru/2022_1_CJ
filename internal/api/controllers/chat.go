@@ -66,6 +66,25 @@ func (c *ChatController) GetDialog(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
+func (c *ChatController) GetDialogByUserID(ctx echo.Context) error {
+	request := new(dto.GetDialogByUserIDRequest)
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
+
+	currentUserID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+
+	response, err := c.registry.ChatService.GetDialogByUserID(context.Background(), request, currentUserID)
+	if err != nil {
+		return err
+	}
+
+	if response.DialogID == "" {
+		return ctx.JSON(http.StatusNoContent, response)
+	}
+	return ctx.JSON(http.StatusOK, response)
+}
+
 func (c *ChatController) CreateDialog(ctx echo.Context) error {
 	request := new(dto.CreateDialogRequest)
 	if err := ctx.Bind(request); err != nil {

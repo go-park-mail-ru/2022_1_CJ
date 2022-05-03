@@ -16,6 +16,7 @@ type ChatService interface {
 	CreateDialog(ctx context.Context, request *dto.CreateDialogRequest) (*dto.CreateDialogResponse, error)
 	GetDialogs(ctx context.Context, request *dto.GetDialogsRequest) (*dto.GetDialogsResponse, error)
 	GetDialog(ctx context.Context, request *dto.GetDialogRequest) (*dto.GetDialogResponse, error)
+	GetDialogByUserID(ctx context.Context, request *dto.GetDialogByUserIDRequest, currentUserID string) (*dto.GetDialogByUserIDResponse, error)
 
 	SendMessage(ctx context.Context, request *dto.SendMessageRequest) (*dto.SendMessageResponse, error)
 	ReadMessage(ctx context.Context, request *dto.ReadMessageRequest) (*dto.ReadMessageResponse, error)
@@ -131,6 +132,15 @@ func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDial
 		dialogs = append(dialogs, convert.Dialog2DTO(dInf, request.UserID))
 	}
 	return &dto.GetDialogsResponse{Dialogs: dialogs, Total: total, AmountPages: page}, err
+}
+
+func (svc *chatServiceImpl) GetDialogByUserID(ctx context.Context, request *dto.GetDialogByUserIDRequest, currentUserID string) (*dto.GetDialogByUserIDResponse, error) {
+	dialogID, err := svc.db.ChatRepo.IsDialogExist(ctx, request.UserID, currentUserID)
+	if err != nil {
+		svc.log.Errorf("IsDialogExist error: %s", err)
+		return nil, err
+	}
+	return &dto.GetDialogByUserIDResponse{DialogID: dialogID}, nil
 }
 
 func (svc *chatServiceImpl) CheckDialog(ctx context.Context, request *dto.CheckDialogRequest) error {

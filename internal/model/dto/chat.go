@@ -76,6 +76,14 @@ type GetDialogResponse struct {
 	AmountPages int64         `json:"amount_pages"`
 }
 
+type GetDialogByUserIDRequest struct {
+	UserID string `query:"user_id"`
+}
+
+type GetDialogByUserIDResponse struct {
+	DialogID string `json:"dialog_id"`
+}
+
 type CheckDialogRequest struct {
 	UserID   string `json:"user_id"`
 	DialogID string `json:"dialog_id"`
