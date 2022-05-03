@@ -59,10 +59,31 @@ func TestLike(t *testing.T) *core.Like {
 		CreatedAt: 1323123,
 	}
 }
+
 func TestNullLike(t *testing.T) *core.Like {
 	t.Helper()
 	return &core.Like{}
 }
+
+func TestNullCommunity(t *testing.T) *core.Community {
+	t.Helper()
+	return &core.Community{}
+}
+
+func TestCommunity(t *testing.T) *core.Community {
+	t.Helper()
+	return &core.Community{
+		ID:          "12345678",
+		Name:        "Community",
+		Image:       "image",
+		Info:        "info",
+		FollowerIDs: []string{"1", "2"},
+		AdminIDs:    []string{"1", "2"},
+		PostIDs:     []string{"1", "2"},
+		CreatedAt:   124565,
+	}
+}
+
 func TestDialog(t *testing.T) *core.Dialog {
 	t.Helper()
 	return &core.Dialog{
