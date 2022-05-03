@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
@@ -24,19 +25,19 @@ type friendsServiceImpl struct {
 }
 
 func (svc *friendsServiceImpl) SendFriendRequest(ctx context.Context, request *dto.SendFriendRequestRequest, userID string) (*dto.SendFriendRequestResponse, error) {
-	if err := svc.db.FriendsRepo.IsUniqRequest(ctx, request.UserID, userID); err != nil {
+	if err := svc.db.FriendsRepo.IsUniqRequest(ctx, userID, request.UserID); err != nil {
 		return nil, err
 	}
 
-	if err := svc.db.FriendsRepo.IsNotFriend(ctx, request.UserID, userID); err != nil {
+	if err := svc.db.FriendsRepo.IsNotFriend(ctx, userID, request.UserID); err != nil {
 		return nil, err
 	}
 
-	if err := svc.db.FriendsRepo.MakeOutcomingRequest(ctx, request.UserID, userID); err != nil {
+	if err := svc.db.FriendsRepo.MakeOutcomingRequest(ctx, userID, request.UserID); err != nil {
 		return nil, err
 	}
 
-	if err := svc.db.FriendsRepo.MakeIncomingRequest(ctx, request.UserID, userID); err != nil {
+	if err := svc.db.FriendsRepo.MakeIncomingRequest(ctx, userID, request.UserID); err != nil {
 		return nil, err
 	}
 
