@@ -10,8 +10,6 @@ import (
 	"testing"
 )
 
-// how test with bad result Update
-
 func TestCreateFriends(t *testing.T) {
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
