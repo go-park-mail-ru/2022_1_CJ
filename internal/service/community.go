@@ -222,7 +222,7 @@ func (svc *communityServiceImpl) GetMutualFriends(ctx context.Context, request *
 		return nil, constants.ErrDBNotFound
 	}
 
-	friends, err := svc.db.FriendsRepo.GetFriendsByID(ctx, user.FriendsID)
+	friends, err := svc.db.FriendsRepo.GetFriendsByUserID(ctx, user.FriendsID)
 	if err != nil {
 		svc.log.Errorf("GetFriendsByID error: %s", err)
 		return nil, constants.ErrDBNotFound

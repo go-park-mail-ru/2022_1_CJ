@@ -25,8 +25,6 @@ type FriendsRepository interface {
 	GetOutcomingRequestsByUserID(ctx context.Context, userID string) ([]string, error)
 	GetIncomingRequestsByUserID(ctx context.Context, userID string) ([]string, error)
 	GetFriendsByUserID(ctx context.Context, userID string) ([]string, error)
-
-	GetFriendsByID(ctx context.Context, userID string) ([]string, error)
 }
 
 type friendsRepositoryImpl struct {
@@ -159,13 +157,10 @@ func (repo *friendsRepositoryImpl) GetFriendsByUserID(ctx context.Context, userI
 	return friends.Friends, wrapError(err)
 }
 
-func (repo *friendsRepositoryImpl) GetFriendsByID(ctx context.Context, userID string) ([]string, error) {
-	friends := core.Friends{}
-	filter := bson.M{"_id": userID}
-	err := repo.coll.FindOne(ctx, filter).Decode(&friends)
-	return friends.Friends, wrapError(err)
-}
-
 func NewFriendsRepository(db *mongo.Database) (*friendsRepositoryImpl, error) {
 	return &friendsRepositoryImpl{db: db, coll: db.Collection("friends")}, nil
+}
+
+func NewFriendsRepositoryTest(collection *mongo.Collection) (*friendsRepositoryImpl, error) {
+	return &friendsRepositoryImpl{coll: collection}, nil
 }
