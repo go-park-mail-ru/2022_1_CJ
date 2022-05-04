@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
@@ -283,14 +284,12 @@ func (svc *communityServiceImpl) SearchCommunities(ctx context.Context, request 
 
 func (svc *communityServiceImpl) UpdatePhoto(ctx context.Context, request *dto.UpdatePhotoCommunityRequest, url string, userID string) (*dto.UpdatePhotoCommunityResponse, error) {
 	if err := svc.db.UserRepo.UserCheckCommunity(ctx, userID, request.CommunityID); err != nil {
-		svc.log.Errorf("UserCheckCommunity error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("UserCheckCommunity: %w", err)
 	}
 
 	community, err := svc.db.CommunityRepo.GetCommunityByID(ctx, request.CommunityID)
 	if err != nil {
-		svc.log.Errorf("GetCommunityByID error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("GetCommunityByID: %w", err)
 	}
 
 	for num, id := range community.AdminIDs {
@@ -516,8 +515,7 @@ func (svc *communityServiceImpl) DeleteCommunity(ctx context.Context, request *d
 
 	err = svc.db.CommunityRepo.DeleteCommunity(ctx, request.CommunityID)
 	if err != nil {
-		svc.log.Errorf("DeleteCommunity error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("DeleteCommunity: %w", err)
 	}
 
 	for _, id := range community.FollowerIDs {
