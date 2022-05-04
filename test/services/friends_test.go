@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
@@ -209,14 +210,14 @@ func TestAcceptFriendRequest(t *testing.T) {
 		{
 			name:   "Error make yourself friend",
 			input:  Input{info: &dto.AcceptFriendRequestRequest{UserID: "1", IsAccepted: true}, userID: "1"},
-			output: Output{res: nil, err: constants.ErrAddYourself},
+			output: Output{res: nil, err: fmt.Errorf("DeleteRequest: %w", constants.ErrAddYourself)},
 		},
 		{
 			name:                               "Success",
 			input:                              Input{info: &dto.AcceptFriendRequestRequest{UserID: "5", IsAccepted: true}, userID: "2"},
 			inputMakeFriends:                   InputMakeFriends{userID: "2", personID: "5"},
 			outputMakeFriends:                  OutputMakeFriends{err: nil},
-			inputDeleteOutcomingRequest:        InputDeleteOutcomingRequest{userID: "2", personID: "5"},
+			inputDeleteOutcomingRequest:        InputDeleteOutcomingRequest{userID: "5", personID: "2"},
 			outputDeleteIncomingRequest:        OutputDeleteIncomingRequest{err: nil},
 			inputDeleteIncomingRequest:         InputDeleteIncomingRequest{userID: "2", personID: "5"},
 			outputDeleteOutcomingRequest:       OutputDeleteOutcomingRequest{err: nil},
