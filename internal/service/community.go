@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
@@ -281,16 +282,15 @@ func (svc *communityServiceImpl) SearchCommunities(ctx context.Context, request 
 }
 
 func (svc *communityServiceImpl) UpdatePhoto(ctx context.Context, request *dto.UpdatePhotoCommunityRequest, url string, userID string) (*dto.UpdatePhotoCommunityResponse, error) {
-	err := svc.db.UserRepo.UserCheckCommunity(ctx, userID, request.CommunityID)
-	if err != nil {
+	if err := svc.db.UserRepo.UserCheckCommunity(ctx, userID, request.CommunityID); err != nil {
 		svc.log.Errorf("UserCheckCommunity error: %s", err)
-		return nil, constants.ErrDBNotFound
+		return nil, err
 	}
 
 	community, err := svc.db.CommunityRepo.GetCommunityByID(ctx, request.CommunityID)
 	if err != nil {
 		svc.log.Errorf("GetCommunityByID error: %s", err)
-		return nil, constants.ErrDBNotFound
+		return nil, err
 	}
 
 	for num, id := range community.AdminIDs {

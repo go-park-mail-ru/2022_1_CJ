@@ -56,7 +56,7 @@ func (svc *friendsServiceImpl) AcceptFriendRequest(ctx context.Context, request 
 		}
 	}
 
-	if err := svc.db.FriendsRepo.DeleteOutcomingRequest(ctx, userID, request.UserID); err != nil {
+	if err := svc.db.FriendsRepo.DeleteOutcomingRequest(ctx, request.UserID, userID); err != nil {
 		svc.log.Errorf("DeleteRequest error: %s", err)
 		return nil, err
 	}

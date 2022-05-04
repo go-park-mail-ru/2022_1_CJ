@@ -114,8 +114,8 @@ func (repo *friendsRepositoryImpl) DeleteOutcomingRequest(ctx context.Context, u
 }
 
 func (repo *friendsRepositoryImpl) DeleteIncomingRequest(ctx context.Context, userID string, personID string) error {
-	filter := bson.M{"_id": personID}
-	update := bson.M{"$pull": bson.M{"incoming_requests": userID}}
+	filter := bson.M{"_id": userID}
+	update := bson.M{"$pull": bson.M{"incoming_requests": personID}}
 	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
 		return err
 	}
