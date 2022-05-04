@@ -33,10 +33,26 @@ func TestPostNull(t *testing.T) *core.Post {
 	return &core.Post{}
 }
 
+func TestFriendsNull(t *testing.T) *core.Friends {
+	t.Helper()
+
+	return &core.Friends{}
+}
+
 func TestDialogNull(t *testing.T) *core.Dialog {
 	t.Helper()
 
 	return &core.Dialog{}
+}
+
+func TestFriends(t *testing.T) *core.Friends {
+	t.Helper()
+	return &core.Friends{
+		ID:                "12345678",
+		OutcomingRequests: []string{"123", "234"},
+		IncomingRequest:   []string{"2345", "2357"},
+		Friends:           []string{"123567", "213123", "214335345"},
+	}
 }
 
 func TestPost(t *testing.T) *core.Post {
