@@ -232,6 +232,13 @@ func (c *CommunityController) SearchCommunities(ctx echo.Context) error {
 }
 
 func (c *CommunityController) UpdatePhotoCommunity(ctx echo.Context) error {
+	// TODO: for some reason doesn't bind community_id query
+	request := &dto.UpdatePhotoCommunityRequest{CommunityID: ctx.QueryParam("community_id")}
+	// request := new(dto.UpdatePhotoCommunityRequest)
+	// if err := ctx.Bind(request); err != nil {
+	// 	return err
+	// }
+
 	image, err := ctx.FormFile("photo")
 	if err != nil {
 		return err
@@ -239,12 +246,6 @@ func (c *CommunityController) UpdatePhotoCommunity(ctx echo.Context) error {
 
 	url, err := c.registry.StaticService.UploadImage(context.Background(), image)
 	if err != nil {
-		return err
-	}
-
-	request := new(dto.UpdatePhotoCommunityRequest)
-	if err := ctx.Bind(request); err != nil {
-		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 

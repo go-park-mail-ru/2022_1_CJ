@@ -85,7 +85,7 @@ type SearchCommunitiesResponse struct {
 }
 
 type UpdatePhotoCommunityRequest struct {
-	CommunityID string `query:"community_id"`
+	CommunityID string `query:"community_id" validate:"required"`
 }
 
 type UpdatePhotoCommunityResponse struct {
@@ -93,19 +93,19 @@ type UpdatePhotoCommunityResponse struct {
 }
 
 type JoinCommunityRequest struct {
-	CommunityID string `query:"community_id"`
+	CommunityID string `query:"community_id" validate:"required"`
 }
 
 type JoinCommunityResponse BasicResponse
 
 type LeaveCommunityRequest struct {
-	CommunityID string `query:"community_id"`
+	CommunityID string `query:"community_id" validate:"required"`
 }
 
 type LeaveCommunityResponse BasicResponse
 
 type GetFollowersRequest struct {
-	CommunityID string `query:"community_id"`
+	CommunityID string `query:"community_id" validate:"required"`
 	Limit       int64  `query:"limit,omitempty"`
 	Page        int64  `query:"page,omitempty"`
 }
@@ -118,7 +118,7 @@ type GetFollowersResponse struct {
 }
 
 type GetMutualFriendsRequest struct {
-	CommunityID string `query:"community_id"`
+	CommunityID string `query:"community_id" validate:"required"`
 	Limit       int64  `query:"limit,omitempty"`
 	Page        int64  `query:"page,omitempty"`
 }
@@ -131,9 +131,9 @@ type GetMutualFriendsResponse struct {
 }
 
 type CreateCommunityRequest struct {
-	Name   string   `json:"name"`
+	Name   string   `json:"name" validate:"required"`
 	Image  string   `json:"image"`
-	Info   string   `json:"info"`
+	Info   string   `json:"info" validate:"required"`
 	Admins []string `json:"admins"`
 }
 
