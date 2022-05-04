@@ -129,7 +129,7 @@ func (c *Conn) writePump() {
 	for {
 		select {
 		case msg, ok := <-c.Send:
-			if ok == false {
+			if !ok {
 				_ = c.write(websocket.CloseMessage, []byte{})
 				return
 			}

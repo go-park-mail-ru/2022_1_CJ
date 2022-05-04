@@ -1,9 +1,10 @@
 package chat
 
 import (
+	"sync"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
-	"sync"
 )
 
 // The Dialog type represents a communication channel.
@@ -58,6 +59,7 @@ func (r *Dialog) Start() {
 			r.Unlock()
 
 			c.Send <- *ConstructMessage(r.Name, constants.JoinedChat, c.ID, constants.Empty, membersString)
+
 		case c := <-r.leavechan:
 			r.Lock()
 			id, ok := r.Members[c.ID]
@@ -69,17 +71,21 @@ func (r *Dialog) Start() {
 			delete(r.Members, id)
 			r.Unlock()
 			c.Send <- *ConstructMessage(r.Name, constants.LeftChat, id, constants.Empty, c.ID)
+
 		case rmsg := <-r.Send:
 			r.Lock()
+
 			for id := range r.Members {
 				r.Unlock()
+
 				ConnManager.Lock()
 				c, ok := ConnManager.Conns[id]
 				ConnManager.Unlock()
-				if !ok || c == rmsg.Sender {
+				if !ok {
 					r.Lock()
 					continue
 				}
+
 				select {
 				case c.Send <- *rmsg.Data:
 				default:
@@ -90,7 +96,9 @@ func (r *Dialog) Start() {
 				}
 				r.Lock()
 			}
+
 			r.Unlock()
+
 		case <-r.stopchan:
 			DialogManager.Lock()
 			delete(DialogManager.Rooms, r.Name)
