@@ -304,7 +304,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -1312,7 +1312,6 @@ components:
           type: string
           example: "123ADF:213"
 
-
     CreateDialogRequest:
       properties:
         name:
@@ -1558,8 +1557,15 @@ components:
         user_profile:
           type: object
           properties:
-            user_info:
-              $ref: "#/components/schemas/User"
+            id:
+              type: string
+            name:
+              $ref: "#/components/schemas/UserName"
+            email:
+              type: string
+              example: mail@example.com
+            image:
+              type: string
             avatar:
               type: string
               example: fmt/img/avatar.jpg
