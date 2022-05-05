@@ -90,7 +90,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to check auth connection: %s", err)
 	}
-	defer grpcConn.Close()
 	log.Info("connected to Microservice Auth")
 
 	// -------------------- Set up service -------------------- //

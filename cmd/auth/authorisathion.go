@@ -89,10 +89,8 @@ func main() {
 
 	log.Infof("Server started listen at", listenAddr)
 
-	go func() {
-		err := server.Serve(lis)
-		if err != nil {
-			return
-		}
-	}()
+	err = server.Serve(lis)
+	if err != nil {
+		return
+	}
 }
