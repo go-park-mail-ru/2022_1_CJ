@@ -13,6 +13,7 @@ import (
 
 type ChatRepository interface {
 	IsUniqDialog(ctx context.Context, firstUserID string, secondUserID string) error
+	IsDialogExist(ctx context.Context, firstUserID string, secondUserID string) (string, error)
 	CreateDialog(ctx context.Context, userID string, name string, authorIDs []string) (*core.Dialog, error)
 	IsChatExist(ctx context.Context, dialogID string) error
 	SendMessage(ctx context.Context, message core.Message, dialogID string) error
@@ -48,6 +49,22 @@ func (repo *chatRepositoryImpl) IsUniqDialog(ctx context.Context, firstUserID st
 		}
 	}
 	return nil
+}
+
+func (repo *chatRepositoryImpl) IsDialogExist(ctx context.Context, firstUserID string, secondUserID string) (string, error) {
+	chat := &core.Dialog{}
+	filter := bson.M{"$and": bson.A{
+		bson.D{{"participants", bson.M{"$size": 2}}},
+		bson.D{{"participants", firstUserID}},
+		bson.D{{"participants", secondUserID}},
+	}}
+	if err := repo.coll.FindOne(ctx, filter).Decode(&chat); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return "", nil
+		}
+		return "", err
+	}
+	return chat.ID, nil
 }
 
 func (repo *chatRepositoryImpl) CreateDialog(ctx context.Context, userID string, name string, authorIDs []string) (*core.Dialog, error) {

@@ -25,8 +25,6 @@ type FriendsRepository interface {
 	GetOutcomingRequestsByUserID(ctx context.Context, userID string) ([]string, error)
 	GetIncomingRequestsByUserID(ctx context.Context, userID string) ([]string, error)
 	GetFriendsByUserID(ctx context.Context, userID string) ([]string, error)
-
-	GetFriendsByID(ctx context.Context, userID string) ([]string, error)
 }
 
 type friendsRepositoryImpl struct {
@@ -114,8 +112,8 @@ func (repo *friendsRepositoryImpl) DeleteOutcomingRequest(ctx context.Context, u
 }
 
 func (repo *friendsRepositoryImpl) DeleteIncomingRequest(ctx context.Context, userID string, personID string) error {
-	filter := bson.M{"_id": personID}
-	update := bson.M{"$pull": bson.M{"incoming_requests": userID}}
+	filter := bson.M{"_id": userID}
+	update := bson.M{"$pull": bson.M{"incoming_requests": personID}}
 	if _, err := repo.coll.UpdateOne(ctx, filter, update); err != nil {
 		return err
 	}
@@ -159,13 +157,10 @@ func (repo *friendsRepositoryImpl) GetFriendsByUserID(ctx context.Context, userI
 	return friends.Friends, wrapError(err)
 }
 
-func (repo *friendsRepositoryImpl) GetFriendsByID(ctx context.Context, userID string) ([]string, error) {
-	friends := core.Friends{}
-	filter := bson.M{"_id": userID}
-	err := repo.coll.FindOne(ctx, filter).Decode(&friends)
-	return friends.Friends, wrapError(err)
-}
-
 func NewFriendsRepository(db *mongo.Database) (*friendsRepositoryImpl, error) {
 	return &friendsRepositoryImpl{db: db, coll: db.Collection("friends")}, nil
+}
+
+func NewFriendsRepositoryTest(collection *mongo.Collection) (*friendsRepositoryImpl, error) {
+	return &friendsRepositoryImpl{coll: collection}, nil
 }

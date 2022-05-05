@@ -480,6 +480,28 @@ paths:
               schema:
                 $ref: "#/components/schemas/GetDialogResponse"
 
+  /messenger/user_dialog:
+    get:
+      tags:
+        - Messenger
+      summary: return dialog id if exist
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/userIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "204":
+          description: Dialog does not exist
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDialogByUserIDResponse"
+
   /messenger/create:
     post:
       tags:
@@ -1268,11 +1290,6 @@ components:
           type: integer
           example: 13
 
-    GetDialogRequest:
-      properties:
-        dialog_id:
-          type: string
-
     GetDialogResponse:
       properties:
         dialog:
@@ -1288,6 +1305,13 @@ components:
         amount_pages:
           type: integer
           example: 13
+
+    GetDialogByUserIDResponse:
+      properties:
+        dialog_id:
+          type: string
+          example: "123ADF:213"
+
 
     CreateDialogRequest:
       properties:

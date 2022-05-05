@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
@@ -24,19 +26,19 @@ type friendsServiceImpl struct {
 }
 
 func (svc *friendsServiceImpl) SendFriendRequest(ctx context.Context, request *dto.SendFriendRequestRequest, userID string) (*dto.SendFriendRequestResponse, error) {
-	if err := svc.db.FriendsRepo.IsUniqRequest(ctx, request.UserID, userID); err != nil {
+	if err := svc.db.FriendsRepo.IsUniqRequest(ctx, userID, request.UserID); err != nil {
 		return nil, err
 	}
 
-	if err := svc.db.FriendsRepo.IsNotFriend(ctx, request.UserID, userID); err != nil {
+	if err := svc.db.FriendsRepo.IsNotFriend(ctx, userID, request.UserID); err != nil {
 		return nil, err
 	}
 
-	if err := svc.db.FriendsRepo.MakeOutcomingRequest(ctx, request.UserID, userID); err != nil {
+	if err := svc.db.FriendsRepo.MakeOutcomingRequest(ctx, userID, request.UserID); err != nil {
 		return nil, err
 	}
 
-	if err := svc.db.FriendsRepo.MakeIncomingRequest(ctx, request.UserID, userID); err != nil {
+	if err := svc.db.FriendsRepo.MakeIncomingRequest(ctx, userID, request.UserID); err != nil {
 		return nil, err
 	}
 
@@ -45,30 +47,34 @@ func (svc *friendsServiceImpl) SendFriendRequest(ctx context.Context, request *d
 
 func (svc *friendsServiceImpl) AcceptFriendRequest(ctx context.Context, request *dto.AcceptFriendRequestRequest, userID string) (*dto.AcceptFriendRequestResponse, error) {
 	if request.UserID == userID {
-		svc.log.Errorf("DeleteRequest error: %s", constants.ErrAddYourself)
-		return nil, constants.ErrAddYourself
+		return nil, fmt.Errorf("DeleteRequest: %w", constants.ErrAddYourself)
 	}
 
 	if request.IsAccepted {
 		if err := svc.db.FriendsRepo.MakeFriends(ctx, userID, request.UserID); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("MakeFriends: %w", err)
 		}
-	}
 
-	if err := svc.db.FriendsRepo.DeleteOutcomingRequest(ctx, userID, request.UserID); err != nil {
-		svc.log.Errorf("DeleteRequest error: %s", err)
-		return nil, err
-	}
+		if err := svc.db.FriendsRepo.DeleteOutcomingRequest(ctx, request.UserID, userID); err != nil {
+			return nil, fmt.Errorf("DeleteOutcomingRequest: %w", err)
+		}
 
-	if err := svc.db.FriendsRepo.DeleteIncomingRequest(ctx, userID, request.UserID); err != nil {
-		svc.log.Errorf("DeleteRequest error: %s", err)
-		return nil, err
+		if err := svc.db.FriendsRepo.DeleteIncomingRequest(ctx, userID, request.UserID); err != nil {
+			return nil, fmt.Errorf("DeleteIncomingRequest: %w", err)
+		}
+	} else {
+		if err := svc.db.FriendsRepo.DeleteOutcomingRequest(ctx, userID, request.UserID); err != nil {
+			return nil, fmt.Errorf("DeleteOutcomingRequest: %w", err)
+		}
+
+		if err := svc.db.FriendsRepo.DeleteIncomingRequest(ctx, request.UserID, userID); err != nil {
+			return nil, fmt.Errorf("DeleteIncomingRequest: %w", err)
+		}
 	}
 
 	requests, err := svc.db.FriendsRepo.GetOutcomingRequestsByUserID(ctx, userID)
 	if err != nil {
-		svc.log.Errorf("GetRequestsByUserID error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("GetOutcomingRequestsByUserID: %w", err)
 	}
 
 	return &dto.AcceptFriendRequestResponse{RequestsID: requests}, nil

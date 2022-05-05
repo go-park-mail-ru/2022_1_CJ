@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
@@ -1512,7 +1513,7 @@ func TestUpdatePhoto(t *testing.T) {
 				communityID: "0",
 			},
 			outputUserCheckCommunity: OutputUserCheckCommunity{err: constants.ErrDBNotFound},
-			output:                   Output{nil, constants.ErrDBNotFound},
+			output:                   Output{nil, fmt.Errorf("UserCheckCommunity: %w", constants.ErrDBNotFound)},
 		},
 		{
 			name: "GetCommunityByID error",
@@ -1530,7 +1531,7 @@ func TestUpdatePhoto(t *testing.T) {
 				community: nil,
 				err:       constants.ErrDBNotFound,
 			},
-			output: Output{nil, constants.ErrDBNotFound},
+			output: Output{nil, fmt.Errorf("GetCommunityByID: %w", constants.ErrDBNotFound)},
 		},
 		{
 			name: "ErrAuthorIDMismatch error",

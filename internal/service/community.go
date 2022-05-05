@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
@@ -222,7 +224,7 @@ func (svc *communityServiceImpl) GetMutualFriends(ctx context.Context, request *
 		return nil, constants.ErrDBNotFound
 	}
 
-	friends, err := svc.db.FriendsRepo.GetFriendsByID(ctx, user.FriendsID)
+	friends, err := svc.db.FriendsRepo.GetFriendsByUserID(ctx, user.FriendsID)
 	if err != nil {
 		svc.log.Errorf("GetFriendsByID error: %s", err)
 		return nil, constants.ErrDBNotFound
@@ -281,16 +283,13 @@ func (svc *communityServiceImpl) SearchCommunities(ctx context.Context, request 
 }
 
 func (svc *communityServiceImpl) UpdatePhoto(ctx context.Context, request *dto.UpdatePhotoCommunityRequest, url string, userID string) (*dto.UpdatePhotoCommunityResponse, error) {
-	err := svc.db.UserRepo.UserCheckCommunity(ctx, userID, request.CommunityID)
-	if err != nil {
-		svc.log.Errorf("UserCheckCommunity error: %s", err)
-		return nil, constants.ErrDBNotFound
+	if err := svc.db.UserRepo.UserCheckCommunity(ctx, userID, request.CommunityID); err != nil {
+		return nil, fmt.Errorf("UserCheckCommunity: %w", err)
 	}
 
 	community, err := svc.db.CommunityRepo.GetCommunityByID(ctx, request.CommunityID)
 	if err != nil {
-		svc.log.Errorf("GetCommunityByID error: %s", err)
-		return nil, constants.ErrDBNotFound
+		return nil, fmt.Errorf("GetCommunityByID: %w", err)
 	}
 
 	for num, id := range community.AdminIDs {
@@ -516,8 +515,7 @@ func (svc *communityServiceImpl) DeleteCommunity(ctx context.Context, request *d
 
 	err = svc.db.CommunityRepo.DeleteCommunity(ctx, request.CommunityID)
 	if err != nil {
-		svc.log.Errorf("DeleteCommunity error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("DeleteCommunity: %w", err)
 	}
 
 	for _, id := range community.FollowerIDs {
