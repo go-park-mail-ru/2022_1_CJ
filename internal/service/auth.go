@@ -6,7 +6,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
@@ -14,8 +13,8 @@ import (
 )
 
 type AuthService interface {
-	SignupUser(ctx context.Context, request *dto.SignupUserRequest) (*dto.SignupUserResponse, error)
-	LoginUser(ctx context.Context, request *dto.LoginUserRequest) (*dto.LoginUserResponse, error)
+	SignupUser(ctx context.Context, request *dto.SignupUserRequest, userID string, token string) (*dto.SignupUserResponse, error)
+	LoginUser(ctx context.Context, userID string, token string) (*dto.LoginUserResponse, error)
 }
 
 type AuthServiceImpl struct {
@@ -23,22 +22,11 @@ type AuthServiceImpl struct {
 	db  *db.Repository
 }
 
-func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupUserRequest) (*dto.SignupUserResponse, error) {
-	if exists, err := svc.db.UserRepo.CheckUserEmailExistence(ctx, request.Email); err != nil {
-		svc.log.Errorf("CheckUserEmailExistence error: %s", err)
-		return nil, err
-	} else if exists {
-		svc.log.Errorf("CheckUserEmailExistence error: %s", constants.ErrEmailAlreadyTaken)
-		return nil, constants.ErrEmailAlreadyTaken
-	}
+func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupUserRequest, userID string, token string) (*dto.SignupUserResponse, error) {
 	user := &core.User{
+		ID:    userID,
 		Name:  request.Name,
 		Email: request.Email,
-	}
-
-	if err := user.Password.Init(request.Password); err != nil {
-		svc.log.Errorf("Init password error: %s", err)
-		return nil, err
 	}
 
 	if err := svc.db.UserRepo.CreateUser(ctx, user); err != nil {
@@ -50,15 +38,6 @@ func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupU
 		svc.log.Errorf("CreateFriends error: %s", err)
 		return nil, err
 	}
-	svc.log.Debug("Create user success")
-
-	// AUTH
-	authToken, err := utils.GenerateAuthToken(&utils.AuthTokenWrapper{UserID: user.ID})
-	if err != nil {
-		svc.log.Errorf("GenerateAuthToken error: %s", err)
-		return nil, err
-	}
-	svc.log.Debugf("Generate auth token success; Token: %s", authToken)
 
 	// CSRF
 	csrfToken, err := utils.GenerateCSRFToken(user.ID)
@@ -66,42 +45,20 @@ func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupU
 		svc.log.Errorf("GenerateCSRFToken error: %s", err)
 		return nil, err
 	}
-	svc.log.Debugf("Generate csrf token success; Token: %s", csrfToken)
 
-	return &dto.SignupUserResponse{AuthToken: authToken, CSRFToken: csrfToken}, nil
+	return &dto.SignupUserResponse{AuthToken: token, CSRFToken: csrfToken}, nil
 }
 
-func (svc *AuthServiceImpl) LoginUser(ctx context.Context, request *dto.LoginUserRequest) (*dto.LoginUserResponse, error) {
-	user, err := svc.db.UserRepo.GetUserByEmail(ctx, request.Email)
-	if err != nil {
-		svc.log.Errorf("GetUserByEmail error: %s", err)
-		return nil, err
-	}
-
-	if err := user.Password.Validate(request.Password); err != nil {
-		svc.log.Errorf("Validate error: %s", err)
-		return nil, err
-	}
-
-	svc.log.Debug("Login success")
-
-	// AUTH
-	authToken, err := utils.GenerateAuthToken(&utils.AuthTokenWrapper{UserID: user.ID})
-	if err != nil {
-		svc.log.Errorf("GenerateAuthToken error: %s", err)
-		return nil, err
-	}
-	svc.log.Debugf("Generate auth token success; Token: %s", authToken)
-
+func (svc *AuthServiceImpl) LoginUser(ctx context.Context, userID string, token string) (*dto.LoginUserResponse, error) {
 	// CSRF
-	csrfToken, err := utils.GenerateCSRFToken(user.ID)
+	csrfToken, err := utils.GenerateCSRFToken(userID)
 	if err != nil {
 		svc.log.Errorf("GenerateCSRFToken error: %s", err)
 		return nil, err
 	}
 	svc.log.Debugf("Generate csrf token success; Token: %s", csrfToken)
 
-	return &dto.LoginUserResponse{AuthToken: authToken, CSRFToken: csrfToken}, nil
+	return &dto.LoginUserResponse{AuthToken: token, CSRFToken: csrfToken}, nil
 }
 
 func NewAuthService(log *logrus.Entry, db *db.Repository) AuthService {

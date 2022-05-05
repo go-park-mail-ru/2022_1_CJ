@@ -259,11 +259,6 @@ func (repo *userRepositoryImpl) IsUserInDialog(ctx context.Context, userID strin
 }
 
 func (repo *userRepositoryImpl) InitUser(user *core.User) error {
-	uid, err := core.GenUUID()
-	if err != nil {
-		return err
-	}
-	user.ID = uid
 	user.Image = "default.jpeg"
 	user.CreatedAt = time.Now().Unix()
 	return nil

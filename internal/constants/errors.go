@@ -41,6 +41,7 @@ var (
 	ErrValidateRequest = &CodedError{errors.New("failed to validate request"), http.StatusBadRequest}
 	ErrDBNotFound      = &CodedError{errors.New("not found in the database"), http.StatusBadRequest}
 	ErrBadJson         = &CodedError{errors.New("bad json request"), http.StatusBadRequest}
+	ErrPassword        = &CodedError{errors.New("error generating hash"), http.StatusBadRequest}
 
 	// Internal
 	ErrSignToken      = &CodedError{errors.New("failed to sign token"), http.StatusInternalServerError}
@@ -59,4 +60,33 @@ var (
 	// Chat
 	ErrSingleChat         = &CodedError{errors.New("you can't create dialog with no one"), http.StatusConflict}
 	ErrDialogAlreadyExist = &CodedError{errors.New("dialog already exist"), http.StatusConflict}
+)
+
+var (
+	ParseError = map[string]*CodedError{
+		ErrMissingAuthToken.Error():        ErrMissingAuthToken,
+		ErrMissingAuthCookie.Error():       ErrMissingAuthCookie,
+		ErrMissingCSRFCookie.Error():       ErrMissingCSRFCookie,
+		ErrCSRFTokenWrong.Error():          ErrCSRFTokenWrong,
+		ErrPasswordMismatch.Error():        ErrPasswordMismatch,
+		ErrAuthTokenInvalid.Error():        ErrAuthTokenInvalid,
+		ErrUnexpectedSigningMethod.Error(): ErrUnexpectedSigningMethod,
+		ErrAuthTokenExpired.Error():        ErrAuthTokenExpired,
+		ErrAuthorIDMismatch.Error():        ErrAuthorIDMismatch,
+		ErrBindRequest.Error():             ErrBindRequest,
+		ErrValidateRequest.Error():         ErrValidateRequest,
+		ErrDBNotFound.Error():              ErrDBNotFound,
+		ErrBadJson.Error():                 ErrBadJson,
+		ErrPassword.Error():                ErrPassword,
+		ErrSignToken.Error():               ErrSignToken,
+		ErrGenerateUUID.Error():            ErrGenerateUUID,
+		ErrParseAuthToken.Error():          ErrParseAuthToken,
+		ErrEmailAlreadyTaken.Error():       ErrEmailAlreadyTaken,
+		ErrAddYourself.Error():             ErrAddYourself,
+		ErrRequestAlreadyExist.Error():     ErrRequestAlreadyExist,
+		ErrAlreadyFriends.Error():          ErrAlreadyFriends,
+		ErrAlreadyFollower.Error():         ErrAlreadyFollower,
+		ErrSingleChat.Error():              ErrSingleChat,
+		ErrDialogAlreadyExist.Error():      ErrDialogAlreadyExist,
+	}
 )
