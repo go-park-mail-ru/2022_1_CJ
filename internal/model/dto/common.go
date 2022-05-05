@@ -9,4 +9,5 @@ type ErrorResponse struct {
 
 type AuthTokenResponse struct {
 	AuthToken string `json:"auth_token"`
+	CSRFToken string `json:"csrf_token"`
 }

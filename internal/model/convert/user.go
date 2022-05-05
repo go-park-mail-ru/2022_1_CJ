@@ -18,5 +18,14 @@ func User2DTO(user *core.User) dto.User {
 		ID:    user.ID,
 		Email: user.Email,
 		Name:  user.Name,
+		Image: user.Image,
+	}
+}
+func User2author(user dto.User) dto.Author {
+	return dto.Author{
+		ID:    user.ID,
+		Name:  user.Name.Full(),
+		Image: user.Image,
+		Type:  "User",
 	}
 }

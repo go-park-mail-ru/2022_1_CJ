@@ -14,6 +14,7 @@ const (
 
 const (
 	CookieKeyAuthToken = "Auth-Token"
+	CookieKeyCSRFToken = "X-CSRF-Token"
 )
 
 const (

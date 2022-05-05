@@ -7,7 +7,12 @@ import (
 )
 
 type Repository struct {
-	UserRepo UserRepository
+	UserRepo      UserRepository
+	FriendsRepo   FriendsRepository
+	PostRepo      PostRepository
+	ChatRepo      ChatRepository
+	LikeRepo      LikeRepository
+	CommunityRepo CommunityRepository
 }
 
 func NewRepository(dbConn *mongo.Database) (*Repository, error) {
@@ -17,6 +22,31 @@ func NewRepository(dbConn *mongo.Database) (*Repository, error) {
 	repository.UserRepo, err = NewUserRepository(dbConn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create user repository: %w", err)
+	}
+
+	repository.FriendsRepo, err = NewFriendsRepository(dbConn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create friends repository: %w", err)
+	}
+
+	repository.PostRepo, err = NewPostRepository(dbConn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create post repository: %w", err)
+	}
+
+	repository.ChatRepo, err = NewChatRepository(dbConn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create chats repository: %w", err)
+	}
+
+	repository.LikeRepo, err = NewLikeRepository(dbConn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create like repository: %w", err)
+	}
+
+	repository.CommunityRepo, err = NewCommunityRepository(dbConn)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create community repository: %w", err)
 	}
 
 	return repository, nil

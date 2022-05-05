@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+// protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative *.proto
+
+package handler;
+
+option go_package = "./handler";
+
+message LoginReq {
+  string  email = 1;
+  string  pwd = 2;
+}
+
+message LoginRes {
+  string  token = 1;
+  string  userID = 2;
+}
+
+message SignUpReq {
+  string  email = 1;
+  string  pwd = 2;
+}
+
+message SignUpRes {
+  string  token = 1;
+  string  userID = 2;
+}
+
+message CheckReq {
+  string  token = 1;
+}
+
+message CheckRes {
+  string  newToken = 1;
+  string  userID = 2;
+  bool code = 3;
+}
+
+// grpc-сервис проверки авторизации
+service UserAuth {
+  rpc Login (LoginReq) returns (LoginRes) {}
+  rpc SignUp (SignUpReq) returns (SignUpRes) {}
+  rpc Check (CheckReq) returns (CheckRes) {}
+}

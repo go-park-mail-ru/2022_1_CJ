@@ -1,0 +1,36 @@
+    let socket = new WebSocket("ws://localhost:8080/api/messenger/ws");
+
+    socket.onopen = () => {
+        console.log("Successfully Connected");
+    };
+
+    socket.onmessage = function (event) {
+      console.log(event.data);
+    }
+
+    socket.onclose = event => {
+        console.log("Socket Closed Connection: ", event);
+    };
+
+    socket.onerror = error => {
+        console.log("Socket Error: ", error);
+    };
+
+    socket.send('{json}')
+
+
+структура сообщения:
+type Message struct {
+	ID        string `json:"_id"`           <- генерируется на беке
+	DialogID  string `json:"dialog_id"`     <- создаем диалог messenger/create, иначе event=constants.ErrChat body=constants.ErrChatDoNotExist
+	Event     string `json:"event"`         <- "join"/"send"/"read", иначе event=constants.ErrChat body=constants.ErrRequest
+	AuthorID  string `json:"author_id"`     <-
+	DestinID  string `json:"dst,omitempty"` <- нужен только для event="read"
+	Body      string `json:"body"`          <- event="send" - сообщение , event="read" - id сообщения
+	CreatedAt int64  `json:"created_at"`    <- формат 1650584038
+}
+
+примеры использования:
+socket.send('{"dialog_id": "{id_dialog}", "event": "join"}')
+socket.send('{"dialog_id": "{id_dialog}", "event": "send", "body": "hi"}')
+socket.send('{"dialog_id": "{id_dialog}", "event": "read", "dst": "{id_destination}", "body": "{id_message}"}')

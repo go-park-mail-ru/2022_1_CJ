@@ -7,16 +7,27 @@ import (
 
 func Post2Core(post *dto.Post) core.Post {
 	return core.Post{
-		AuthorID: post.AuthorID,
+		ID:       post.ID,
+		AuthorID: post.Author.ID,
 		Message:  post.Message,
 		Images:   post.Images,
 	}
 }
 
-func Post2DTO(post *core.Post) dto.Post {
+func Post2DTOByUser(post *core.Post, author *core.User) dto.Post {
 	return dto.Post{
-		AuthorID: post.AuthorID,
-		Message:  post.Message,
-		Images:   post.Images,
+		ID:      post.ID,
+		Author:  User2author(User2DTO(author)),
+		Message: post.Message,
+		Images:  post.Images,
+	}
+}
+
+func Post2DTOByCommunity(post *core.Post, community *core.Community) dto.Post {
+	return dto.Post{
+		ID:      post.ID,
+		Author:  CommunityProfile2Author(Community2DTOSmallProfile(community)),
+		Message: post.Message,
+		Images:  post.Images,
 	}
 }

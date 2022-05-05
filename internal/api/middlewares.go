@@ -2,6 +2,8 @@ package api
 
 import (
 	"bytes"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
+	"github.com/spf13/viper"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -15,20 +17,53 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
+func (svc *APIService) AuthMiddlewareMicro(rep cl.AuthRepository) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) error {
-			cookie, err := ctx.Cookie(constants.CookieKeyAuthToken)
+			cookieAuth, err := ctx.Cookie(constants.CookieKeyAuthToken)
 			if err != nil {
 				return constants.ErrMissingAuthCookie
 			}
 
-			tw, err := utils.ParseAuthToken(cookie.Value)
+			newToken, UserID, code, err := rep.Check(cookieAuth.Value)
+			if err != nil {
+				return err
+			}
+			if len(UserID) != 0 {
+				ctx.Request().Header.Set(constants.HeaderKeyUserID, UserID)
+			}
+
+			if code == true {
+				ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, newToken, viper.GetInt64(constants.ViperJWTTTLKey)))
+			}
+
+			return next(ctx)
+		}
+	}
+}
+
+func (svc *APIService) CSRFMiddleware() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+			cookieCSRF, err := ctx.Cookie(constants.CookieKeyCSRFToken)
+			if err != nil || len(cookieCSRF.Value) == 0 {
+				return constants.ErrMissingCSRFCookie
+			}
+			tokenCSRF := ctx.QueryParam(constants.CookieKeyCSRFToken)
+
+			if tokenCSRF != cookieCSRF.Value {
+				svc.log.Errorf("Cookie token: %s; Query token: %s", cookieCSRF.Value, tokenCSRF)
+				return constants.ErrCSRFTokenWrong
+			}
+
+			newTokenCSRF, err := utils.RefreshIfNeededCSRFToken(tokenCSRF, ctx.Request().Header.Get(constants.HeaderKeyUserID))
 			if err != nil {
 				return err
 			}
 
-			ctx.Request().Header.Set(constants.HeaderKeyUserID, string(tw.UserID))
+			if err == nil && len(newTokenCSRF) != 0 {
+				ctx.SetCookie(utils.CreateCookie(constants.CookieKeyCSRFToken, newTokenCSRF, viper.GetInt64(constants.ViperCSRFTTLKey)))
+			}
 
 			return next(ctx)
 		}

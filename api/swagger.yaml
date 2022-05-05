@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: CJ
   description: "Social Network VK"
-  version: 0.0.1
+  version: 1.0.0-oas3
 servers:
   - url: /api
 security:
@@ -38,8 +38,6 @@ paths:
         - Authorization
       summary: Login user
       security: []
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       requestBody:
         content:
           application/json:
@@ -56,15 +54,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LoginUserResponse"
-                
+
   /auth/logout:
     delete:
       tags:
         - Authorization
       summary: Logout user
       security: []
-      parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
       responses:
         "500":
           description: Internal error
@@ -77,20 +73,14 @@ paths:
                 $ref: "#/components/schemas/BasicResponse"
 
   /user/get:
-    post:
+    get:
       tags:
         - User
       summary: Get user data
       security: []
       parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
-      requestBody:
-        description: On empty user_id returns information about currently authorized user if there's one
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/GetUserDataRequest"
-        required: true
+        - $ref: "#/components/parameters/userIDParam"
+        - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
@@ -100,22 +90,38 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetUserDataResponse"
-                
-  /user/feed:
-    post:
+                $ref: "#/components/schemas/GetUserResponse"
+
+  /user/posts:
+    get:
       tags:
         - User
-      summary: Get user feed
+      summary: Get user's posts
       parameters:
-        - $ref: "#/components/parameters/DefaultParameters"
-      requestBody:
-        description: On empty user_id returns information about currently authorized user if there's one
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/GetUserFeedRequest"
-        required: true
+        - $ref: "#/components/parameters/userIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserPostsResponse"
+
+  /user/feed:
+    get:
+      tags:
+        - User
+      summary: Get feed
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
       responses:
         "500":
           description: Internal error
@@ -127,31 +133,965 @@ paths:
               schema:
                 $ref: "#/components/schemas/GetUserFeedResponse"
 
+  /user/update_photo:
+    post:
+      tags:
+        - User
+      summary: Change photo
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatePhotoResponse"
+
+  /user/profile:
+    get:
+      tags:
+        - Profile
+      summary: Get user profile
+      parameters:
+        - $ref: "#/components/parameters/userIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserProfileResponse"
+
+  /user/profile/edit:
+    post:
+      tags:
+        - Profile
+      summary: Edit info about user
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditUserProfileRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EditUserProfileResponse"
+
+  /user/search:
+    get:
+      tags:
+        - User
+      summary: Search users
+      parameters:
+        - in: query
+          name: selector
+          schema:
+            type: string
+          required: true
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+      responses:
+        500:
+          description: Internal error
+          content: {}
+        200:
+          description: Представители
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchUsersResponse"
+
+  /friends/request:
+    post:
+      tags:
+        - Friends
+      summary: Send a friend request
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendFriendRequestRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SendFriendRequestResponse"
+
+  /friends/accept:
+    post:
+      tags:
+        - Friends
+      summary: Accept friend request
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptFriendRequestRequestRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcceptFriendRequestRequestResponse"
+
+  /friends/requests/outcoming:
+    get:
+      tags:
+        - Friends
+      summary: Get my outcomming requests
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetOutcomingRequestsResponse"
+
+  /friends/requests/incoming:
+    get:
+      tags:
+        - Friends
+      summary: Get my incoming requests
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetIncomingRequestsResponse"
+
+  /friends/get:
+    get:
+      tags:
+        - Friends
+      summary: Get my friends
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetFriendsResponse"
+
+  /friends/delete:
+    delete:
+      tags:
+        - Friends
+      summary: Delete friend
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - in: query
+          name: ex_friend_id
+          schema:
+            type: string
+            example: user_id
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteFriendResponse"
+
+  /post/create:
+    post:
+      tags:
+        - Post
+      summary: Create new post
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatePostResponse"
+
+  /post/get:
+    get:
+      tags:
+        - Post
+      summary: Get post
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/postIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetPostResponse"
+
+  /post/edit:
+    put:
+      tags:
+        - Post
+      summary: Edit post
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostEditRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostEditResponse"
+
+  /post/delete:
+    delete:
+      tags:
+        - Post
+      summary: Delete post
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/postIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BasicResponse"
+
+  /messenger/dialogs:
+    get:
+      tags:
+        - Messenger
+      summary: get all dialogs
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDialogsResponse"
+
+  /messenger/get:
+    get:
+      tags:
+        - Messenger
+      summary: get dialog
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/dialogID"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDialogResponse"
+
+  /messenger/user_dialog:
+    get:
+      tags:
+        - Messenger
+      summary: return dialog id if exist
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/userIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "204":
+          description: Dialog does not exist
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDialogByUserIDResponse"
+
+  /messenger/create:
+    post:
+      tags:
+        - Messenger
+      summary: create dialog
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDialogRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateDialogResponse"
+
+  /messenger/ws:
+    get:
+      tags:
+        - Messenger
+      summary: websocket chat
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+
+  /like/increase:
+    post:
+      tags:
+        - Like
+      summary: increase like
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IncreaseLikeRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IncreaseLikeResponse"
+
+  /like/reduce:
+    post:
+      tags:
+        - Like
+      summary: reduce like
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReduceLikeRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReduceLikeResponse"
+
+  /like/post/get:
+    get:
+      tags:
+        - Like
+      summary: get post likes
+      parameters:
+        - $ref: "#/components/parameters/postIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetLikePostResponse"
+  /like/photo/get:
+    get:
+      tags:
+        - Like
+      summary: get photo likes
+      parameters:
+        - $ref: "#/components/parameters/photoIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetLikePhotoResponse"
+
+  /static/upload:
+    post:
+      tags:
+        - Upload
+      summary: Upload photo
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatePhotoResponse"
+
+  /communities/get:
+    get:
+      tags:
+        - Community
+      summary: get community profile info
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCommunityResponse"
+
+  /communities/posts:
+    get:
+      tags:
+        - Community
+      summary: get community posts
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCommunityPostsResponse"
+
+  /communities/list:
+    get:
+      tags:
+        - Community
+      summary: get list communities of user
+      parameters:
+        - $ref: "#/components/parameters/userIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserCommunitiesResponse"
+
+  /communities/managed_list:
+    get:
+      tags:
+        - Community
+      summary: get managed list communities of user
+      parameters:
+        - $ref: "#/components/parameters/userIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserManageCommunitiesResponse"
+
+  /communities/full_list:
+    get:
+      tags:
+        - Community
+      summary: get list all communities
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCommunitiesResponse"
+
+  /communities/search:
+    get:
+      tags:
+        - Community
+      summary: get serch communities
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+        - in: query
+          name: selector
+          schema:
+            type: string
+          required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchCommunitiesResponse"
+
+  /communities/join:
+    get:
+      tags:
+        - Community
+      summary: join community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JoinCommunityResponse"
+
+  /communities/leave:
+    get:
+      tags:
+        - Community
+      summary: leave community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaveCommunityResponse"
+
+  /communities/followers:
+    get:
+      tags:
+        - Community
+      summary: get followers of community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetFollowersResponse"
+
+  /communities/mutual_friends:
+    get:
+      tags:
+        - Community
+      summary: get mutual friends of community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetMutualFriendsResponse"
+
+  /communities/create:
+    post:
+      tags:
+        - Community
+      summary: create community
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommunityRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCommunityResponse"
+  /communities/edit:
+    put:
+      tags:
+        - Community
+      summary: edit community
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditCommunityRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EditCommunityResponse"
+
+  /communities/delete:
+    delete:
+      tags:
+        - Community
+      summary: delete community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteCommunityResponse"
+
+  /communities/post/create:
+    post:
+      tags:
+        - Community
+      summary: create post community
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostCommunityRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatePostCommunityResponse"
+
+  /communities/post/edit:
+    put:
+      tags:
+        - Community
+      summary: edit post community
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditPostCommunityRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EditPostCommunityResponse"
+
+  /communities/post/delete:
+    delete:
+      tags:
+        - Community
+      summary: delete post community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/postIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletePostCommunityResponse"
+
+  /communities/update_photo:
+    post:
+      tags:
+        - Community
+      summary: update photo of community
+      parameters:
+        - $ref: "#/components/parameters/communityIDParam"
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatePhotoCommunityResponse"
+
 components:
   parameters:
-    DefaultParameters:
-      in: header
-      name: X-Request-ID
+    userIDParam:
+      in: query
+      name: user_id
+      required: false
       schema:
         type: string
-        format: uuid
+      description: On empty user_id currently authorized user's id is used
+
+    postIDParam:
+      in: query
+      name: post_id
+      required: true
+      schema:
+        type: string
+
+    communityIDParam:
+      in: query
+      name: community_id
+      required: true
+      schema:
+        type: string
+
+    photoIDParam:
+      in: query
+      name: photo_id
+      required: true
+      schema:
+        type: string
+
+    csrfToken:
+      in: query
+      name: X-CSRF-Token
+      required: true
+      schema:
+        type: string
+      description: some_hash_data:some_time_in_unix
+
+    limit:
+      in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+      description: number elements in page
+
+    page:
+      in: query
+      name: page
+      required: false
+      schema:
+        type: integer
+      description: number of page
+
+    dialogID:
+      in: query
+      name: dialog_id
+      required: true
+      schema:
+        type: string
 
   securitySchemes:
     CookieAuth:
       type: apiKey
       in: cookie
-      name: AuthToken 
+      name: AuthToken
 
   schemas:
-    UserName:
-      type: object
-      properties:
-        first:
-          type: string
-          example: John
-        last:
-          type: string
-          example: Doe
+    # --------------------- Models --------------------- #
 
     SignupUserRequest:
       type: object
@@ -181,20 +1121,94 @@ components:
     LoginUserResponse:
       $ref: "#/components/schemas/BasicResponse"
 
-    GetUserDataRequest:
+    GetUserResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+
+    GetUserPostsResponse:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetPosts"
+        total:
+          type: integer
+          example: 123
+        amount_pages:
+          type: integer
+          example: 13
+
+    UpdatePhotoResponse:
+      properties:
+        url:
+          type: string
+          example: "img/profile.png"
+
+    GetUserProfileResponse:
+      $ref: "#/components/schemas/UserProfile"
+
+    EditUserProfileRequest:
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/UserName"
+        avatar:
+          type: string
+          example: fmt/img/avatar.jpg
+        phone:
+          type: string
+        location:
+          type: string
+          example: Moscow
+        birth_day:
+          type: string
+
+    EditUserProfileResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    SendFriendRequestRequest:
       type: object
       properties:
         user_id:
           type: string
 
-    GetUserDataResponse:
-      $ref: "#/components/schemas/User"
-      
-    GetUserFeedRequest:
+    SendFriendRequestResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    AcceptFriendRequestRequestRequest:
       type: object
       properties:
         user_id:
           type: string
+        is_accepted:
+          type: boolean
+          example: true
+
+    AcceptFriendRequestRequestResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/FriendRequest"
+
+    DeleteFriendResponse:
+      type: object
+      properties:
+        friend_ids:
+          type: array
+          items:
+            type: string
+            example: [friend_id1, friend_id2]
+
+    GetFriendsResponse:
+      $ref: "#/components/schemas/Friends"
+
+    GetOutcomingRequestsResponse:
+      $ref: "#/components/schemas/FriendRequests"
+
+    GetIncomingRequestsResponse:
+      $ref: "#/components/schemas/FriendRequests"
 
     GetUserFeedResponse:
       type: object
@@ -202,7 +1216,314 @@ components:
         posts:
           type: array
           items:
-            $ref: "#/components/schemas/Post"
+            $ref: "#/components/schemas/GetPosts"
+        total:
+          type: integer
+          example: 123
+        amount_pages:
+          type: integer
+          example: 13
+
+    CreatePostRequest:
+      type: object
+      properties:
+        message:
+          type: string
+          example: This is my new post
+        images:
+          type: array
+          items:
+            type: string
+            example: src/image.jpg
+
+    CreatePostResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    PostEditRequest:
+      type: object
+      properties:
+        post_id:
+          type: string
+        message:
+          type: string
+          example: This is my new post
+        images:
+          type: array
+          items:
+            type: string
+            example: src/image.jpg
+
+    PostEditResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    GetPostResponse:
+      type: object
+      properties:
+        post:
+          $ref: "#/components/schemas/Post"
+        likes:
+          $ref: "#/components/schemas/Like"
+
+    SearchUsersResponse:
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        total:
+          type: integer
+          example: 123
+        amount_pages:
+          type: integer
+          example: 13
+
+    GetDialogsResponse:
+      properties:
+        dialogs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Dialog"
+        total:
+          type: integer
+          example: 123
+        amount_pages:
+          type: integer
+          example: 13
+
+    GetDialogResponse:
+      properties:
+        dialog:
+          $ref: "#/components/schemas/Dialog"
+        messages:
+          description: is read return only for author
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageInfo"
+        total:
+          type: integer
+          example: 123
+        amount_pages:
+          type: integer
+          example: 13
+
+    GetDialogByUserIDResponse:
+      properties:
+        dialog_id:
+          type: string
+          example: "123ADF:213"
+
+    CreateDialogRequest:
+      properties:
+        name:
+          type: string
+        author_ids:
+          type: array
+          items:
+            type: string
+
+    CreateDialogResponse:
+      properties:
+        dialog_id:
+          type: string
+
+    IncreaseLikeRequest:
+      properties:
+        post_id:
+          type: string
+        photo_id:
+          type: string
+
+    IncreaseLikeResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    ReduceLikeRequest:
+      properties:
+        post_id:
+          type: string
+        photo_id:
+          type: string
+
+    ReduceLikeResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    GetLikePostResponse:
+      properties:
+        likes:
+          $ref: "#/components/schemas/Like"
+
+    GetLikePhotoResponse:
+      properties:
+        likes:
+          $ref: "#/components/schemas/Like"
+
+    GetCommunityResponse:
+      properties:
+        community:
+          $ref: "#/components/schemas/CommunityProfile"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
+
+    GetCommunityPostsResponse:
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetPosts"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
+
+    GetUserCommunitiesResponse:
+      properties:
+        communities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Community"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
+
+    GetUserManageCommunitiesResponse:
+      properties:
+        communities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Community"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
+
+    GetCommunitiesResponse:
+      properties:
+        communities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Community"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
+
+    SearchCommunitiesResponse:
+      properties:
+        communities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Community"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
+
+    JoinCommunityResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    LeaveCommunityResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    GetFollowersResponse:
+      properties:
+        amount:
+          type: integer
+        followers:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        total:
+          type: integer
+        amount_pages:
+          type: integer
+
+    GetMutualFriendsResponse:
+      properties:
+        amount:
+          type: integer
+        followers:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+
+    CreateCommunityRequest:
+      properties:
+        name:
+          type: string
+        image:
+          type: string
+        info:
+          type: string
+        admins:
+          type: array
+          items:
+            type: string
+
+    CreateCommunityResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    EditCommunityRequest:
+      properties:
+        community_id:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+        info:
+          type: string
+        admins:
+          type: array
+          items:
+            type: string
+
+    EditCommunityResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    DeleteCommunityResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    CreatePostCommunityRequest:
+      properties:
+        community_id:
+          type: string
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+
+    CreatePostCommunityResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    UpdatePhotoCommunityResponse:
+      properties:
+        url:
+          type: string
+
+    EditPostCommunityRequest:
+      properties:
+        community_id:
+          type: string
+        post_id:
+          type: string
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+
+    EditPostCommunityResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    DeletePostCommunityResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    # --------------------- Models --------------------- #
 
     BasicResponse:
       type: object
@@ -217,15 +1538,173 @@ components:
         email:
           type: string
           example: mail@example.com
-          
+        image:
+          type: string
+
+    UserName:
+      type: object
+      properties:
+        first:
+          type: string
+          example: John
+        last:
+          type: string
+          example: Doe
+
+    UserProfile:
+      type: object
+      properties:
+        user_profile:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              $ref: "#/components/schemas/UserName"
+            email:
+              type: string
+              example: mail@example.com
+            image:
+              type: string
+            avatar:
+              type: string
+              example: fmt/img/avatar.jpg
+            phone:
+              type: string
+              example: +8(800)-555-35-35
+            location:
+              type: string
+              example: Moscow
+            birth_day:
+              type: string
+              example: 01.02.2018
+
+    FriendRequests:
+      type: array
+      items:
+        type: string
+      example: [request_id1, request_id2]
+
+    FriendRequest:
+      type: object
+      properties:
+        request_ids:
+          type: string
+
+    Friends:
+      type: object
+      properties:
+        friend_ids:
+          type: array
+          items:
+            type: string
+
     Post:
       type: object
       properties:
-        author_id:
+        id:
           type: string
+        author:
+          $ref: "#/components/schemas/Author"
         message:
           type: string
         images:
           type: array
           items:
             type: string
+    Author:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+        type:
+          type: string
+          example: "community or user"
+
+    Dialog:
+      type: object
+      properties:
+        dialog_id:
+          type: string
+        name:
+          type: string
+        non_read:
+          type: integer
+        participants:
+          type: array
+          items:
+            type: string
+
+    MessageInfo:
+      type: object
+      description: is_read return only for user's message
+      properties:
+        author_id:
+          type: string
+        body:
+          type: string
+        created_at:
+          type: integer
+        is_read:
+          type: array
+          items:
+            $ref: "#/components/schemas/IsRead"
+
+    IsRead:
+      type: object
+      properties:
+        id:
+          type: string
+        is_read:
+          type: string
+
+    Like:
+      type: object
+      properties:
+        amount:
+          type: integer
+        my_like:
+          type: boolean
+        user_ids:
+          type: array
+          items:
+            type: string
+    GetPosts:
+      type: object
+      properties:
+        post:
+          $ref: "#/components/schemas/Post"
+        likes:
+          $ref: "#/components/schemas/Like"
+
+    Community:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+
+    CommunityProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+        info:
+          type: string
+        followers:
+          type: integer
+        admins:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
