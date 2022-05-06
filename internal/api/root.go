@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/api/controllers"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
@@ -86,7 +87,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 
 	friendsAPI.POST("/request", friendsCtrl.SendFriendRequest)
 	friendsAPI.POST("/accept", friendsCtrl.AcceptFriendRequest)
-	friendsAPI.GET("/requests/outcoming", friendsCtrl.GetOutcomingRequests) //Swagger
+	friendsAPI.GET("/requests/outcoming", friendsCtrl.GetOutcomingRequests)
 	friendsAPI.GET("/requests/incoming", friendsCtrl.GetIncomingRequests)
 	friendsAPI.GET("/get", friendsCtrl.GetFriendsByUserID)
 	friendsAPI.DELETE("/delete", friendsCtrl.DeleteFriend)
