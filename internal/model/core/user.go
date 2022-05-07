@@ -15,7 +15,6 @@ type User struct {
 	BirthDay     string          `bson:"birth_day"`
 	CreatedAt    int64           `bson:"created_at"` // unix timestamp
 	Posts        []string        `bson:"posts,omitempty"`
-	FriendsID    string          `bson:"friends_id"`
 	DialogIDs    []string        `bson:"dialog_ids,omitempty"`
 	CommunityIDs []string        `bson:"community_ids,omitempty"`
 }

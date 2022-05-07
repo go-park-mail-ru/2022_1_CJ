@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func Context(eCtx echo.Context) context.Context {
