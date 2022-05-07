@@ -129,8 +129,20 @@ func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDial
 		if err != nil {
 			svc.log.Errorf("GetDialogInfo error: %s", err)
 		}
+
 		dialogs = append(dialogs, convert.Dialog2DTO(dInf, request.UserID))
 	}
+
+	for i, dialog := range dialogs {
+		if len(dialog.Participants) == 1 {
+			participant, err := svc.db.UserRepo.GetUserByID(ctx, dialog.Participants[0])
+			if err != nil {
+				return nil, err
+			}
+			dialogs[i].Name = participant.Name.Full()
+		}
+	}
+
 	return &dto.GetDialogsResponse{Dialogs: dialogs, Total: total, AmountPages: page}, err
 }
 
