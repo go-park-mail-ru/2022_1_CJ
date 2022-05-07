@@ -31,7 +31,7 @@ type GetFriendsResponse struct {
 
 type DeleteFriendRequest struct {
 	UserID   string `header:"User-Id" validate:"required"`
-	FriendID string `query:"friend_id"`
+	FriendID string `query:"friend_id" validate:"required"`
 }
 
 type DeleteFriendResponse BasicResponse
