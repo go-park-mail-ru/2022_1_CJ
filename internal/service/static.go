@@ -51,7 +51,8 @@ func (svc *staticServiceImpl) UploadImage(ctx context.Context, fileHeader *multi
 		return "", err
 	}
 
-	return filename, nil
+	url := "/" + filename
+	return url, nil
 }
 
 func NewStaticService(log *logrus.Entry, db *db.Repository) StaticService {

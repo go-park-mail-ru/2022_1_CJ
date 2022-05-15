@@ -17,6 +17,11 @@ service:
   host: 127.0.0.1
   port: 8080
 
+microservice_auth:
+  host: cj_auth
+  port: 8082
+  network: tcp
+
 logging:
   level: debug
 

@@ -17,6 +17,21 @@ services:
       - ./var/www/images:/opt/pics
     env_file:
       - resources/config/.env
+    depends_on:
+      - mongodb_container
+      - auth_microservice
+
+  auth_microservice:
+    build:
+      context: ./
+      target: exec_auth
+    container_name: cj_auth
+    ports:
+      - 3000:3000
+    env_file:
+      - resources/config/.env
+    depends_on:
+      - mongodb_container
 
   mongodb_container:
     image: mongo:latest
@@ -40,6 +55,8 @@ services:
       ME_CONFIG_MONGODB_SERVER: mongodb_container
     ports:
       - 18081:8081
+    depends_on:
+      - mongodb_container
 
   webp:
     image: webpsh/webp-server-go
@@ -79,7 +96,7 @@ services:
     image: grafana/grafana
     restart: always
     ports:
-      - "3000:3000"
+      - "3001:3001"
     volumes:
       - ./monitoring:/etc/config
       - grafana_data:/var/lib/grafana

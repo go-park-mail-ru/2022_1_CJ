@@ -3,22 +3,24 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/signal"
-	"time"
-
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/controller"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/handler"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/api"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
+	"net"
+	"os"
+	"time"
 )
 
 const (
-	configPathEnvVar = "CONFIG_PATH"
-	defaultAddress   = "0.0.0.0"
-	defaultPort      = "8080"
+	configPathEnvVar = "CONFIG_AUTH_PATH"
+	configHost       = "microservice_auth.host"
+	configPost       = "microservice_auth.port"
+	configNetwork    = "microservice_auth.network"
 )
 
 func main() {
@@ -31,10 +33,6 @@ func main() {
 		fmt.Printf("fatal error config file: %s \n", err)
 		os.Exit(1)
 	}
-
-	viper.SetDefault("service.bind.address", defaultAddress)
-	viper.SetDefault("service.bind.port", defaultPort)
-
 	// -------------------- Set up logging -------------------- //
 
 	log := logrus.New()
@@ -43,7 +41,6 @@ func main() {
 		TimestampFormat: time.RFC3339,
 	}
 
-	var debug bool
 	switch viper.GetString("logging.level") {
 	case "warning":
 		log.SetLevel(logrus.WarnLevel)
@@ -51,8 +48,6 @@ func main() {
 		log.SetLevel(logrus.InfoLevel)
 	case "debug":
 		log.SetLevel(logrus.DebugLevel)
-		debug = true
-		formatter.PrettyPrint = true
 	default:
 		log.SetLevel(logrus.InfoLevel)
 	}
@@ -78,27 +73,24 @@ func main() {
 	log.Info("connected to MongoDB")
 	mongoDB := client.Database(viper.GetString("db.database"))
 
-	// -------------------- Set up service -------------------- //
+	//-------------------- Set up service -------------------- //
 
-	svc, err := api.NewAPIService(logrus.NewEntry(log), mongoDB, debug)
+	listenAddr := viper.GetString(configHost) + ":" + viper.GetString(configPost)
+	lis, err := net.Listen(viper.GetString(configNetwork), listenAddr)
 	if err != nil {
-		log.Fatalf("error creating service instance: %s", err)
+		log.Fatalln("cant listen port", err)
 	}
 
-	go svc.Serve()
-
-	// -------------------- Listen for Interruption signal and shutdown -------------------- //
-
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
-	<-quit
-	ctx, cancel := context.WithTimeout(
-		context.Background(),
-		time.Duration(viper.GetInt("service.shutdown_timeout"))*time.Second,
+	server := grpc.NewServer(
+		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 5 * time.Minute}),
 	)
-	defer cancel()
 
-	if err := svc.Shutdown(ctx); err != nil {
-		log.Fatal(err)
+	handler.RegisterUserAuthServer(server, controller.CreateAuthServer(mongoDB, logrus.NewEntry(log)))
+
+	log.Infof("Server started listen at", listenAddr)
+
+	err = server.Serve(lis)
+	if err != nil {
+		return
 	}
 }

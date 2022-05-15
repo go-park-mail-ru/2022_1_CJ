@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
 	"github.com/gofrs/uuid"
 	"github.com/spf13/viper"
 	"io/ioutil"
@@ -18,7 +19,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
+func (svc *APIService) AuthMiddlewareMicro(rep cl.AuthRepository) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) error {
 			cookieAuth, err := ctx.Cookie(constants.CookieKeyAuthToken)
@@ -26,21 +27,16 @@ func (svc *APIService) AuthMiddleware() echo.MiddlewareFunc {
 				return constants.ErrMissingAuthCookie
 			}
 
-			tw, err := utils.ParseAuthToken(cookieAuth.Value)
+			newToken, UserID, code, err := rep.Check(cookieAuth.Value)
 			if err != nil {
 				return err
 			}
-
-			ctx.Request().Header.Set(constants.HeaderKeyUserID, tw.UserID)
-
-			authToken, err := utils.RefreshIfNeededAuthToken(tw)
-
-			if err != nil {
-				return err
+			if len(UserID) != 0 {
+				ctx.Request().Header.Set(constants.HeaderKeyUserID, UserID)
 			}
 
-			if err == nil && len(authToken) != 0 {
-				ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, authToken, viper.GetInt64(constants.ViperJWTTTLKey)))
+			if code == true {
+				ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, newToken, viper.GetInt64(constants.ViperJWTTTLKey)))
 			}
 
 			return next(ctx)
