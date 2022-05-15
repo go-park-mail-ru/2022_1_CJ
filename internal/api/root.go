@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/monitoring"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/api/controllers"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
@@ -13,9 +14,10 @@ import (
 )
 
 type APIService struct {
-	log    *logrus.Entry
-	router *echo.Echo
-	debug  bool
+	log     *logrus.Entry
+	router  *echo.Echo
+	debug   bool
+	metrics *monitoring.PrometheusMetrics
 }
 
 func (svc *APIService) Serve() {
@@ -58,7 +60,9 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool) (*APIS
 	chatCtrl := controllers.NewChatController(log, repository, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
-	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware())
+
+	svc.metrics = monitoring.RegisterMonitoring(svc.router)
+	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware(), svc.AccessLogMiddleware())
 
 	api := svc.router.Group("/api")
 

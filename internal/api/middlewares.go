@@ -2,10 +2,12 @@ package api
 
 import (
 	"bytes"
+	"github.com/gofrs/uuid"
 	"github.com/spf13/viper"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -149,6 +151,33 @@ func (svc *APIService) LoggingMiddleware() echo.MiddlewareFunc {
 			}
 
 			return nil
+		}
+	}
+}
+
+func (svc *APIService) AccessLogMiddleware() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+			id, _ := uuid.NewV4()
+
+			start := time.Now()
+			ctx.Set("REQUEST_ID", id.String())
+
+			svc.log.Infof("ID: %s; URL: %s; METHOD: %s", id.String(), ctx.Request().URL.Path, ctx.Request().Method)
+
+			err := next(ctx)
+
+			responseTime := time.Since(start)
+			svc.log.Infof("ID: %s; TIME FOR ANSWER: %s", id.String(), responseTime)
+
+			status := strconv.Itoa(ctx.Response().Status)
+			path := ctx.Request().URL.Path
+			method := ctx.Request().Method
+
+			svc.metrics.Hits.WithLabelValues(status, path, method).Inc()
+			svc.metrics.Duration.WithLabelValues(status, path, method).Observe(responseTime.Seconds())
+
+			return err
 		}
 	}
 }
