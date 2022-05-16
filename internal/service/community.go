@@ -355,10 +355,21 @@ func (svc *communityServiceImpl) EditCommunity(ctx context.Context, request *dto
 		}
 	}
 
-	community.Name = request.Name
-	community.Image = request.Image
-	community.Info = request.Info
-	community.AdminIDs = request.Admins
+	if len(request.Name) != 0 {
+		community.Name = request.Name
+	}
+
+	if len(request.Image) != 0 {
+		community.Image = request.Image
+	}
+
+	if len(request.Info) != 0 {
+		community.Info = request.Info
+	}
+
+	if len(request.Admins) != 0 {
+		community.AdminIDs = request.Admins
+	}
 
 	err = svc.db.CommunityRepo.EditCommunity(ctx, community)
 	if err != nil {

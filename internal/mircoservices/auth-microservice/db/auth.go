@@ -28,6 +28,11 @@ func NewAuthRepository(db *mongo.Database) (*authRepositoryImpl, error) {
 	return &authRepositoryImpl{db: db, coll: db.Collection("auth")}, nil
 }
 
+// NewUserRepositoryTest for Tests (bad)
+func NewAuthRepositoryTest(collection *mongo.Collection) (*authRepositoryImpl, error) {
+	return &authRepositoryImpl{coll: collection}, nil
+}
+
 // CreateUser tries to insert given user to the db:
 // returns error if the email is already taken, otherwise inserts.
 func (repo *authRepositoryImpl) CreateUser(ctx context.Context, user *auth_core.User) (string, error) {

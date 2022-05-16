@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/monitoring"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/api/controllers"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
@@ -15,9 +17,10 @@ import (
 )
 
 type APIService struct {
-	log    *logrus.Entry
-	router *echo.Echo
-	debug  bool
+	log     *logrus.Entry
+	router  *echo.Echo
+	debug   bool
+	metrics *monitoring.PrometheusMetrics
 }
 
 func (svc *APIService) Serve() {
@@ -62,7 +65,9 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	chatCtrl := controllers.NewChatController(log, repository, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
-	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware())
+
+	svc.metrics = monitoring.RegisterMonitoring(svc.router)
+	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware(), svc.AccessLogMiddleware())
 
 	api := svc.router.Group("/api")
 
@@ -86,7 +91,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 
 	friendsAPI.POST("/request", friendsCtrl.SendFriendRequest)
 	friendsAPI.POST("/accept", friendsCtrl.AcceptFriendRequest)
-	friendsAPI.GET("/requests/outcoming", friendsCtrl.GetOutcomingRequests) //Swagger
+	friendsAPI.GET("/requests/outcoming", friendsCtrl.GetOutcomingRequests)
 	friendsAPI.GET("/requests/incoming", friendsCtrl.GetIncomingRequests)
 	friendsAPI.GET("/get", friendsCtrl.GetFriendsByUserID)
 	friendsAPI.DELETE("/delete", friendsCtrl.DeleteFriend)

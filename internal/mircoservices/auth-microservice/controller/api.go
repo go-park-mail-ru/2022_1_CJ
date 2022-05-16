@@ -2,12 +2,13 @@ package controller
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/constants"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/db"
+
+	auth_constants "github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/constants"
+	auth_db "github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/handler"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/model/dto"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/service"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/utils"
+	auth_dto "github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/model/dto"
+	auth_service "github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/service"
+	auth_utils "github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/utils"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 )
