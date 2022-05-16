@@ -5,12 +5,12 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 )
 
-func Like2Core(like *dto.Like) core.Like {
-	return core.Like{
-		Amount:  like.Amount,
-		UserIDs: like.UserIDs,
-	}
-}
+//func Like2Core(like *dto.Like) core.Like {
+//	return core.Like{
+//		Amount:  like.Amount,
+//		UserIDs: like.UserIDs,
+//	}
+//}
 
 func isMyLike(userIDs []string, userID string) bool {
 	for _, id := range userIDs {
