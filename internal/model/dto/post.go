@@ -8,10 +8,11 @@ type Author struct {
 }
 
 type Post struct {
-	ID      string   `json:"id"`
-	Author  Author   `json:"author"`
-	Message string   `json:"message"`
-	Images  []string `json:"images,omitempty"`
+	ID        string   `json:"id"`
+	Author    Author   `json:"author"`
+	Message   string   `json:"message"`
+	Images    []string `json:"images,omitempty"`
+	CreatedAt int64    `json:"created_at"`
 }
 
 type CreatePostRequest struct {

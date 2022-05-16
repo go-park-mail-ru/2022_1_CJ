@@ -115,10 +115,10 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 
 	chatAPI := api.Group("/messenger", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
 
+	chatAPI.POST("/create", chatCtrl.CreateChat)
 	chatAPI.GET("/dialogs", chatCtrl.GetDialogs)
 	chatAPI.GET("/get", chatCtrl.GetDialog)
 	chatAPI.GET("/user_dialog", chatCtrl.GetDialogByUserID)
-	chatAPI.POST("/create", chatCtrl.CreateDialog)
 	chatAPI.GET("/ws", chatCtrl.WsHandler)
 
 	communitiesAPI := api.Group("/communities", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())

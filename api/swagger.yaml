@@ -535,7 +535,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateDialogRequest"
+              $ref: "#/components/schemas/CreateChatRequest"
         required: true
       responses:
         "500":
@@ -546,7 +546,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateDialogResponse"
+                $ref: "#/components/schemas/CreateChatResponse"
 
   /messenger/ws:
     get:
@@ -1215,6 +1215,14 @@ components:
     AcceptFriendRequestResponse:
       $ref: "#/components/schemas/BasicResponse"
 
+    DenyFriendRequestRequest:
+      type: object
+      properties:
+        from:
+          type: string
+    DenyFriendRequestResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
     GetFriendsRequest: {}
     GetFriendsResponse:
       type: object
@@ -1346,7 +1354,7 @@ components:
           type: string
           example: "123ADF:213"
 
-    CreateDialogRequest:
+    CreateChatRequest:
       properties:
         name:
           type: string
@@ -1355,7 +1363,7 @@ components:
           items:
             type: string
 
-    CreateDialogResponse:
+    CreateChatResponse:
       properties:
         dialog_id:
           type: string
@@ -1645,6 +1653,9 @@ components:
           type: array
           items:
             type: string
+        created_at:
+          type: number
+
     Author:
       type: object
       properties:
