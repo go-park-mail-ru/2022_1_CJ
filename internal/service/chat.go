@@ -150,7 +150,6 @@ func (svc *chatServiceImpl) CheckDialog(ctx context.Context, request *dto.CheckD
 		return err
 	}
 
-	svc.log.Info("Dialog: %s in User: %s", request.DialogID, request.UserID)
 	err = svc.db.UserRepo.UserCheckDialog(ctx, dialog.ID, request.UserID)
 	if err != nil {
 		svc.log.Errorf("Don't found in db")

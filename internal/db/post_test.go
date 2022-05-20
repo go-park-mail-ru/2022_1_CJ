@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,7 +15,7 @@ func TestCreatePost(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		postCollection, _ := db.NewPostRepositoryTest(mt.Coll)
+		postCollection, _ := NewPostRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		post := TestPost(t)
@@ -29,7 +28,7 @@ func TestCreatePost(t *testing.T) {
 	})
 
 	mt.Run("custom error duplicate in insert", func(mt *mtest.T) {
-		postCollection, _ := db.NewPostRepositoryTest(mt.Coll)
+		postCollection, _ := NewPostRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateWriteErrorsResponse(mtest.WriteError{
 			Index:   1,
@@ -50,7 +49,7 @@ func TestGetPostByID(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		postCollection, _ := db.NewPostRepositoryTest(mt.Coll)
+		postCollection, _ := NewPostRepositoryTest(mt.Coll)
 
 		expectedPost := TestPost(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
@@ -67,7 +66,7 @@ func TestGetPostByID(t *testing.T) {
 	})
 
 	mt.Run("don't find in collection", func(mt *mtest.T) {
-		postCollection, _ := db.NewPostRepositoryTest(mt.Coll)
+		postCollection, _ := NewPostRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		ctx := context.Background()
@@ -83,7 +82,7 @@ func TestGetPostsByUserID(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		postCollection, _ := db.NewPostRepositoryTest(mt.Coll)
+		postCollection, _ := NewPostRepositoryTest(mt.Coll)
 
 		expectedPost1 := core.Post{
 			ID:        "12345678",
@@ -129,7 +128,7 @@ func TestDeletePost(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		postCollection, _ := db.NewPostRepositoryTest(mt.Coll)
+		postCollection, _ := NewPostRepositoryTest(mt.Coll)
 		mt.AddMockResponses(bson.D{{"ok", 1}, {"acknowledged", true}, {"n", 1}})
 
 		ctx := context.Background()
@@ -143,7 +142,7 @@ func TestEditPost(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		postCollection, _ := db.NewPostRepositoryTest(mt.Coll)
+		postCollection, _ := NewPostRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		expectedPost := TestPost(t)
@@ -159,7 +158,7 @@ func TestGetFeed(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		postCollection, _ := db.NewPostRepositoryTest(mt.Coll)
+		postCollection, _ := NewPostRepositoryTest(mt.Coll)
 
 		expectedPost1 := core.Post{
 			ID:        "12345678",
@@ -205,7 +204,7 @@ func TestInitPost(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		postCollection, _ := db.NewPostRepositoryTest(mt.Coll)
+		postCollection, _ := NewPostRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 

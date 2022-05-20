@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,7 +14,7 @@ func TestCreateLike(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		likeCollection, _ := db.NewLikeRepositoryTest(mt.Coll)
+		likeCollection, _ := NewLikeRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		like := TestNullLike(t)
@@ -28,7 +27,7 @@ func TestCreateLike(t *testing.T) {
 	})
 
 	mt.Run("custom error duplicate in insert", func(mt *mtest.T) {
-		likeCollection, _ := db.NewLikeRepositoryTest(mt.Coll)
+		likeCollection, _ := NewLikeRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateWriteErrorsResponse(mtest.WriteError{
 			Index:   1,
@@ -49,7 +48,7 @@ func TestGetLikeBySubjectID(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		likeCollection, _ := db.NewLikeRepositoryTest(mt.Coll)
+		likeCollection, _ := NewLikeRepositoryTest(mt.Coll)
 
 		expectedLike := TestLike(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
@@ -66,7 +65,7 @@ func TestGetLikeBySubjectID(t *testing.T) {
 	})
 
 	mt.Run("don't find in collection", func(mt *mtest.T) {
-		likeCollection, _ := db.NewLikeRepositoryTest(mt.Coll)
+		likeCollection, _ := NewLikeRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		ctx := context.Background()
@@ -82,7 +81,7 @@ func TestIncreaseLike(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		likeCollection, _ := db.NewLikeRepositoryTest(mt.Coll)
+		likeCollection, _ := NewLikeRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		ctx := context.Background()
@@ -96,7 +95,7 @@ func TestReduceLike(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		likeCollection, _ := db.NewLikeRepositoryTest(mt.Coll)
+		likeCollection, _ := NewLikeRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		ctx := context.Background()
@@ -110,7 +109,7 @@ func TestInitLike(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		likeCollection, _ := db.NewLikeRepositoryTest(mt.Coll)
+		likeCollection, _ := NewLikeRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 

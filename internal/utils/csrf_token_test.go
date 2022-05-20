@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"strconv"
 	"testing"
@@ -16,8 +15,8 @@ import (
 func TestGenerateCSRFToken(t *testing.T) {
 	// Test 1
 	testUserID := "123"
-	csrfFirst, _ := utils.GenerateCSRFToken(testUserID)
-	csrfSecond, _ := utils.GenerateCSRFToken(testUserID)
+	csrfFirst, _ := GenerateCSRFToken(testUserID)
+	csrfSecond, _ := GenerateCSRFToken(testUserID)
 	t.Run("Check cookie", func(t *testing.T) {
 		if !assert.Equal(t, csrfFirst, csrfSecond) {
 			t.Error("got : ", csrfFirst, " expected :", csrfSecond)
@@ -25,7 +24,7 @@ func TestGenerateCSRFToken(t *testing.T) {
 	})
 	// Test 2
 	testNewUserID := "223"
-	csrfThird, _ := utils.GenerateCSRFToken(testNewUserID)
+	csrfThird, _ := GenerateCSRFToken(testNewUserID)
 	t.Run("Check cookie", func(t *testing.T) {
 		if !assert.NotEqual(t, csrfFirst, csrfThird) {
 			t.Error("got : ", csrfFirst, "not expected :", csrfSecond)
@@ -41,7 +40,7 @@ func TestRefreshIfNeededCSRFToken(t *testing.T) {
 	data := fmt.Sprintf("%s:%d", "123", timeNow)
 	h.Write([]byte(data))
 	token := hex.EncodeToString(h.Sum(nil)) + ":" + strconv.FormatInt(timeNow, 10)
-	tokenNew, _ := utils.RefreshIfNeededCSRFToken(token, "123")
+	tokenNew, _ := RefreshIfNeededCSRFToken(token, "123")
 	t.Run("Check cookie", func(t *testing.T) {
 		if !assert.NotEqual(t, token, tokenNew) {
 			t.Error("got : ", tokenNew, "not expected :", token)
@@ -55,7 +54,7 @@ func TestRefreshIfNeededCSRFToken(t *testing.T) {
 	dataNew := fmt.Sprintf("%s:%d", "123", timeNowNew)
 	hNew.Write([]byte(dataNew))
 	tokenS := hex.EncodeToString(h.Sum(nil)) + ":" + strconv.FormatInt(timeNowNew, 10)
-	tokenNewS, _ := utils.RefreshIfNeededCSRFToken(tokenS, "123")
+	tokenNewS, _ := RefreshIfNeededCSRFToken(tokenS, "123")
 	t.Run("Check cookie", func(t *testing.T) {
 		if !assert.Equal(t, "", tokenNewS) {
 			t.Error("got : ", tokenNewS, "expected :", "")
