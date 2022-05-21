@@ -59,7 +59,11 @@ func (svc *friendsServiceImpl) AcceptRequest(ctx context.Context, request *dto.A
 }
 
 func (svc *friendsServiceImpl) GetFriends(ctx context.Context, request *dto.GetFriendsRequest) (*dto.GetFriendsResponse, error) {
-	friendIDs, err := svc.db.FriendsRepo.GetFriends(ctx, request.UserID)
+	userID := request.UserID
+	if len(request.QueryUserID) != 0 {
+		userID = request.QueryUserID
+	}
+	friendIDs, err := svc.db.FriendsRepo.GetFriends(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

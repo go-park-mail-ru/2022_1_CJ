@@ -22,7 +22,8 @@ type AcceptFriendRequestRequest struct {
 type AcceptFriendRequestResponse BasicResponse
 
 type GetFriendsRequest struct {
-	UserID string `header:"User-Id" validate:"required"`
+	UserID      string `header:"User-Id" validate:"required"`
+	QueryUserID string `query:"user_id"`
 }
 
 type GetFriendsResponse struct {
