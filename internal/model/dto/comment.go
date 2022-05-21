@@ -8,7 +8,7 @@ type Comment struct {
 }
 
 type CreateCommentRequest struct {
-	PostID  string   `query:"post_id" validate:"required"`
+	PostID  string   `json:"post_id" validate:"required"`
 	Message string   `json:"message" validate:"required"`
 	Images  []string `json:"images,omitempty"`
 }
@@ -16,7 +16,7 @@ type CreateCommentRequest struct {
 type CreateCommentResponse BasicResponse
 
 type GetCommentsRequest struct {
-	PostID string `query:"post_id" validate:"required"`
+	PostID string `query:"post_id"`
 	Limit  int64  `query:"limit,omitempty"`
 	Page   int64  `query:"page,omitempty"`
 }
@@ -28,8 +28,8 @@ type GetCommentsResponse struct {
 }
 
 type EditCommentRequest struct {
-	PostID    string   `query:"post_id" validate:"required"`
-	CommentID string   `query:"comment_id" validate:"required"`
+	PostID    string   `json:"post_id" validate:"required"`
+	CommentID string   `json:"comment_id" validate:"required"`
 	Message   string   `json:"message"`
 	Images    []string `json:"images,omitempty"`
 }
@@ -37,8 +37,8 @@ type EditCommentRequest struct {
 type EditCommentResponse BasicResponse
 
 type DeleteCommentRequest struct {
-	PostID    string `query:"post_id" validate:"required"`
-	CommentID string `query:"comment_id" validate:"required"`
+	PostID    string `json:"post_id" validate:"required"`
+	CommentID string `json:"comment_id" validate:"required"`
 }
 
 type DeleteCommentResponse struct{}

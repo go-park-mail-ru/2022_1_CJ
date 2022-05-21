@@ -16,10 +16,11 @@ import (
 
 func Post2DTOByUser(post *core.Post, author *core.User) dto.Post {
 	return dto.Post{
-		ID:      post.ID,
-		Author:  User2author(User2DTO(author)),
-		Message: post.Message,
-		Images:  post.Images,
+		ID:            post.ID,
+		Author:        User2author(User2DTO(author)),
+		Message:       post.Message,
+		Images:        post.Images,
+		CountComments: int64(len(post.CommentsIDs)),
 	}
 }
 

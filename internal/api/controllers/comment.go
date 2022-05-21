@@ -39,6 +39,15 @@ func (c *CommentController) GetComments(ctx echo.Context) error {
 		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
+
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
+
+	if request.Page <= 0 {
+		request.Page = 1
+	}
+
 	response, err := c.registry.CommentService.GetComments(context.Background(), request)
 	if err != nil {
 		return err
@@ -69,6 +78,7 @@ func (c *CommentController) DeleteComment(ctx echo.Context) error {
 		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
+	c.log.Info("DELETE", " ", request.PostID, " ", request.CommentID)
 
 	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
 	response, err := c.registry.CommentService.DeleteComment(context.Background(), request, userID)

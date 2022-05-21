@@ -149,7 +149,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	commentAPI := api.Group("/comment", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
 
 	commentAPI.POST("/create", commentCtrl.CreateComment)
-	commentAPI.POST("/get", commentCtrl.GetComments)
+	commentAPI.GET("/get", commentCtrl.GetComments)
 	commentAPI.PUT("/edit", commentCtrl.EditComment)
 	commentAPI.DELETE("/delete", commentCtrl.DeleteComment)
 

@@ -195,5 +195,6 @@ func (repo *postRepositoryImpl) InitPost(post *core.Post) error {
 	}
 	post.ID = uid
 	post.CreatedAt = time.Now().Unix()
+	post.CommentsIDs = []string{}
 	return nil
 }
