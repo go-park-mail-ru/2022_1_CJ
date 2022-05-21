@@ -1022,6 +1022,98 @@ paths:
               schema:
                 $ref: "#/components/schemas/UpdatePhotoCommunityResponse"
 
+  /comment/get:
+    get:
+      tags:
+        - Comment
+      summary: Get post's comment
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/postIDParam"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCommentsResponse"
+
+  /comment/create:
+    post:
+      tags:
+        - Comment
+      summary: create comment
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/postIDParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCommentResponse"
+
+  /comment/edit:
+    put:
+      tags:
+        - Comment
+      summary: edit comment
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/postIDParam"
+        - $ref: "#/components/parameters/commentIDParam"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditCommentRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EditCommentResponse"
+
+  /comment/delete:
+    delete:
+      tags:
+        - Comment
+      summary: delete comment
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/postIDParam"
+        - $ref: "#/components/parameters/commentIDParam"
+      responses:
+        "500":
+          description: Internal error
+          content: {}
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteCommentResponse"
+
 components:
   parameters:
     userIDParam:
@@ -1035,6 +1127,13 @@ components:
     postIDParam:
       in: query
       name: post_id
+      required: true
+      schema:
+        type: string
+
+    commentIDParam:
+      in: query
+      name: comment_id
       required: true
       schema:
         type: string
@@ -1523,6 +1622,44 @@ components:
     DeletePostCommunityResponse:
       $ref: "#/components/schemas/BasicResponse"
 
+    CreateCommentRequest:
+      properties:
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+
+    CreateCommentResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    GetCommentsResponse:
+      properties:
+        total:
+          type: integer
+        amount_pages:
+          type: integer
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
+
+    EditCommentRequest:
+      properties:
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+
+    EditCommentResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    DeleteCommentResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
     # --------------------- Models --------------------- #
 
     BasicResponse:
@@ -1608,10 +1745,27 @@ components:
           $ref: "#/components/schemas/Author"
         message:
           type: string
+        count_comments:
+          type: integer
         images:
           type: array
           items:
             type: string
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+        author:
+          $ref: "#/components/schemas/User"
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+
     Author:
       type: object
       properties:

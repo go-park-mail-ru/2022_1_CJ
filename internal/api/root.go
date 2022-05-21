@@ -62,6 +62,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	staticCtrl := controllers.NewStaticController(log, registry)
 	likeCtrl := controllers.NewLikeController(log, registry)
 	communitiesCtrl := controllers.NewCommunityController(log, registry)
+	commentCtrl := controllers.NewCommentController(log, registry)
 	chatCtrl := controllers.NewChatController(log, repository, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
@@ -144,6 +145,13 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	communitiesPostAPI.POST("/create", communitiesCtrl.CreatePostCommunity)
 	communitiesPostAPI.PUT("/edit", communitiesCtrl.EditPostCommunity)
 	communitiesPostAPI.DELETE("/delete", communitiesCtrl.DeletePostCommunity)
+
+	commentAPI := api.Group("/comment", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
+
+	commentAPI.POST("/create", commentCtrl.CreateComment)
+	commentAPI.POST("/get", commentCtrl.GetComments)
+	commentAPI.PUT("/edit", commentCtrl.EditComment)
+	commentAPI.DELETE("/delete", commentCtrl.DeleteComment)
 
 	return svc, nil
 }
