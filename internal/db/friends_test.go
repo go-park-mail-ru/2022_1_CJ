@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,7 +14,7 @@ func TestCreateFriends(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		friends := TestFriends(t)
@@ -25,7 +24,7 @@ func TestCreateFriends(t *testing.T) {
 	})
 
 	mt.Run("custom error duplicate in insert", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateWriteErrorsResponse(mtest.WriteError{
 			Index:   1,
@@ -46,7 +45,7 @@ func TestIsUniqRequest(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("already friends", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		ctx := context.Background()
@@ -55,7 +54,7 @@ func TestIsUniqRequest(t *testing.T) {
 	})
 
 	mt.Run("uniq request", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		ctx := context.Background()
@@ -69,7 +68,7 @@ func TestIsNotFriend(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("already friends", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		ctx := context.Background()
@@ -78,7 +77,7 @@ func TestIsNotFriend(t *testing.T) {
 	})
 
 	mt.Run("not friends", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		ctx := context.Background()
@@ -92,7 +91,7 @@ func TestMakeOutcomingRequest(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		ctx := context.Background()
@@ -106,7 +105,7 @@ func TestMakeIncomingRequest(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		ctx := context.Background()
@@ -120,7 +119,7 @@ func TestMakeFriends(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
@@ -130,7 +129,7 @@ func TestMakeFriends(t *testing.T) {
 	})
 
 	mt.Run("UpdateOne error", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		ctx := context.Background()
 		err := friendsCollection.MakeFriends(ctx, "123", "234")
@@ -143,7 +142,7 @@ func TestDeleteOutcomingRequest(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("delete error", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		ctx := context.Background()
 		err := friendsCollection.DeleteOutcomingRequest(ctx, "123", "234")
@@ -151,7 +150,7 @@ func TestDeleteOutcomingRequest(t *testing.T) {
 	})
 
 	mt.Run("success delete", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(bson.D{{"ok", 1}, {"acknowledged", true}, {"n", 1}})
 		ctx := context.Background()
@@ -165,7 +164,7 @@ func TestDeleteIncomingRequest(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("delete error", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		ctx := context.Background()
 		err := friendsCollection.DeleteIncomingRequest(ctx, "123", "234")
@@ -173,7 +172,7 @@ func TestDeleteIncomingRequest(t *testing.T) {
 	})
 
 	mt.Run("success delete", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(bson.D{{"ok", 1}, {"acknowledged", true}, {"n", 1}})
 		ctx := context.Background()
@@ -187,7 +186,7 @@ func TestDeleteFriend(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("delete error", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		ctx := context.Background()
 		err := friendsCollection.DeleteFriend(ctx, "123", "234")
@@ -195,7 +194,7 @@ func TestDeleteFriend(t *testing.T) {
 	})
 
 	mt.Run("success delete", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
@@ -210,7 +209,7 @@ func TestGetOutcomingRequestsByUserID(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success return outcoming requests", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 		ctx := context.Background()
 		friends := TestFriends(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
@@ -225,7 +224,7 @@ func TestGetOutcomingRequestsByUserID(t *testing.T) {
 	})
 
 	mt.Run("don't find in collection", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 		ctx := context.Background()
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		requests, err := friendsCollection.GetOutcomingRequestsByUserID(ctx, TestPost(t).ID)
@@ -240,7 +239,7 @@ func TestGetIncomingRequestsByUserID(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success return incoming requests", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 		ctx := context.Background()
 		friends := TestFriends(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
@@ -255,7 +254,7 @@ func TestGetIncomingRequestsByUserID(t *testing.T) {
 	})
 
 	mt.Run("don't find in collection", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 		ctx := context.Background()
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		requests, err := friendsCollection.GetIncomingRequestsByUserID(ctx, TestPost(t).ID)
@@ -270,7 +269,7 @@ func TestGetFriendsByUserID(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success return friends", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 		ctx := context.Background()
 		friends := TestFriends(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
@@ -285,7 +284,7 @@ func TestGetFriendsByUserID(t *testing.T) {
 	})
 
 	mt.Run("don't find in collection", func(mt *mtest.T) {
-		friendsCollection, _ := db.NewFriendsRepositoryTest(mt.Coll)
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
 		ctx := context.Background()
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		requests, err := friendsCollection.GetFriendsByUserID(ctx, TestPost(t).ID)

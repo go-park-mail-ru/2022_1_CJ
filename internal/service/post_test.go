@@ -6,7 +6,6 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +17,7 @@ func TestCreatePost(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewPostService(TestLogger(t), TestBD)
+	dbUserImpl := NewPostService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -141,7 +140,7 @@ func TestCreatePost(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.PostService.CreatePost(dbUserImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := PostService.CreatePost(dbUserImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -157,7 +156,7 @@ func TestGetPost(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewPostService(TestLogger(t), TestBD)
+	dbUserImpl := NewPostService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -240,7 +239,7 @@ func TestGetPost(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.PostService.GetPost(dbUserImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := PostService.GetPost(dbUserImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -256,7 +255,7 @@ func TestEditPost(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewPostService(TestLogger(t), TestBD)
+	dbUserImpl := NewPostService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -402,7 +401,7 @@ func TestEditPost(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.PostService.EditPost(dbUserImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := PostService.EditPost(dbUserImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -418,7 +417,7 @@ func TestDeletePost(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewPostService(TestLogger(t), TestBD)
+	dbUserImpl := NewPostService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -534,7 +533,7 @@ func TestDeletePost(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.PostService.DeletePost(dbUserImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := PostService.DeletePost(dbUserImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}

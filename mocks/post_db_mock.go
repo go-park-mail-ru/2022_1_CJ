@@ -126,3 +126,45 @@ func (mr *MockPostRepositoryMockRecorder) GetPostsByUserID(ctx, userID, pageNumb
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPostsByUserID", reflect.TypeOf((*MockPostRepository)(nil).GetPostsByUserID), ctx, userID, pageNumber, limit)
 }
+
+// PostAddComment mocks base method.
+func (m *MockPostRepository) PostAddComment(ctx context.Context, postID, commentID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PostAddComment", ctx, postID, commentID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PostAddComment indicates an expected call of PostAddComment.
+func (mr *MockPostRepositoryMockRecorder) PostAddComment(ctx, postID, commentID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostAddComment", reflect.TypeOf((*MockPostRepository)(nil).PostAddComment), ctx, postID, commentID)
+}
+
+// PostCheckComment mocks base method.
+func (m *MockPostRepository) PostCheckComment(ctx context.Context, post *core.Post, commentID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PostCheckComment", ctx, post, commentID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PostCheckComment indicates an expected call of PostCheckComment.
+func (mr *MockPostRepositoryMockRecorder) PostCheckComment(ctx, post, commentID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostCheckComment", reflect.TypeOf((*MockPostRepository)(nil).PostCheckComment), ctx, post, commentID)
+}
+
+// PostDeleteComment mocks base method.
+func (m *MockPostRepository) PostDeleteComment(ctx context.Context, postID, commentID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PostDeleteComment", ctx, postID, commentID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PostDeleteComment indicates an expected call of PostDeleteComment.
+func (mr *MockPostRepositoryMockRecorder) PostDeleteComment(ctx, postID, commentID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostDeleteComment", reflect.TypeOf((*MockPostRepository)(nil).PostDeleteComment), ctx, postID, commentID)
+}

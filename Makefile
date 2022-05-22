@@ -37,7 +37,7 @@ mod:
 	go mod tidy -compat=1.18 && go mod vendor && go install ./...
 
 tests:
-	go test ./test/... -cover -coverpkg ./internal/...
+	go test ./internal/... -coverprofile -coverpkg ./internal/...
 
 mock:
 	mockgen -source=internal/db/friends.go -destination=mocks/friends_db_mock.go \
@@ -46,4 +46,5 @@ mock:
 	&& mockgen -source=internal/db/chat.go -destination=mocks/chat_db_mock.go \
 	&& mockgen -source=internal/db/like.go -destination=mocks/like_db_mock.go \
 	&& mockgen -source=internal/db/community.go -destination=mocks/community_db_mock.go \
-	&& mockgen -source=internal/mircoservices/auth-microservice/db/auth.go -destination=internal/mircoservices/auth-microservice/mocks/auth_db_mock.go \
+	&& mockgen -source=internal/db/comment.go -destination=mocks/comment_db_mock.go \
+	&& mockgen -source=internal/mircoservices/auth-microservice/db/auth.go -destination=internal/mircoservices/auth-microservice/mocks/auth_db_mock.go

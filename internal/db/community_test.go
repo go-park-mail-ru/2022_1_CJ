@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,7 +15,7 @@ func TestCreateCommunity(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		community := TestNullCommunity(t)
@@ -29,7 +28,7 @@ func TestCreateCommunity(t *testing.T) {
 	})
 
 	mt.Run("custom error duplicate in insert", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateWriteErrorsResponse(mtest.WriteError{
 			Index:   1,
@@ -50,7 +49,7 @@ func TestGetCommunityByID(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		expectedCommunity := TestCommunity(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
@@ -70,7 +69,7 @@ func TestGetCommunityByID(t *testing.T) {
 	})
 
 	mt.Run("don't find in collection", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		ctx := context.Background()
@@ -86,7 +85,7 @@ func TestDeleteCommunity(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 
@@ -101,7 +100,7 @@ func TestEditCommunity(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 
@@ -116,7 +115,7 @@ func TestAddFollower(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 
@@ -131,7 +130,7 @@ func TestCommunityAddPost(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 
@@ -146,7 +145,7 @@ func TestCommunityDeletePost(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse(), mtest.CreateSuccessResponse())
 
@@ -161,7 +160,7 @@ func TestDeleteAdmin(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse(), mtest.CreateSuccessResponse())
 
@@ -176,7 +175,7 @@ func TestDeleteFollower(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse(), mtest.CreateSuccessResponse())
 
@@ -191,7 +190,7 @@ func TestGetAllCommunities(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		expectedCommunity1 := TestCommunity(t)
 
@@ -252,7 +251,7 @@ func TestSearchCommunities(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		expectedCommunity1 := TestCommunity(t)
 
@@ -313,7 +312,7 @@ func TestInitCommunity(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		communityCollection, _ := db.NewCommunityRepositoryTest(mt.Coll)
+		communityCollection, _ := NewCommunityRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 

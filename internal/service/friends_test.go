@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +16,7 @@ func TestSendFriendRequest(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewFriendsService(TestLogger(t), TestBD)
+	dbUserImpl := NewFriendsService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -128,7 +127,7 @@ func TestSendFriendRequest(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			res, errRes := service.FriendsService.SendFriendRequest(dbUserImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := FriendsService.SendFriendRequest(dbUserImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -144,7 +143,7 @@ func TestAcceptFriendRequest(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewFriendsService(TestLogger(t), TestBD)
+	dbUserImpl := NewFriendsService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -237,7 +236,7 @@ func TestAcceptFriendRequest(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			res, errRes := service.FriendsService.AcceptFriendRequest(dbUserImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := FriendsService.AcceptFriendRequest(dbUserImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -253,7 +252,7 @@ func TestDeleteFriend(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewFriendsService(TestLogger(t), TestBD)
+	dbUserImpl := NewFriendsService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -324,7 +323,7 @@ func TestDeleteFriend(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			res, errRes := service.FriendsService.DeleteFriend(dbUserImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := FriendsService.DeleteFriend(dbUserImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -340,7 +339,7 @@ func TestGetFriendsByUserID(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewFriendsService(TestLogger(t), TestBD)
+	dbUserImpl := NewFriendsService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -388,7 +387,7 @@ func TestGetFriendsByUserID(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			res, errRes := service.FriendsService.GetFriendsByUserID(dbUserImpl, ctx, test.input.userID)
+			res, errRes := FriendsService.GetFriendsByUserID(dbUserImpl, ctx, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -404,7 +403,7 @@ func TestGetOutcomingRequests(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewFriendsService(TestLogger(t), TestBD)
+	dbUserImpl := NewFriendsService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -452,7 +451,7 @@ func TestGetOutcomingRequests(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			res, errRes := service.FriendsService.GetOutcomingRequests(dbUserImpl, ctx, test.input.userID)
+			res, errRes := FriendsService.GetOutcomingRequests(dbUserImpl, ctx, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -468,7 +467,7 @@ func TestGetIncomingRequests(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewFriendsService(TestLogger(t), TestBD)
+	dbUserImpl := NewFriendsService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -516,7 +515,7 @@ func TestGetIncomingRequests(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			res, errRes := service.FriendsService.GetIncomingRequests(dbUserImpl, ctx, test.input.userID)
+			res, errRes := FriendsService.GetIncomingRequests(dbUserImpl, ctx, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}

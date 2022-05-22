@@ -14,6 +14,7 @@ type Registry struct {
 	ChatService      ChatService
 	LikeService      LikeService
 	CommunityService CommunityService
+	CommentService   CommentService
 }
 
 func NewRegistry(log *logrus.Entry, repository *db.Repository) *Registry {
@@ -27,6 +28,7 @@ func NewRegistry(log *logrus.Entry, repository *db.Repository) *Registry {
 	registry.ChatService = NewChatService(log, repository)
 	registry.LikeService = NewLikeService(log, repository)
 	registry.CommunityService = NewCommunityService(log, repository)
+	registry.CommentService = NewCommentService(log, repository)
 
 	return registry
 }

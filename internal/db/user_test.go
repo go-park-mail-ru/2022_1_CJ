@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +17,7 @@ func TestCreateUser(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch), mtest.CreateSuccessResponse())
 		user := TestUser(t)
@@ -31,7 +30,7 @@ func TestCreateUser(t *testing.T) {
 	})
 
 	mt.Run("Find in collection", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		expectedUser := core.User{
 			ID: "1234567890",
@@ -58,7 +57,7 @@ func TestCreateUser(t *testing.T) {
 	})
 
 	mt.Run("custom error duplicate in insert", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch), mtest.CreateWriteErrorsResponse(mtest.WriteError{
 			Index:   1,
@@ -80,7 +79,7 @@ func TestGetUserByID(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		expectedUser := core.User{
 			ID: "1234567890",
@@ -106,7 +105,7 @@ func TestGetUserByID(t *testing.T) {
 	})
 
 	mt.Run("don't find in collection", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		ctx := context.Background()
@@ -123,7 +122,7 @@ func TestGetUserByEmail(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		expectedUser := core.User{
 			ID: "1234567890",
@@ -149,7 +148,7 @@ func TestGetUserByEmail(t *testing.T) {
 	})
 
 	mt.Run("don't find in collection", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		ctx := context.Background()
@@ -165,7 +164,7 @@ func TestCheckUserEmailExistence(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		expectedUser := core.User{
 			ID: "1234567890",
@@ -192,7 +191,7 @@ func TestCheckUserEmailExistence(t *testing.T) {
 	})
 
 	mt.Run("don't find in collection", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		ctx := context.Background()
@@ -207,7 +206,7 @@ func TestUpdateUser(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		user := TestUser(t)
@@ -222,7 +221,7 @@ func TestUserAddPost(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		ctx := context.Background()
 		err := userCollection.UserAddPost(ctx, "1234567890", "123")
@@ -235,7 +234,7 @@ func TestUserCheckPost(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		ctx := context.Background()
 		err := userCollection.UserCheckPost(ctx, TestUser(t), "123")
@@ -248,7 +247,7 @@ func TestUserDeletePost(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 		mt.AddMockResponses(mtest.CreateSuccessResponse(), mtest.CreateSuccessResponse())
 		ctx := context.Background()
 		err := userCollection.UserDeletePost(ctx, TestUser(t).ID, TestPost(t).ID)
@@ -256,7 +255,7 @@ func TestUserDeletePost(t *testing.T) {
 	})
 
 	mt.Run("don't find post from user in db", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 
@@ -272,7 +271,7 @@ func TestUserDelete(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 		mt.AddMockResponses(bson.D{{"ok", 1}, {"acknowledged", true}, {"n", 1}})
 
 		ctx := context.Background()
@@ -286,7 +285,7 @@ func TestSelectUsers(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		expectedUser1 := core.User{
 			ID: "1234567890",
@@ -330,7 +329,7 @@ func TestAddDialog(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 
@@ -345,7 +344,7 @@ func TestUserCheckDialog(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		expectedUser := core.User{
 			ID: "1234567890",
@@ -370,7 +369,7 @@ func TestUserCheckDialog(t *testing.T) {
 	})
 
 	mt.Run("don't find in collection", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		ctx := context.Background()
@@ -385,7 +384,7 @@ func TestGetUserDialogs(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		expectedUser := core.User{
 			ID: "1234567890",
@@ -414,7 +413,7 @@ func TestGetUserDialogs(t *testing.T) {
 	})
 
 	mt.Run("don't find in collection", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		ctx := context.Background()
@@ -430,7 +429,7 @@ func TestInitUser(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		userCollection, _ := db.NewUserRepositoryTest(mt.Coll)
+		userCollection, _ := NewUserRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 

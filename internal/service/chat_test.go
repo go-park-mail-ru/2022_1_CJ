@@ -5,7 +5,6 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +17,7 @@ func TestCreateDialog(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewChatService(TestLogger(t), TestBD)
+	dbUserImpl := NewChatService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -150,7 +149,7 @@ func TestCreateDialog(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.ChatService.CreateDialog(dbUserImpl, ctx, test.input.info)
+			res, errRes := ChatService.CreateDialog(dbUserImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -166,7 +165,7 @@ func TestSendMessage(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewChatService(TestLogger(t), TestBD)
+	dbUserImpl := NewChatService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -261,7 +260,7 @@ func TestSendMessage(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.ChatService.SendMessage(dbUserImpl, ctx, test.input.info)
+			res, errRes := ChatService.SendMessage(dbUserImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -277,7 +276,7 @@ func TestReadMessage(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewChatService(TestLogger(t), TestBD)
+	dbUserImpl := NewChatService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -365,7 +364,7 @@ func TestReadMessage(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.ChatService.ReadMessage(dbUserImpl, ctx, test.input.info)
+			res, errRes := ChatService.ReadMessage(dbUserImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -381,7 +380,7 @@ func TestGetDialogs(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewChatService(TestLogger(t), TestBD)
+	dbUserImpl := NewChatService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -436,7 +435,7 @@ func TestGetDialogs(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.ChatService.GetDialogs(dbUserImpl, ctx, test.input.info)
+			res, errRes := ChatService.GetDialogs(dbUserImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -452,7 +451,7 @@ func TestCheckDialog(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewChatService(TestLogger(t), TestBD)
+	dbUserImpl := NewChatService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -551,7 +550,7 @@ func TestCheckDialog(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			errRes := service.ChatService.CheckDialog(dbUserImpl, ctx, test.input.info)
+			errRes := ChatService.CheckDialog(dbUserImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.err, errRes) {
 				t.Error("got : ", errRes, " expected :", test.output.err)
 			}
@@ -564,7 +563,7 @@ func TestGetDialog(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewChatService(TestLogger(t), TestBD)
+	dbUserImpl := NewChatService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -623,7 +622,7 @@ func TestGetDialog(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.ChatService.GetDialog(dbUserImpl, ctx, test.input.info)
+			res, errRes := ChatService.GetDialog(dbUserImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
