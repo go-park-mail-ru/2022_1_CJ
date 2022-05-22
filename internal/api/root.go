@@ -151,7 +151,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	commentAPI.POST("/create", commentCtrl.CreateComment)
 	commentAPI.GET("/get", commentCtrl.GetComments)
 	commentAPI.PUT("/edit", commentCtrl.EditComment)
-	commentAPI.DELETE("/delete", commentCtrl.DeleteComment)
+	commentAPI.POST("/delete", commentCtrl.DeleteComment)
 
 	return svc, nil
 }

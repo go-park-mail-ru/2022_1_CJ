@@ -1092,7 +1092,7 @@ paths:
                 $ref: "#/components/schemas/EditCommentResponse"
 
   /comment/delete:
-    delete:
+    post:
       tags:
         - Comment
       summary: delete comment
