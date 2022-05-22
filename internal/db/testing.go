@@ -33,6 +33,12 @@ func TestPostNull(t *testing.T) *core.Post {
 	return &core.Post{}
 }
 
+func TestCommentNull(t *testing.T) *core.Comment {
+	t.Helper()
+
+	return &core.Comment{}
+}
+
 func TestFriendsNull(t *testing.T) *core.Friends {
 	t.Helper()
 
@@ -58,6 +64,17 @@ func TestFriends(t *testing.T) *core.Friends {
 func TestPost(t *testing.T) *core.Post {
 	t.Helper()
 	return &core.Post{
+		ID:        "12345678",
+		AuthorID:  "123456789",
+		Message:   "Hi it's my first post",
+		Images:    []string{"src/image.jpg"},
+		CreatedAt: 1323123,
+	}
+}
+
+func TestComment(t *testing.T) *core.Comment {
+	t.Helper()
+	return &core.Comment{
 		ID:        "12345678",
 		AuthorID:  "123456789",
 		Message:   "Hi it's my first post",

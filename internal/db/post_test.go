@@ -215,3 +215,50 @@ func TestInitPost(t *testing.T) {
 		assert.NotNil(t, post.CreatedAt)
 	})
 }
+
+func TestPostAddComment(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+	defer mt.Close()
+
+	mt.Run("success", func(mt *mtest.T) {
+		postCollection, _ := NewPostRepositoryTest(mt.Coll)
+
+		mt.AddMockResponses(mtest.CreateSuccessResponse())
+
+		ctx := context.Background()
+		post := TestPost(t)
+		comment := TestComment(t)
+		err := postCollection.PostAddComment(ctx, post.ID, comment.ID)
+		assert.Nil(t, err)
+	})
+}
+
+func TestPostDeleteComment(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+	defer mt.Close()
+
+	mt.Run("success", func(mt *mtest.T) {
+		postCollection, _ := NewPostRepositoryTest(mt.Coll)
+		mt.AddMockResponses(mtest.CreateSuccessResponse(), mtest.CreateSuccessResponse())
+		ctx := context.Background()
+		post := TestPost(t)
+		comment := TestComment(t)
+		err := postCollection.PostDeleteComment(ctx, post.ID, comment.ID)
+		assert.Nil(t, err)
+	})
+}
+
+func TestPostCheckComment(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+	defer mt.Close()
+
+	mt.Run("success", func(mt *mtest.T) {
+		postCollection, _ := NewPostRepositoryTest(mt.Coll)
+		mt.AddMockResponses(mtest.CreateSuccessResponse(), mtest.CreateSuccessResponse())
+		ctx := context.Background()
+		post := TestPost(t)
+		comment := TestComment(t)
+		err := postCollection.PostCheckComment(ctx, post, comment.ID)
+		assert.Nil(t, err)
+	})
+}
