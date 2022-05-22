@@ -37,7 +37,9 @@ mod:
 	go mod tidy -compat=1.18 && go mod vendor && go install ./...
 
 tests:
-	go test ./internal/... -coverprofile -coverpkg ./internal/...
+	go test ./internal/... -cover -coverprofile=cover.out -coverpkg=./internal/...
+	cat cover.out | fgrep -v "root" | fgrep -v "handler" | fgrep -v "mocks" | fgrep -v "chat" > cover1.out
+	go tool cover -func=cover1.out
 
 mock:
 	mockgen -source=internal/db/friends.go -destination=mocks/friends_db_mock.go \
