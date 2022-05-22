@@ -24,7 +24,7 @@ type CommentServiceImpl struct {
 }
 
 func (svc *CommentServiceImpl) CreateComment(ctx context.Context, request *dto.CreateCommentRequest, userID string) (*dto.CreateCommentResponse, error) {
-	Comment, err := svc.db.CommentRepo.CreateComment(ctx, &core.Comment{
+	comment, err := svc.db.CommentRepo.CreateComment(ctx, &core.Comment{
 		AuthorID: userID,
 		Message:  request.Message,
 		Images:   request.Images,
@@ -33,7 +33,7 @@ func (svc *CommentServiceImpl) CreateComment(ctx context.Context, request *dto.C
 		svc.log.Errorf("CreateComment error: %s", err)
 		return nil, err
 	}
-	err = svc.db.PostRepo.PostAddComment(ctx, request.PostID, Comment.ID)
+	err = svc.db.PostRepo.PostAddComment(ctx, request.PostID, comment.ID)
 	if err != nil {
 		svc.log.Errorf("UserAddComment error: %s", err)
 		return nil, err
@@ -48,7 +48,7 @@ func (svc *CommentServiceImpl) GetComments(ctx context.Context, request *dto.Get
 		svc.log.Errorf("GetPostByID error: %s", err)
 		return nil, err
 	}
-	svc.log.Info(post.CommentsIDs)
+
 	commentsIDs, total, pages := utils.GetLimitArray(&post.CommentsIDs, request.Limit, request.Page)
 	var comments []dto.Comment
 	for _, id := range commentsIDs {
