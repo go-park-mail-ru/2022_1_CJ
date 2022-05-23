@@ -1814,6 +1814,8 @@ components:
           type: array
           items:
             type: string
+        created_at:
+          type: number
 
     Author:
       type: object
