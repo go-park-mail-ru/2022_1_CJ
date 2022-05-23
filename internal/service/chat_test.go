@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"testing"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
@@ -9,7 +11,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/mongo"
-	"testing"
 )
 
 func TestCreateDialog(t *testing.T) {
@@ -22,7 +23,7 @@ func TestCreateDialog(t *testing.T) {
 	ctx := context.Background()
 
 	type Input struct {
-		info *dto.CreateDialogRequest
+		info *dto.CreateChatRequest
 	}
 
 	type InputIsUniqDialog struct {
@@ -59,7 +60,7 @@ func TestCreateDialog(t *testing.T) {
 	}
 
 	type Output struct {
-		res *dto.CreateDialogResponse
+		res *dto.CreateChatResponse
 		err error
 	}
 
@@ -78,17 +79,17 @@ func TestCreateDialog(t *testing.T) {
 	}{
 		{
 			name:   "AuthorIDs < 1",
-			input:  Input{info: &dto.CreateDialogRequest{UserID: "0", Name: "nice chat", AuthorIDs: nil}},
+			input:  Input{info: &dto.CreateChatRequest{UserID: "0", Name: "nice chat", AuthorIDs: nil}},
 			output: Output{nil, constants.ErrSingleChat},
 		},
 		{
 			name:   "AuthorIDs == 1 and AuthorIDs[0] == request.UserID",
-			input:  Input{info: &dto.CreateDialogRequest{UserID: "1", Name: "nice chat", AuthorIDs: []string{"1"}}},
+			input:  Input{info: &dto.CreateChatRequest{UserID: "1", Name: "nice chat", AuthorIDs: []string{"1"}}},
 			output: Output{nil, constants.ErrSingleChat},
 		},
 		{
 			name:  "AuthorIDs == 1 and Uniq Dialog exist ",
-			input: Input{info: &dto.CreateDialogRequest{UserID: "2", Name: "nice chat", AuthorIDs: []string{"3"}}},
+			input: Input{info: &dto.CreateChatRequest{UserID: "2", Name: "nice chat", AuthorIDs: []string{"3"}}},
 			inputIsUniqDialog: InputIsUniqDialog{
 				firstUserID:  "2",
 				secondUserID: "3",
@@ -98,7 +99,7 @@ func TestCreateDialog(t *testing.T) {
 		},
 		{
 			name:  "success",
-			input: Input{info: &dto.CreateDialogRequest{UserID: "3", Name: "nice chat", AuthorIDs: []string{"4"}}},
+			input: Input{info: &dto.CreateChatRequest{UserID: "3", Name: "nice chat", AuthorIDs: []string{"4"}}},
 			inputIsUniqDialog: InputIsUniqDialog{
 				firstUserID:  "3",
 				secondUserID: "4",
@@ -127,7 +128,7 @@ func TestCreateDialog(t *testing.T) {
 			outputAddDialogForAuthorIDs: OutputAddDialogForAuthorIDs{
 				err: nil,
 			},
-			output: Output{&dto.CreateDialogResponse{DialogID: "5"}, nil},
+			output: Output{&dto.CreateChatResponse{DialogID: "5"}, nil},
 		},
 	}
 
@@ -149,7 +150,7 @@ func TestCreateDialog(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := ChatService.CreateDialog(dbUserImpl, ctx, test.input.info)
+			res, errRes := ChatService.CreateChat(dbUserImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}

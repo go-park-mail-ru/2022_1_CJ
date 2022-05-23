@@ -2,14 +2,15 @@ package api
 
 import (
 	"context"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/monitoring"
+	"github.com/labstack/echo/v4"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/api/controllers"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/handler"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
-	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -43,10 +44,10 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 		debug:  debug,
 	}
 
-	authService := cl.NewAuthRepository(log, handler.NewUserAuthClient(grpcConn))
-
 	svc.router.Validator = NewValidator()
 	svc.router.Binder = NewBinder()
+
+	authService := cl.NewAuthRepository(log, handler.NewUserAuthClient(grpcConn))
 
 	repository, err := db.NewRepository(dbConn)
 	if err != nil {
@@ -90,12 +91,15 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 
 	friendsAPI := api.Group("/friends", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
 
-	friendsAPI.POST("/request", friendsCtrl.SendFriendRequest)
-	friendsAPI.POST("/accept", friendsCtrl.AcceptFriendRequest)
-	friendsAPI.GET("/requests/outcoming", friendsCtrl.GetOutcomingRequests)
-	friendsAPI.GET("/requests/incoming", friendsCtrl.GetIncomingRequests)
-	friendsAPI.GET("/get", friendsCtrl.GetFriendsByUserID)
+	friendsAPI.POST("/request/send", friendsCtrl.SendRequest)
+	friendsAPI.POST("/request/revoke", friendsCtrl.RevokeRequest)
+	friendsAPI.POST("/request/accept", friendsCtrl.AcceptRequest)
+
+	friendsAPI.GET("/get", friendsCtrl.GetFriends)
 	friendsAPI.DELETE("/delete", friendsCtrl.DeleteFriend)
+
+	friendsAPI.GET("/requests/incoming", friendsCtrl.GetIncomingRequests)
+	friendsAPI.GET("/requests/outcoming", friendsCtrl.GetOutcomingRequests)
 
 	postAPI := api.Group("/post", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
 
@@ -117,10 +121,10 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 
 	chatAPI := api.Group("/messenger", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
 
+	chatAPI.POST("/create", chatCtrl.CreateChat)
 	chatAPI.GET("/dialogs", chatCtrl.GetDialogs)
 	chatAPI.GET("/get", chatCtrl.GetDialog)
 	chatAPI.GET("/user_dialog", chatCtrl.GetDialogByUserID)
-	chatAPI.POST("/create", chatCtrl.CreateDialog)
 	chatAPI.GET("/ws", chatCtrl.WsHandler)
 
 	communitiesAPI := api.Group("/communities", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())

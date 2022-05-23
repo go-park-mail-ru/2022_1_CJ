@@ -21,6 +21,7 @@ func Post2DTOByUser(post *core.Post, author *core.User) dto.Post {
 		Message:       post.Message,
 		Images:        post.Images,
 		CountComments: int64(len(post.CommentsIDs)),
+		CreatedAt:     post.CreatedAt,
 	}
 }
 
@@ -31,5 +32,6 @@ func Post2DTOByCommunity(post *core.Post, community *core.Community) dto.Post {
 		Message:       post.Message,
 		Images:        post.Images,
 		CountComments: int64(len(post.CommentsIDs)),
+		CreatedAt:     post.CreatedAt,
 	}
 }

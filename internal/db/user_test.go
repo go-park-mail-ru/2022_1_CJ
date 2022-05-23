@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"testing"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
@@ -9,7 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/integration/mtest"
-	"testing"
 )
 
 func TestCreateUser(t *testing.T) {
@@ -25,7 +26,6 @@ func TestCreateUser(t *testing.T) {
 		err := userCollection.CreateUser(ctx, user)
 		assert.Nil(t, err)
 		assert.NotNil(t, user.ID)
-		assert.NotNil(t, user.FriendsID)
 		assert.NotNil(t, user.CreatedAt)
 	})
 

@@ -2,9 +2,6 @@ package api
 
 import (
 	"bytes"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
-	"github.com/gofrs/uuid"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -12,10 +9,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
+	"github.com/gofrs/uuid"
+	"github.com/spf13/viper"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/utils"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
 

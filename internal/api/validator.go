@@ -1,11 +1,13 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 
+	"github.com/bytedance/sonic"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-playground/validator/v10"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type validatorImpl struct {
@@ -27,7 +29,20 @@ type binderImpl struct{}
 
 func (b *binderImpl) Bind(i interface{}, ctx echo.Context) error {
 	db := new(echo.DefaultBinder)
-	if err := db.Bind(i, ctx); err != nil {
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(ctx.Request().Body)
+	sonic.Unmarshal(buf.Bytes(), i)
+
+	if err := db.BindQueryParams(ctx, i); err != nil {
+		return fmt.Errorf("%w: %v", constants.ErrBindRequest, err)
+	}
+
+	if err := db.BindPathParams(ctx, i); err != nil {
+		return fmt.Errorf("%w: %v", constants.ErrBindRequest, err)
+	}
+
+	if err := db.BindHeaders(ctx, i); err != nil {
 		return fmt.Errorf("%w: %v", constants.ErrBindRequest, err)
 	}
 

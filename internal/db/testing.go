@@ -1,9 +1,10 @@
 package db
 
 import (
+	"testing"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
-	"testing"
 )
 
 func TestUser(t *testing.T) *core.User {
@@ -56,7 +57,7 @@ func TestFriends(t *testing.T) *core.Friends {
 	return &core.Friends{
 		ID:                "12345678",
 		OutcomingRequests: []string{"123", "234"},
-		IncomingRequest:   []string{"2345", "2357"},
+		IncomingRequests:  []string{"2345", "2357"},
 		Friends:           []string{"123567", "213123", "214335345"},
 	}
 }

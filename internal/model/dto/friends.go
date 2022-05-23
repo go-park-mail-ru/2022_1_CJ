@@ -1,42 +1,54 @@
 package dto
 
 type SendFriendRequestRequest struct {
-	UserID string `json:"user_id"`
+	From string `header:"User-Id" validate:"required"`
+	To   string `json:"to" validate:"required"`
 }
 
 type SendFriendRequestResponse BasicResponse
 
-type AcceptFriendRequestRequest struct {
-	UserID     string `json:"user_id"`
-	IsAccepted bool   `json:"is_accepted"`
+type RevokeFriendRequestRequest struct {
+	From string `header:"User-Id" validate:"required"`
+	To   string `json:"to" validate:"required"`
 }
 
-type AcceptFriendRequestResponse struct {
-	RequestsID []string `json:"request_ids"`
+type RevokeFriendRequestResponse BasicResponse
+
+type AcceptFriendRequestRequest struct {
+	To   string `header:"User-Id" validate:"required"`
+	From string `json:"from" validate:"required"`
+}
+
+type AcceptFriendRequestResponse BasicResponse
+
+type GetFriendsRequest struct {
+	UserID      string `header:"User-Id" validate:"required"`
+	QueryUserID string `query:"user_id"`
+}
+
+type GetFriendsResponse struct {
+	FriendIDs []string `json:"friend_ids"`
 }
 
 type DeleteFriendRequest struct {
-	ExFriendID string `query:"ex_friend_id"`
+	UserID   string `header:"User-Id" validate:"required"`
+	FriendID string `query:"friend_id" validate:"required"`
 }
 
-type DeleteFriendResponse struct {
-	FriendsID []string `json:"friend_ids"`
+type DeleteFriendResponse BasicResponse
+
+type GetIncomingRequestsRequest struct {
+	UserID string `header:"User-Id" validate:"required"`
 }
 
-type GetFriendsRequests struct{}
-
-type GetFriendsResponse struct {
-	FriendsID []string `json:"friend_ids"`
-}
-
-type GetOutcomingRequestsRequest struct{}
-
-type GetOutcomingRequestsResponse struct {
+type GetIncomingRequestsResponse struct {
 	RequestIDs []string `json:"request_ids"`
 }
 
-type GetIncomingRequestsRequest struct{}
+type GetOutcomingRequestsRequest struct {
+	UserID string `header:"User-Id" validate:"required"`
+}
 
-type GetIncomingRequestsResponse struct {
+type GetOutcomingRequestsResponse struct {
 	RequestIDs []string `json:"request_ids"`
 }

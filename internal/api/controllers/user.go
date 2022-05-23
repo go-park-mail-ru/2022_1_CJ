@@ -6,9 +6,9 @@ import (
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
+	"github.com/labstack/echo/v4"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
-	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 )
 

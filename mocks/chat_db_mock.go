@@ -80,32 +80,32 @@ func (mr *MockChatRepositoryMockRecorder) IsChatExist(ctx, dialogID interface{})
 }
 
 // IsDialogExist mocks base method.
-func (m *MockChatRepository) IsDialogExist(ctx context.Context, firstUserID, secondUserID string) (string, error) {
+func (m *MockChatRepository) IsDialogExist(ctx context.Context, userID1, userID2 string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsDialogExist", ctx, firstUserID, secondUserID)
+	ret := m.ctrl.Call(m, "IsDialogExist", ctx, userID1, userID2)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // IsDialogExist indicates an expected call of IsDialogExist.
-func (mr *MockChatRepositoryMockRecorder) IsDialogExist(ctx, firstUserID, secondUserID interface{}) *gomock.Call {
+func (mr *MockChatRepositoryMockRecorder) IsDialogExist(ctx, userID1, userID2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsDialogExist", reflect.TypeOf((*MockChatRepository)(nil).IsDialogExist), ctx, firstUserID, secondUserID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsDialogExist", reflect.TypeOf((*MockChatRepository)(nil).IsDialogExist), ctx, userID1, userID2)
 }
 
 // IsUniqDialog mocks base method.
-func (m *MockChatRepository) IsUniqDialog(ctx context.Context, firstUserID, secondUserID string) error {
+func (m *MockChatRepository) IsUniqDialog(ctx context.Context, userID1, userID2 string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "IsUniqDialog", ctx, firstUserID, secondUserID)
+	ret := m.ctrl.Call(m, "IsUniqDialog", ctx, userID1, userID2)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // IsUniqDialog indicates an expected call of IsUniqDialog.
-func (mr *MockChatRepositoryMockRecorder) IsUniqDialog(ctx, firstUserID, secondUserID interface{}) *gomock.Call {
+func (mr *MockChatRepositoryMockRecorder) IsUniqDialog(ctx, userID1, userID2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUniqDialog", reflect.TypeOf((*MockChatRepository)(nil).IsUniqDialog), ctx, firstUserID, secondUserID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsUniqDialog", reflect.TypeOf((*MockChatRepository)(nil).IsUniqDialog), ctx, userID1, userID2)
 }
 
 // ReadMessage mocks base method.

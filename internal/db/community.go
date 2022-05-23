@@ -211,6 +211,7 @@ func (repo *comunnityRepositoryImpl) InitCommunity(community *core.Community) er
 	if err != nil {
 		return err
 	}
+	community.Image = "/default.jpeg"
 	community.ID = uid
 	community.CreatedAt = time.Now().Unix()
 	community.PostIDs = []string{}
