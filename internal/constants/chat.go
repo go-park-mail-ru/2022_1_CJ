@@ -17,6 +17,7 @@ const (
 	JoinedChat = "joined"
 	LeftChat   = "left"
 	SendChat   = "send"
+	SendFile   = "send_file"
 	ReadChat   = "read"
 	Empty      = ""
 
