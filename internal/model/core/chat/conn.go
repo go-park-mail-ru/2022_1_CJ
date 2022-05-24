@@ -172,7 +172,7 @@ func (c *Conn) SendMessage(msg *dto.Message) {
 
 	_, err = c.reg.ChatService.SendMessage(context.Background(), &dto.SendMessageRequest{Message: *msg})
 	if err != nil {
-		c.log.Error("don't send message: %s", err)
+		c.log.Errorf("don't send message: %s", err)
 		return
 	}
 	c.log.Info("send message")
