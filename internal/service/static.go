@@ -14,6 +14,7 @@ import (
 
 type StaticService interface {
 	UploadImage(ctx context.Context, fileHeader *multipart.FileHeader) (string, error)
+	UploadFile(fileHeader *multipart.FileHeader) (string, error)
 }
 
 type staticServiceImpl struct {
@@ -48,6 +49,34 @@ func (svc *staticServiceImpl) UploadImage(ctx context.Context, fileHeader *multi
 	_, err = svc.db.LikeRepo.CreateLike(ctx, &core.Like{Subject: filename})
 	if err != nil {
 		svc.log.Errorf("CreateLike error: %s", err)
+		return "", err
+	}
+
+	url := "/" + filename
+	return url, nil
+}
+
+func (svc *staticServiceImpl) UploadFile(fileHeader *multipart.FileHeader) (string, error) {
+	src, err := fileHeader.Open()
+	if err != nil {
+		return "", err
+	}
+	defer src.Close()
+
+	uuid, err := core.GenUUID()
+	if err != nil {
+		return "", err
+	}
+
+	filename := uuid + filepath.Ext(fileHeader.Filename)
+
+	dst, err := os.Create("/opt/files/" + filename)
+	if err != nil {
+		return "", err
+	}
+	defer dst.Close()
+
+	if _, err = io.Copy(dst, src); err != nil {
 		return "", err
 	}
 
