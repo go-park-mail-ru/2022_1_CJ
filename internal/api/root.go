@@ -79,10 +79,10 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	authAPI.POST("/login", authCtrl.LoginUser)
 	authAPI.DELETE("/logout", authCtrl.LogoutUser)
 
-	fileAPI := api.Group("/file")
+	fileAPI := api.Group("/file", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
 
 	fileAPI.POST("/upload", fileCtrl.UploadFile)
-	fileAPI.GET("/login", fileCtrl.GetFile)
+	fileAPI.GET("/get", fileCtrl.GetFile)
 
 	userAPI := api.Group("/user", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
 
