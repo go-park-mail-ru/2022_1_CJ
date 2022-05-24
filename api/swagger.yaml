@@ -6,7 +6,7 @@ info:
 servers:
   - url: /api
 security:
-  - CookieAuth: [ ]
+  - CookieAuth: []
 
 paths:
   /auth/signup:
@@ -14,7 +14,7 @@ paths:
       tags:
         - Authorization
       summary: Signup user
-      security: [ ]
+      security: []
       requestBody:
         content:
           application/json:
@@ -24,7 +24,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -37,7 +37,7 @@ paths:
       tags:
         - Authorization
       summary: Login user
-      security: [ ]
+      security: []
       requestBody:
         content:
           application/json:
@@ -47,7 +47,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -60,11 +60,11 @@ paths:
       tags:
         - Authorization
       summary: Logout user
-      security: [ ]
+      security: []
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -77,14 +77,14 @@ paths:
       tags:
         - User
       summary: Get user data
-      security: [ ]
+      security: []
       parameters:
         - $ref: "#/components/parameters/userIDParam"
         - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -105,7 +105,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -125,7 +125,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -138,7 +138,7 @@ paths:
       tags:
         - User
       summary: Change photo
-      security: [ ]
+      security: []
       parameters:
         - $ref: "#/components/parameters/csrfToken"
       requestBody:
@@ -153,7 +153,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -172,7 +172,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -196,7 +196,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -220,7 +220,7 @@ paths:
       responses:
         500:
           description: Internal error
-          content: { }
+          content: {}
         200:
           description: Представители
           content:
@@ -228,7 +228,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/SearchUsersResponse"
 
-  /friends/request:
+  /friends/request/send:
     post:
       tags:
         - Friends
@@ -242,9 +242,6 @@ paths:
               $ref: "#/components/schemas/SendFriendRequestRequest"
         required: true
       responses:
-        "500":
-          description: Internal error
-          content: { }
         "200":
           description: Success
           content:
@@ -252,77 +249,63 @@ paths:
               schema:
                 $ref: "#/components/schemas/SendFriendRequestResponse"
 
-  /friends/accept:
+  /friends/request/revoke:
     post:
       tags:
         - Friends
-      summary: Accept friend request
+      summary: Revoke a friend request
       parameters:
         - $ref: "#/components/parameters/csrfToken"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AcceptFriendRequestRequestRequest"
+              $ref: "#/components/schemas/RevokeFriendRequestRequest"
         required: true
       responses:
-        "500":
-          description: Internal error
-          content: { }
         "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AcceptFriendRequestRequestResponse"
+                $ref: "#/components/schemas/RevokeFriendRequestResponse"
 
-  /friends/requests/outcoming:
-    get:
+  /friends/request/accept:
+    post:
       tags:
         - Friends
-      summary: Get my outcomming requests
+      summary: Accept a friend request
       parameters:
         - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptFriendRequestRequest"
+        required: true
       responses:
-        "500":
-          description: Internal error
-          content: { }
         "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetOutcomingRequestsResponse"
-
-  /friends/requests/incoming:
-    get:
-      tags:
-        - Friends
-      summary: Get my incoming requests
-      parameters:
-        - $ref: "#/components/parameters/csrfToken"
-      responses:
-        "500":
-          description: Internal error
-          content: { }
-        "200":
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetIncomingRequestsResponse"
+                $ref: "#/components/schemas/AcceptFriendRequestResponse"
 
   /friends/get:
-    get:
+    post:
       tags:
         - Friends
-      summary: Get my friends
+      summary: Get friends list
       parameters:
+        - $ref: "#/components/parameters/userIDParam"
         - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetFriendsRequest"
+        required: true
       responses:
-        "500":
-          description: Internal error
-          content: { }
         "200":
           description: Success
           content:
@@ -331,27 +314,67 @@ paths:
                 $ref: "#/components/schemas/GetFriendsResponse"
 
   /friends/delete:
-    delete:
+    post:
       tags:
         - Friends
-      summary: Delete friend
+      summary: Delete a friend
       parameters:
         - $ref: "#/components/parameters/csrfToken"
-        - in: query
-          name: ex_friend_id
-          schema:
-            type: string
-            example: user_id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteFriendRequest"
+        required: true
       responses:
-        "500":
-          description: Internal error
-          content: { }
         "200":
           description: Success
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/DeleteFriendResponse"
+
+  /friends/requests/incoming:
+    post:
+      tags:
+        - Friends
+      summary: Get incoming friend requests list
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetIncomingRequestsRequest"
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetIncomingRequestsResponse"
+
+  /friends/requests/outcoming:
+    post:
+      tags:
+        - Friends
+      summary: Get outcoming friend requests list
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetOutcomingRequestsRequest"
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetOutcomingRequestsResponse"
 
   /post/create:
     post:
@@ -369,7 +392,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -388,7 +411,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -412,7 +435,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -431,7 +454,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -451,7 +474,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -472,7 +495,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -491,10 +514,10 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "204":
           description: Dialog does not exist
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -513,18 +536,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateDialogRequest"
+              $ref: "#/components/schemas/CreateChatRequest"
         required: true
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateDialogResponse"
+                $ref: "#/components/schemas/CreateChatResponse"
 
   /messenger/ws:
     get:
@@ -536,7 +559,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
 
@@ -556,7 +579,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -580,7 +603,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -599,7 +622,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -617,7 +640,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -630,7 +653,7 @@ paths:
       tags:
         - Upload
       summary: Upload photo
-      security: [ ]
+      security: []
       parameters:
         - $ref: "#/components/parameters/csrfToken"
       requestBody:
@@ -645,7 +668,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -666,7 +689,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -687,7 +710,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -709,7 +732,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -730,7 +753,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -750,7 +773,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -775,7 +798,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -794,7 +817,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -813,7 +836,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -833,7 +856,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -852,7 +875,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -876,7 +899,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -899,7 +922,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -918,7 +941,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -942,7 +965,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -966,7 +989,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -986,7 +1009,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -1014,7 +1037,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -1035,7 +1058,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -1059,7 +1082,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -1083,7 +1106,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -1106,7 +1129,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: { }
+          content: {}
         "200":
           description: Success
           content:
@@ -1271,43 +1294,55 @@ components:
     SendFriendRequestRequest:
       type: object
       properties:
-        user_id:
+        to:
           type: string
-
     SendFriendRequestResponse:
       $ref: "#/components/schemas/BasicResponse"
 
-    AcceptFriendRequestRequestRequest:
+    RevokeFriendRequestRequest:
       type: object
       properties:
-        user_id:
+        to:
           type: string
-        is_accepted:
-          type: boolean
-          example: true
+    RevokeFriendRequestResponse:
+      $ref: "#/components/schemas/BasicResponse"
 
-    AcceptFriendRequestRequestResponse:
-      type: array
-      items:
-        $ref: "#/components/schemas/FriendRequest"
+    AcceptFriendRequestRequest:
+      type: object
+      properties:
+        from:
+          type: string
+    AcceptFriendRequestResponse:
+      $ref: "#/components/schemas/BasicResponse"
 
-    DeleteFriendResponse:
+    GetFriendsRequest: {}
+    GetFriendsResponse:
       type: object
       properties:
         friend_ids:
-          type: array
-          items:
-            type: string
-            example: [ friend_id1, friend_id2 ]
+          $ref: "#/components/schemas/StringArray"
 
-    GetFriendsResponse:
-      $ref: "#/components/schemas/Friends"
+    DeleteFriendRequest:
+      type: object
+      properties:
+        friend_id:
+          type: string
+    DeleteFriendResponse:
+      $ref: "#/components/schemas/BasicResponse"
 
-    GetOutcomingRequestsResponse:
-      $ref: "#/components/schemas/FriendRequests"
-
+    GetIncomingRequestsRequest: {}
     GetIncomingRequestsResponse:
-      $ref: "#/components/schemas/FriendRequests"
+      type: object
+      properties:
+        request_ids:
+          $ref: "#/components/schemas/StringArray"
+
+    GetOutcomingRequestsRequest: {}
+    GetOutcomingRequestsResponse:
+      type: object
+      properties:
+        request_ids:
+          $ref: "#/components/schemas/StringArray"
 
     GetUserFeedResponse:
       type: object
@@ -1411,7 +1446,7 @@ components:
           type: string
           example: "123ADF:213"
 
-    CreateDialogRequest:
+    CreateChatRequest:
       properties:
         name:
           type: string
@@ -1420,7 +1455,7 @@ components:
           items:
             type: string
 
-    CreateDialogResponse:
+    CreateChatResponse:
       properties:
         dialog_id:
           type: string
@@ -1729,11 +1764,10 @@ components:
               type: string
               example: 01.02.2018
 
-    FriendRequests:
+    StringArray:
       type: array
       items:
         type: string
-      example: [ request_id1, request_id2 ]
 
     FriendRequest:
       type: object
@@ -1764,6 +1798,8 @@ components:
           type: array
           items:
             type: string
+        created_at:
+          type: number
 
     Comment:
       type: object
@@ -1778,6 +1814,8 @@ components:
           type: array
           items:
             type: string
+        created_at:
+          type: number
 
     Author:
       type: object

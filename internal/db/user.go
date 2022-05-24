@@ -260,7 +260,7 @@ func (repo *userRepositoryImpl) IsUserInDialog(ctx context.Context, userID strin
 }
 
 func (repo *userRepositoryImpl) InitUser(user *core.User) error {
-	user.Image = "default.jpeg"
+	user.Image = "/default.jpeg"
 	user.CreatedAt = time.Now().Unix()
 	return nil
 }

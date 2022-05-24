@@ -58,7 +58,7 @@ var (
 	ErrAlreadyFollower     = &CodedError{errors.New("you already in community"), http.StatusConflict}
 
 	// Chat
-	ErrSingleChat         = &CodedError{errors.New("you can't create dialog with no one"), http.StatusConflict}
+	ErrSingleChat         = &CodedError{errors.New("you can't create dialog with no one"), http.StatusBadRequest}
 	ErrDialogAlreadyExist = &CodedError{errors.New("dialog already exist"), http.StatusConflict}
 )
 

@@ -13,6 +13,7 @@ type Post struct {
 	Message       string   `json:"message"`
 	Images        []string `json:"images,omitempty"`
 	CountComments int64    `json:"count_comments"`
+	CreatedAt: post.CreatedAt,
 }
 
 type CreatePostRequest struct {
