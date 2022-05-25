@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/monitoring"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/api/controllers"
@@ -79,9 +80,9 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	authAPI.POST("/login", authCtrl.LoginUser)
 	authAPI.DELETE("/logout", authCtrl.LogoutUser)
 
-	fileAPI := api.Group("/file", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
+	fileAPI := api.Group("/file", svc.AuthMiddlewareMicro(authService))
 
-	fileAPI.POST("/upload", fileCtrl.UploadFile)
+	fileAPI.POST("/upload", fileCtrl.UploadFile, svc.CSRFMiddleware())
 	fileAPI.GET("/get", fileCtrl.GetFile)
 
 	userAPI := api.Group("/user", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())

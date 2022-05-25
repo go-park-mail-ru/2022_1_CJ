@@ -42,16 +42,20 @@ func Message2DTO(message core.Message, userID string) dto.MessageInfo {
 
 	if userID == message.AuthorID {
 		return dto.MessageInfo{
-			AuthorID:  message.AuthorID,
-			Body:      message.Body,
-			IsRead:    message.IsRead,
-			CreatedAt: message.CreatedAt,
+			AuthorID:    message.AuthorID,
+			Body:        message.Body,
+			IsRead:      message.IsRead,
+			CreatedAt:   message.CreatedAt,
+			Attachments: message.Attachments,
+			Images:      message.Images,
 		}
 	}
 	return dto.MessageInfo{
-		AuthorID:  message.AuthorID,
-		Body:      message.Body,
-		CreatedAt: message.CreatedAt,
+		AuthorID:    message.AuthorID,
+		Body:        message.Body,
+		CreatedAt:   message.CreatedAt,
+		Attachments: message.Attachments,
+		Images:      message.Images,
 	}
 }
 

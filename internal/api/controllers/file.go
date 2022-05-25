@@ -3,9 +3,11 @@ package controllers
 import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
-	"github.com/labstack/echo"
-	"github.com/sirupsen/logrus"
+
 	"net/http"
+
+	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
 type FileController struct {
@@ -16,13 +18,11 @@ type FileController struct {
 func (c *FileController) UploadFile(ctx echo.Context) error {
 	image, err := ctx.FormFile("file")
 	if err != nil {
-		c.log.Errorf("FormFile error: %s", err)
 		return err
 	}
 
 	url, err := c.registry.StaticService.UploadFile(image)
 	if err != nil {
-		c.log.Errorf("Upload error: %s", err)
 		return err
 	}
 
@@ -32,11 +32,9 @@ func (c *FileController) UploadFile(ctx echo.Context) error {
 func (c *FileController) GetFile(ctx echo.Context) error {
 	request := new(dto.GetFileRequest)
 	if err := ctx.Bind(request); err != nil {
-		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
-
-	return ctx.JSON(http.StatusOK, ctx.File("/opt/files"+request.URL))
+	return ctx.Inline("/opt/files"+request.URL, request.URL)
 }
 
 func NewFileController(log *logrus.Entry, registry *service.Registry) *FileController {

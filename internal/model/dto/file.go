@@ -5,5 +5,5 @@ type UploadFileResponse struct {
 }
 
 type GetFileRequest struct {
-	URL string `json:"url"`
+	URL string `query:"url" validate:"required"`
 }
