@@ -23,7 +23,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Run linter
-        run: make lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.46.2
+          $(go env GOPATH)/bin/golangci-lint run
 
   deploy:
     needs: [ linter ]
