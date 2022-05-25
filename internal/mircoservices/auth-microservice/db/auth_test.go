@@ -147,3 +147,13 @@ func TestInitUser(t *testing.T) {
 		assert.NotNil(t, authUser.CreatedAt)
 	})
 }
+func TestNewRepository(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+	defer mt.Close()
+
+	mt.Run("success", func(mt *mtest.T) {
+
+		_, err := NewRepository(mt.DB)
+		assert.Nil(t, err)
+	})
+}
