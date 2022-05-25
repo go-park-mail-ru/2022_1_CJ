@@ -37,8 +37,9 @@ mod:
 	go mod tidy -compat=1.18 && go mod vendor && go install ./...
 
 tests:
-	go test ./test/db/... -cover -coverpkg ./internal/db/...
-	go test ./test/services/... -cover -coverpkg ./internal/service/...
+	go test ./internal/... -cover -coverprofile=cover.out -coverpkg=./internal/...
+	cat cover.out | fgrep -v "handler" | fgrep -v "mocks" > cover1.out
+	go tool cover -func=cover1.out
 
 mock:
 	mockgen -source=internal/db/friends.go -destination=mocks/friends_db_mock.go \
@@ -46,4 +47,6 @@ mock:
 	&& mockgen -source=internal/db/user.go -destination=mocks/user_db_mock.go \
 	&& mockgen -source=internal/db/chat.go -destination=mocks/chat_db_mock.go \
 	&& mockgen -source=internal/db/like.go -destination=mocks/like_db_mock.go \
-	&& mockgen -source=internal/db/community.go -destination=mocks/community_db_mock.go
+	&& mockgen -source=internal/db/community.go -destination=mocks/community_db_mock.go \
+	&& mockgen -source=internal/db/comment.go -destination=mocks/comment_db_mock.go \
+	&& mockgen -source=internal/mircoservices/auth-microservice/db/auth.go -destination=internal/mircoservices/auth-microservice/mocks/auth_db_mock.go

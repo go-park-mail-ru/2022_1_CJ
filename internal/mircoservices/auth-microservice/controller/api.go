@@ -49,7 +49,6 @@ func (s *AuthServerImpl) SignUp(ctx context.Context, in *handler.SignUpReq) (*ha
 	request.Email = in.Email
 	request.Password = in.Pwd
 
-	s.log.Infof("SignupUser", in.Email, in.Pwd)
 	response, err := s.rep.AuthService.SignupUser(context.Background(), request)
 	if err != nil {
 		s.log.Errorf("SignupUser: %s", err)

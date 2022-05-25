@@ -5,7 +5,7 @@ import "github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 func GetLimitArray(array *[]string, limit, page int64) ([]string, int64, int64) {
 	total := int64(len(*array))
 
-	if limit != -1 || limit >= total {
+	if limit != -1 && limit <= total {
 		start := total - limit*(page)
 		end := total - limit*(page-1)
 		if end < 0 {
@@ -25,7 +25,7 @@ func GetLimitArray(array *[]string, limit, page int64) ([]string, int64, int64) 
 func GetLimitMessage(array *[]core.Message, limit, page int64) ([]core.Message, int64, int64) {
 	total := int64(len(*array))
 
-	if limit != -1 || limit >= total {
+	if limit != -1 && limit <= total {
 		start := total - limit*(page)
 		end := total - limit*(page-1)
 		if end < 0 {

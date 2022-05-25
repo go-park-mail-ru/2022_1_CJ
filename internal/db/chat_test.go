@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,7 +15,7 @@ func TestCreateDialog(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		chatCollection, _ := db.NewChatRepositoryTest(mt.Coll)
+		chatCollection, _ := NewChatRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		dialog := TestDialog(t)
@@ -29,7 +28,7 @@ func TestCreateDialog(t *testing.T) {
 	})
 
 	mt.Run("custom error duplicate in insert", func(mt *mtest.T) {
-		chatCollection, _ := db.NewChatRepositoryTest(mt.Coll)
+		chatCollection, _ := NewChatRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateWriteErrorsResponse(mtest.WriteError{
 			Index:   1,
@@ -50,7 +49,7 @@ func TestIsChatExist(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		chatCollection, _ := db.NewChatRepositoryTest(mt.Coll)
+		chatCollection, _ := NewChatRepositoryTest(mt.Coll)
 
 		expectedDialog := TestDialog(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
@@ -66,7 +65,7 @@ func TestIsChatExist(t *testing.T) {
 	})
 
 	mt.Run("don't find in collection", func(mt *mtest.T) {
-		chatCollection, _ := db.NewChatRepositoryTest(mt.Coll)
+		chatCollection, _ := NewChatRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch))
 		ctx := context.Background()
@@ -80,7 +79,7 @@ func TestIsUniqDialog(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("not uniq dialog", func(mt *mtest.T) {
-		chatCollection, _ := db.NewChatRepositoryTest(mt.Coll)
+		chatCollection, _ := NewChatRepositoryTest(mt.Coll)
 
 		expectedDialog := TestDialog(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
@@ -96,7 +95,7 @@ func TestIsUniqDialog(t *testing.T) {
 	})
 
 	mt.Run("success", func(mt *mtest.T) {
-		chatCollection, _ := db.NewChatRepositoryTest(mt.Coll)
+		chatCollection, _ := NewChatRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch))
 		ctx := context.Background()
@@ -110,7 +109,7 @@ func TestSendMessage(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		chatCollection, _ := db.NewChatRepositoryTest(mt.Coll)
+		chatCollection, _ := NewChatRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 		dialog := TestDialog(t)
@@ -128,7 +127,7 @@ func TestReadMessage(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("not success", func(mt *mtest.T) {
-		chatCollection, _ := db.NewChatRepositoryTest(mt.Coll)
+		chatCollection, _ := NewChatRepositoryTest(mt.Coll)
 
 		dialog := TestDialog(t)
 		message := TestMessage(t)
@@ -146,7 +145,7 @@ func TestGetDialogByID(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		chatCollection, _ := db.NewChatRepositoryTest(mt.Coll)
+		chatCollection, _ := NewChatRepositoryTest(mt.Coll)
 
 		expectedDialog := TestDialog(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
@@ -163,7 +162,7 @@ func TestGetDialogByID(t *testing.T) {
 	})
 
 	mt.Run("don't find in collection", func(mt *mtest.T) {
-		chatCollection, _ := db.NewChatRepositoryTest(mt.Coll)
+		chatCollection, _ := NewChatRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
 		ctx := context.Background()
@@ -179,7 +178,7 @@ func TestInitDialog(t *testing.T) {
 	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
-		chatCollection, _ := db.NewChatRepositoryTest(mt.Coll)
+		chatCollection, _ := NewChatRepositoryTest(mt.Coll)
 
 		mt.AddMockResponses(mtest.CreateSuccessResponse())
 

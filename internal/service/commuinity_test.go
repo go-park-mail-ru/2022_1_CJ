@@ -8,7 +8,6 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/golang/mock/gomock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +19,7 @@ func TestCreateCommunity(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -165,7 +164,7 @@ func TestCreateCommunity(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.CreateCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := CommunityService.CreateCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -181,7 +180,7 @@ func TestGetCommunity(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -319,7 +318,7 @@ func TestGetCommunity(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.GetCommunity(dbCommunityImpl, ctx, test.input.info)
+			res, errRes := CommunityService.GetCommunity(dbCommunityImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -335,7 +334,7 @@ func TestGetUserManageCommunities(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -475,7 +474,7 @@ func TestGetUserManageCommunities(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.GetUserManageCommunities(dbCommunityImpl, ctx, test.input.info)
+			res, errRes := CommunityService.GetUserManageCommunities(dbCommunityImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -491,7 +490,7 @@ func TestGetCommunities(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -587,7 +586,7 @@ func TestGetCommunities(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.GetCommunities(dbCommunityImpl, ctx, test.input.info)
+			res, errRes := CommunityService.GetCommunities(dbCommunityImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -603,7 +602,7 @@ func TestJoinCommunity(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -722,7 +721,7 @@ func TestJoinCommunity(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.JoinCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := CommunityService.JoinCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -738,7 +737,7 @@ func TestLeaveCommunity(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -963,7 +962,7 @@ func TestLeaveCommunity(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.LeaveCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := CommunityService.LeaveCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -979,7 +978,7 @@ func TestGetFollowers(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -1098,7 +1097,7 @@ func TestGetFollowers(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.GetFollowers(dbCommunityImpl, ctx, test.input.info)
+			res, errRes := CommunityService.GetFollowers(dbCommunityImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -1114,7 +1113,7 @@ func TestGetUserCommunities(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -1222,7 +1221,7 @@ func TestGetUserCommunities(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.GetUserCommunities(dbCommunityImpl, ctx, test.input.info)
+			res, errRes := CommunityService.GetUserCommunities(dbCommunityImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -1238,7 +1237,7 @@ func TestGetMutualFriends(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -1325,7 +1324,7 @@ func TestGetMutualFriends(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.GetMutualFriends(dbCommunityImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := CommunityService.GetMutualFriends(dbCommunityImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -1341,7 +1340,7 @@ func TestSearchCommunities(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -1441,7 +1440,7 @@ func TestSearchCommunities(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.SearchCommunities(dbCommunityImpl, ctx, test.input.info)
+			res, errRes := CommunityService.SearchCommunities(dbCommunityImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -1457,7 +1456,7 @@ func TestUpdatePhoto(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -1654,7 +1653,7 @@ func TestUpdatePhoto(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.UpdatePhoto(dbCommunityImpl, ctx, test.input.info, test.input.url, test.input.userID)
+			res, errRes := CommunityService.UpdatePhoto(dbCommunityImpl, ctx, test.input.info, test.input.url, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -1670,7 +1669,7 @@ func TestGetCommunityPosts(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -1877,7 +1876,7 @@ func TestGetCommunityPosts(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.GetCommunityPosts(dbCommunityImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := CommunityService.GetCommunityPosts(dbCommunityImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -1893,7 +1892,7 @@ func TestEditCommunity(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -1948,7 +1947,7 @@ func TestEditCommunity(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.EditCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := CommunityService.EditCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -1964,7 +1963,7 @@ func TestCreatePostCommunity(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -2017,7 +2016,7 @@ func TestCreatePostCommunity(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.CreatePostCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := CommunityService.CreatePostCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -2033,7 +2032,7 @@ func TestEditPostCommunity(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -2087,7 +2086,7 @@ func TestEditPostCommunity(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.EditPostCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := CommunityService.EditPostCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -2103,7 +2102,7 @@ func TestDeletePostCommunity(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -2155,7 +2154,7 @@ func TestDeletePostCommunity(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.DeletePostCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := CommunityService.DeletePostCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -2171,7 +2170,7 @@ func TestDeleteCommunity(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbCommunityImpl := service.NewCommunityService(TestLogger(t), TestBD)
+	dbCommunityImpl := NewCommunityService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -2222,7 +2221,7 @@ func TestDeleteCommunity(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.CommunityService.DeleteCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := CommunityService.DeleteCommunity(dbCommunityImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}

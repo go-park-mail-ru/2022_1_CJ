@@ -90,21 +90,6 @@ func (mr *MockFriendsRepositoryMockRecorder) DeleteOutcomingRequest(ctx, userID,
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOutcomingRequest", reflect.TypeOf((*MockFriendsRepository)(nil).DeleteOutcomingRequest), ctx, userID, personID)
 }
 
-// GetFriendsByID mocks base method.
-func (m *MockFriendsRepository) GetFriendsByID(ctx context.Context, userID string) ([]string, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFriendsByID", ctx, userID)
-	ret0, _ := ret[0].([]string)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetFriendsByID indicates an expected call of GetFriendsByID.
-func (mr *MockFriendsRepositoryMockRecorder) GetFriendsByID(ctx, userID interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFriendsByID", reflect.TypeOf((*MockFriendsRepository)(nil).GetFriendsByID), ctx, userID)
-}
-
 // GetFriendsByUserID mocks base method.
 func (m *MockFriendsRepository) GetFriendsByUserID(ctx context.Context, userID string) ([]string, error) {
 	m.ctrl.T.Helper()

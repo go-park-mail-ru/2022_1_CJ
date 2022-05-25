@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/monitoring"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/api/controllers"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
@@ -16,9 +17,10 @@ import (
 )
 
 type APIService struct {
-	log    *logrus.Entry
-	router *echo.Echo
-	debug  bool
+	log     *logrus.Entry
+	router  *echo.Echo
+	debug   bool
+	metrics *monitoring.PrometheusMetrics
 }
 
 func (svc *APIService) Serve() {
@@ -54,16 +56,20 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	registry := service.NewRegistry(log, repository)
 
 	authCtrl := controllers.NewAuthController(log, registry, authService)
+	fileCtrl := controllers.NewFileController(log, registry)
 	userCtrl := controllers.NewUserController(log, registry)
 	friendsCtrl := controllers.NewFriendsController(log, registry)
 	postCtrl := controllers.NewPostController(log, registry)
 	staticCtrl := controllers.NewStaticController(log, registry)
 	likeCtrl := controllers.NewLikeController(log, registry)
 	communitiesCtrl := controllers.NewCommunityController(log, registry)
+	commentCtrl := controllers.NewCommentController(log, registry)
 	chatCtrl := controllers.NewChatController(log, repository, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
-	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware())
+
+	svc.metrics = monitoring.RegisterMonitoring(svc.router)
+	svc.router.Use(svc.XRequestIDMiddleware(), svc.LoggingMiddleware(), svc.AccessLogMiddleware())
 
 	api := svc.router.Group("/api")
 
@@ -72,6 +78,11 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	authAPI.POST("/signup", authCtrl.SignupUser)
 	authAPI.POST("/login", authCtrl.LoginUser)
 	authAPI.DELETE("/logout", authCtrl.LogoutUser)
+
+	fileAPI := api.Group("/file", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
+
+	fileAPI.POST("/upload", fileCtrl.UploadFile)
+	fileAPI.GET("/get", fileCtrl.GetFile)
 
 	userAPI := api.Group("/user", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
 
@@ -143,6 +154,13 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	communitiesPostAPI.POST("/create", communitiesCtrl.CreatePostCommunity)
 	communitiesPostAPI.PUT("/edit", communitiesCtrl.EditPostCommunity)
 	communitiesPostAPI.DELETE("/delete", communitiesCtrl.DeletePostCommunity)
+
+	commentAPI := api.Group("/comment", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
+
+	commentAPI.POST("/create", commentCtrl.CreateComment)
+	commentAPI.GET("/get", commentCtrl.GetComments)
+	commentAPI.PUT("/edit", commentCtrl.EditComment)
+	commentAPI.POST("/delete", commentCtrl.DeleteComment)
 
 	return svc, nil
 }

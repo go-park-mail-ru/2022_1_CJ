@@ -24,6 +24,7 @@ type Conn struct {
 	Dialogs map[string]string
 	reg     *service.Registry
 	log     *logrus.Entry
+	ctx     echo.Context
 }
 
 var (
@@ -52,6 +53,8 @@ func HandleData(c *Conn, msg *dto.Message) {
 			c.ReadMessage(msg)
 		case constants.SendChat:
 			c.SendMessage(msg)
+		case constants.SendFile:
+			c.SendFile(msg)
 		default:
 			c.Send <- *ConstructMessage(msg.DialogID, constants.ErrChat, c.ID, constants.Empty, constants.ErrRequest)
 		}
@@ -169,7 +172,36 @@ func (c *Conn) SendMessage(msg *dto.Message) {
 
 	_, err = c.reg.ChatService.SendMessage(context.Background(), &dto.SendMessageRequest{Message: *msg})
 	if err != nil {
-		c.log.Infof("don't send message")
+		c.log.Errorf("don't send message: %s", err)
+		return
+	}
+	c.log.Info("send message")
+	c.Emit(msg)
+}
+
+func (c *Conn) SendFile(msg *dto.Message) {
+	ext := c.ctx.FormValue("ext")
+	if ext == "" {
+		c.log.Error("Extension is empty")
+		return
+	}
+
+	msgID, err := core.GenUUID()
+	if err != nil {
+		return
+	}
+	msg.ID = msgID
+	msg.CreatedAt = time.Now().Unix()
+
+	msg.Body, err = c.reg.StaticService.UploadFileChat(msgID, ext, msg.Body)
+	if err != nil {
+		c.log.Errorf("UploadFileChat error: %s", err)
+		return
+	}
+
+	_, err = c.reg.ChatService.SendMessage(context.Background(), &dto.SendMessageRequest{Message: *msg})
+	if err != nil {
+		c.log.Errorf("don't send message: %s", err)
 		return
 	}
 	c.log.Infof("send message")
@@ -283,6 +315,7 @@ func NewConnection(ctx *echo.Context, log *logrus.Entry, registry *service.Regis
 		Dialogs: make(map[string]string),
 		log:     log,
 		reg:     registry,
+		ctx:     *ctx,
 	}
 	ConnManager.Lock()
 	ConnManager.Conns[conn.ID] = conn

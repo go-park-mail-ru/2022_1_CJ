@@ -7,25 +7,25 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 )
 
-type PostController struct {
+type CommentController struct {
 	log      *logrus.Entry
 	registry *service.Registry
 }
 
-func (c *PostController) CreatePost(ctx echo.Context) error {
-	request := new(dto.CreatePostRequest)
+func (c *CommentController) CreateComment(ctx echo.Context) error {
+	request := new(dto.CreateCommentRequest)
 	if err := ctx.Bind(request); err != nil {
 		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 
 	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	///Загрузку сделать нормальную по файлам и картинкам
-	response, err := c.registry.PostService.CreatePost(context.Background(), request, userID)
+
+	response, err := c.registry.CommentService.CreateComment(context.Background(), request, userID)
 	if err != nil {
 		return err
 	}
@@ -33,14 +33,22 @@ func (c *PostController) CreatePost(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (c *PostController) GetPost(ctx echo.Context) error {
-	request := new(dto.GetPostRequest)
+func (c *CommentController) GetComments(ctx echo.Context) error {
+	request := new(dto.GetCommentsRequest)
 	if err := ctx.Bind(request); err != nil {
 		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
-	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	response, err := c.registry.PostService.GetPost(context.Background(), request, userID)
+
+	if request.Limit < -1 || request.Limit == 0 {
+		request.Limit = 10
+	}
+
+	if request.Page <= 0 {
+		request.Page = 1
+	}
+
+	response, err := c.registry.CommentService.GetComments(context.Background(), request)
 	if err != nil {
 		return err
 	}
@@ -48,15 +56,15 @@ func (c *PostController) GetPost(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (c *PostController) EditPost(ctx echo.Context) error {
-	request := new(dto.EditPostRequest)
+func (c *CommentController) EditComment(ctx echo.Context) error {
+	request := new(dto.EditCommentRequest)
 	if err := ctx.Bind(request); err != nil {
 		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 
 	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	response, err := c.registry.PostService.EditPost(context.Background(), request, userID)
+	response, err := c.registry.CommentService.EditComment(context.Background(), request, userID)
 	if err != nil {
 		return err
 	}
@@ -64,15 +72,15 @@ func (c *PostController) EditPost(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (c *PostController) DeletePost(ctx echo.Context) error {
-	request := new(dto.DeletePostRequest)
+func (c *CommentController) DeleteComment(ctx echo.Context) error {
+	request := new(dto.DeleteCommentRequest)
 	if err := ctx.Bind(request); err != nil {
 		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 
 	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	response, err := c.registry.PostService.DeletePost(context.Background(), request, userID)
+	response, err := c.registry.CommentService.DeleteComment(context.Background(), request, userID)
 	if err != nil {
 		return err
 	}
@@ -80,6 +88,6 @@ func (c *PostController) DeletePost(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func NewPostController(log *logrus.Entry, registry *service.Registry) *PostController {
-	return &PostController{log: log, registry: registry}
+func NewCommentController(log *logrus.Entry, registry *service.Registry) *CommentController {
+	return &CommentController{log: log, registry: registry}
 }

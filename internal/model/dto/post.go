@@ -8,16 +8,19 @@ type Author struct {
 }
 
 type Post struct {
-	ID        string   `json:"id"`
-	Author    Author   `json:"author"`
-	Message   string   `json:"message"`
-	Images    []string `json:"images,omitempty"`
+	ID            string   `json:"id"`
+	Author        Author   `json:"author"`
+	Message       string   `json:"message"`
+	Images        []string `json:"images,omitempty"`
 	CreatedAt int64    `json:"created_at"`
+  CountComments int64    `json:"count_comments"`
 }
 
 type CreatePostRequest struct {
 	Message string   `json:"message" validate:"required"`
 	Images  []string `json:"images,omitempty"`
+	Videos  []string `json:"videos,omitempty"`
+	Files   []string `json:"files,omitempty"`
 }
 
 type CreatePostResponse BasicResponse

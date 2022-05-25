@@ -6,7 +6,7 @@ info:
 servers:
   - url: /api
 security:
-  - CookieAuth: []
+  - CookieAuth: [ ]
 
 paths:
   /auth/signup:
@@ -14,7 +14,7 @@ paths:
       tags:
         - Authorization
       summary: Signup user
-      security: []
+      security: [ ]
       requestBody:
         content:
           application/json:
@@ -24,7 +24,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -37,7 +37,7 @@ paths:
       tags:
         - Authorization
       summary: Login user
-      security: []
+      security: [ ]
       requestBody:
         content:
           application/json:
@@ -47,7 +47,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -60,11 +60,11 @@ paths:
       tags:
         - Authorization
       summary: Logout user
-      security: []
+      security: [ ]
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -77,14 +77,14 @@ paths:
       tags:
         - User
       summary: Get user data
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/userIDParam"
         - $ref: "#/components/parameters/csrfToken"
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -105,7 +105,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -125,7 +125,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -138,7 +138,7 @@ paths:
       tags:
         - User
       summary: Change photo
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/csrfToken"
       requestBody:
@@ -153,7 +153,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -172,7 +172,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -196,7 +196,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -220,7 +220,7 @@ paths:
       responses:
         500:
           description: Internal error
-          content: {}
+          content: { }
         200:
           description: Представители
           content:
@@ -392,7 +392,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -411,7 +411,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -435,7 +435,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -454,7 +454,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -474,7 +474,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -495,7 +495,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -514,10 +514,10 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "204":
           description: Dialog does not exist
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -541,7 +541,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -559,7 +559,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
 
@@ -579,7 +579,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -603,7 +603,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -622,7 +622,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -640,7 +640,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -653,7 +653,7 @@ paths:
       tags:
         - Upload
       summary: Upload photo
-      security: []
+      security: [ ]
       parameters:
         - $ref: "#/components/parameters/csrfToken"
       requestBody:
@@ -668,7 +668,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -689,7 +689,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -710,7 +710,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -732,7 +732,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -753,7 +753,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -773,7 +773,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -798,7 +798,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -817,7 +817,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -836,7 +836,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -856,7 +856,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -875,7 +875,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -899,7 +899,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -922,7 +922,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -941,7 +941,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -965,7 +965,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -989,7 +989,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -1009,7 +1009,7 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
@@ -1037,13 +1037,105 @@ paths:
       responses:
         "500":
           description: Internal error
-          content: {}
+          content: { }
         "200":
           description: Success
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdatePhotoCommunityResponse"
+
+  /comment/get:
+    get:
+      tags:
+        - Comment
+      summary: Get post's comment
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+        - $ref: "#/components/parameters/postIDParam"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/page"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCommentsResponse"
+
+  /comment/create:
+    post:
+      tags:
+        - Comment
+      summary: create comment
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCommentResponse"
+
+  /comment/edit:
+    put:
+      tags:
+        - Comment
+      summary: edit comment
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EditCommentRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EditCommentResponse"
+
+  /comment/delete:
+    post:
+      tags:
+        - Comment
+      summary: delete comment
+      parameters:
+        - $ref: "#/components/parameters/csrfToken"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteCommentRequest"
+      responses:
+        "500":
+          description: Internal error
+          content: { }
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteCommentResponse"
 
 components:
   parameters:
@@ -1058,6 +1150,13 @@ components:
     postIDParam:
       in: query
       name: post_id
+      required: true
+      schema:
+        type: string
+
+    commentIDParam:
+      in: query
+      name: comment_id
       required: true
       schema:
         type: string
@@ -1558,6 +1657,57 @@ components:
     DeletePostCommunityResponse:
       $ref: "#/components/schemas/BasicResponse"
 
+    CreateCommentRequest:
+      properties:
+        message:
+          type: string
+        post_id:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+
+    CreateCommentResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    GetCommentsResponse:
+      properties:
+        total:
+          type: integer
+        amount_pages:
+          type: integer
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
+
+    EditCommentRequest:
+      properties:
+        post_id:
+          type: string
+        comment_id:
+          type: string
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+
+    DeleteCommentRequest:
+      properties:
+        post_id:
+          type: string
+        comment_id:
+          type: string
+
+    EditCommentResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
+    DeleteCommentResponse:
+      $ref: "#/components/schemas/BasicResponse"
+
     # --------------------- Models --------------------- #
 
     BasicResponse:
@@ -1642,12 +1792,26 @@ components:
           $ref: "#/components/schemas/Author"
         message:
           type: string
+        count_comments:
+          type: integer
         images:
           type: array
           items:
             type: string
-        created_at:
-          type: number
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+        author:
+          $ref: "#/components/schemas/User"
+        message:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
 
     Author:
       type: object

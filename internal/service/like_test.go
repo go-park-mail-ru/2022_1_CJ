@@ -6,7 +6,6 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -17,7 +16,7 @@ func TestIncreaseLike(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewLikeService(TestLogger(t), TestBD)
+	dbUserImpl := NewLikeService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -141,7 +140,7 @@ func TestIncreaseLike(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.LikeService.IncreaseLike(dbUserImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := LikeService.IncreaseLike(dbUserImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -157,7 +156,7 @@ func TestGetLikePost(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewLikeService(TestLogger(t), TestBD)
+	dbUserImpl := NewLikeService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -221,7 +220,7 @@ func TestGetLikePost(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.LikeService.GetLikePost(dbUserImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := LikeService.GetLikePost(dbUserImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -237,7 +236,7 @@ func TestGetLikePhoto(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewLikeService(TestLogger(t), TestBD)
+	dbUserImpl := NewLikeService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -301,7 +300,7 @@ func TestGetLikePhoto(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.LikeService.GetLikePhoto(dbUserImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := LikeService.GetLikePhoto(dbUserImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -317,7 +316,7 @@ func TestReduceLike(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewLikeService(TestLogger(t), TestBD)
+	dbUserImpl := NewLikeService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -441,7 +440,7 @@ func TestReduceLike(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.LikeService.ReduceLike(dbUserImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := LikeService.ReduceLike(dbUserImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}

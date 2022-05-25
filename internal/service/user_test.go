@@ -7,7 +7,6 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,7 +18,7 @@ func TestGetUserData(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewUserService(TestLogger(t), TestBD)
+	dbUserImpl := NewUserService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -47,7 +46,7 @@ func TestGetUserData(t *testing.T) {
 			gomock.InOrder(
 				testRepo.mockUserR.EXPECT().GetUserByID(ctx, test.input).Return(&core.User{}, test.resultGetUserByID),
 			)
-			_, res := service.UserService.GetUserData(dbUserImpl, ctx, test.input)
+			_, res := UserService.GetUserData(dbUserImpl, ctx, test.input)
 			if !assert.Equal(t, test.output, res) {
 				t.Error("got : ", res, " expected :", test.output)
 			}
@@ -60,7 +59,7 @@ func TestGetUserPosts(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewUserService(TestLogger(t), TestBD)
+	dbUserImpl := NewUserService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -172,7 +171,7 @@ func TestGetUserPosts(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, err := service.UserService.GetUserPosts(dbUserImpl, ctx, test.input)
+			res, err := UserService.GetUserPosts(dbUserImpl, ctx, test.input)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -189,7 +188,7 @@ func TestGetFeed(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewUserService(TestLogger(t), TestBD)
+	dbUserImpl := NewUserService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -321,7 +320,7 @@ func TestGetFeed(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, err := service.UserService.GetFeed(dbUserImpl, ctx, test.input.userID, test.input.info)
+			res, err := UserService.GetFeed(dbUserImpl, ctx, test.input.userID, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -338,7 +337,7 @@ func TestGetProfile(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewUserService(TestLogger(t), TestBD)
+	dbUserImpl := NewUserService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -394,7 +393,7 @@ func TestGetProfile(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, err := service.UserService.GetProfile(dbUserImpl, ctx, test.input.info)
+			res, err := UserService.GetProfile(dbUserImpl, ctx, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -411,7 +410,7 @@ func TestEditProfile(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewUserService(TestLogger(t), TestBD)
+	dbUserImpl := NewUserService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -479,7 +478,7 @@ func TestEditProfile(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, errRes := service.UserService.EditProfile(dbUserImpl, ctx, test.input.info, test.input.userID)
+			res, errRes := UserService.EditProfile(dbUserImpl, ctx, test.input.info, test.input.userID)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}
@@ -495,7 +494,7 @@ func TestUpdatePhotoUser(t *testing.T) {
 	defer ctrl.Finish()
 
 	TestBD, testRepo := TestRepositories(t, ctrl)
-	dbUserImpl := service.NewUserService(TestLogger(t), TestBD)
+	dbUserImpl := NewUserService(TestLogger(t), TestBD)
 
 	ctx := context.Background()
 
@@ -565,7 +564,7 @@ func TestUpdatePhotoUser(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 
-			res, err := service.UserService.UpdatePhoto(dbUserImpl, ctx, test.input.url, test.input.info)
+			res, err := UserService.UpdatePhoto(dbUserImpl, ctx, test.input.url, test.input.info)
 			if !assert.Equal(t, test.output.res, res) {
 				t.Error("got : ", res, " expected :", test.output.res)
 			}

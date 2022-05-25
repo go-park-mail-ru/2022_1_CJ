@@ -17,6 +17,7 @@ type TestRepository struct {
 	mockChatR      *mockDB.MockChatRepository
 	mockLikeR      *mockDB.MockLikeRepository
 	mockCommunityR *mockDB.MockCommunityRepository
+	mockCommentR   *mockDB.MockCommentRepository
 }
 
 // TestRepositories ...
@@ -28,6 +29,7 @@ func TestRepositories(t *testing.T, ctrl *gomock.Controller) (*db.Repository, *T
 		mockDB.NewMockChatRepository(ctrl),
 		mockDB.NewMockLikeRepository(ctrl),
 		mockDB.NewMockCommunityRepository(ctrl),
+		mockDB.NewMockCommentRepository(ctrl),
 	}
 	t.Helper()
 	return &db.Repository{UserRepo: MockRepo.mockUserR,
@@ -36,6 +38,7 @@ func TestRepositories(t *testing.T, ctrl *gomock.Controller) (*db.Repository, *T
 		ChatRepo:      MockRepo.mockChatR,
 		LikeRepo:      MockRepo.mockLikeR,
 		CommunityRepo: MockRepo.mockCommunityR,
+		CommentRepo:   MockRepo.mockCommentR,
 	}, MockRepo
 }
 
