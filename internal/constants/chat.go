@@ -12,14 +12,15 @@ const (
 	PingPeriod     = PongWait * 9 / 10
 	MaxMessageSize = 1024 * 1024 * 1024
 
-	JoinChat   = "join"
-	LeaveChat  = "leave"
-	JoinedChat = "joined"
-	LeftChat   = "left"
-	SendChat   = "send"
-	SendFile   = "send_file"
-	ReadChat   = "read"
-	Empty      = ""
+	JoinChat    = "join"
+	LeaveChat   = "leave"
+	JoinedChat  = "joined"
+	LeftChat    = "left"
+	SendChat    = "send"
+	SendFile    = "send_file"
+	SendSticker = "send_sticker"
+	ReadChat    = "read"
+	Empty       = ""
 
 	ErrChat           = "error"
 	ErrChatDoNotExist = "room does not exit"

@@ -55,6 +55,8 @@ func HandleData(c *Conn, msg *dto.Message) {
 			c.SendMessage(msg)
 		case constants.SendFile:
 			c.SendFile(msg)
+		case constants.SendSticker:
+			c.SendSticker(msg)
 		default:
 			c.Send <- *ConstructMessage(msg.DialogID, constants.ErrChat, c.ID, constants.Empty, constants.ErrRequest)
 		}
@@ -205,6 +207,24 @@ func (c *Conn) SendFile(msg *dto.Message) {
 		return
 	}
 	c.log.Infof("send message")
+	c.Emit(msg)
+}
+
+// SendMessage ...
+func (c *Conn) SendSticker(msg *dto.Message) {
+	msgID, err := core.GenUUID()
+	if err != nil {
+		return
+	}
+	msg.ID = msgID
+	msg.CreatedAt = time.Now().Unix()
+
+	_, err = c.reg.ChatService.SendMessage(context.Background(), &dto.SendMessageRequest{Message: *msg})
+	if err != nil {
+		c.log.Errorf("don't send message: %s", err)
+		return
+	}
+	c.log.Info("send message")
 	c.Emit(msg)
 }
 
