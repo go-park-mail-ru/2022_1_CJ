@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
@@ -78,32 +79,30 @@ func (svc *postServiceImpl) GetPost(ctx context.Context, request *dto.GetPostReq
 func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostRequest, userID string) (*dto.EditPostResponse, error) {
 	user, err := svc.db.UserRepo.GetUserByID(ctx, userID)
 	if err != nil {
-		svc.log.Errorf("GetUserByID error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("GetUserByID: %w", err)
 	}
 
 	err = svc.db.UserRepo.UserCheckPost(ctx, user, request.PostID)
 	if err != nil {
-		svc.log.Errorf("UserCheckPost error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("UserCheckPost: %w", err)
 	}
 
 	postBefore, err := svc.db.PostRepo.GetPostByID(ctx, request.PostID)
 	if err != nil {
-		svc.log.Errorf("GetPostByID error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("GetPostByID: %w", err)
 	}
-	svc.log.Debugf("Post data befor edit: Message: %s; Images paths: %v", postBefore.Message, postBefore.Images)
 
-	_, err = svc.db.PostRepo.EditPost(ctx, &core.Post{
-		AuthorID: userID,
-		ID:       request.PostID,
-		Message:  request.Message,
-		Images:   request.Images,
-	})
+	if len(request.Message) != 0 {
+		postBefore.Message = request.Message
+	}
+
+	if request.Images != nil {
+		postBefore.Images = request.Images
+	}
+
+	_, err = svc.db.PostRepo.EditPost(ctx, postBefore)
 	if err != nil {
-		svc.log.Errorf("EditPost error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("EditPost: %w", err)
 	}
 
 	return &dto.EditPostResponse{}, nil
