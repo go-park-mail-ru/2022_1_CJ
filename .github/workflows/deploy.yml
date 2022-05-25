@@ -4,24 +4,33 @@ on:
   push:
     branches:
       - dev
+      - checkCI
   pull_request:
     branches:
       - main
       - dev
+      - checkCI
 
 jobs:
   linter:
-    name: Run linter
+    name: Linter check
     runs-on: ubuntu-latest
     steps:
-      - name: Install Go
+      - name: Installation Go v1.18
         uses: actions/setup-go@v2
         with:
           go-version: '1.18.x'
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Run linter
-        run: |
-          # binary will be $(go env GOPATH)/bin/golangci-lint
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.46.2
-          $(go env GOPATH)/bin/golangci-lint run
+        run: make lint
+
+  deploy:
+    needs: [ linter ]
+    name: Run Docker
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run Docker
+        run: make
