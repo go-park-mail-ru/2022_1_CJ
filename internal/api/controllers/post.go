@@ -24,7 +24,6 @@ func (c *PostController) CreatePost(ctx echo.Context) error {
 	}
 
 	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-	///Загрузку сделать нормальную по файлам и картинкам
 	response, err := c.registry.PostService.CreatePost(context.Background(), request, userID)
 	if err != nil {
 		return err

@@ -28,7 +28,7 @@ func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.CreateP
 	post, err := svc.db.PostRepo.CreatePost(ctx, &core.Post{
 		AuthorID: userID,
 		Message:  request.Message,
-		Images:   request.Images,
+		Files:    request.Files,
 		Type:     constants.UserPost,
 	})
 	if err != nil {
@@ -96,8 +96,8 @@ func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostR
 		postBefore.Message = request.Message
 	}
 
-	if request.Images != nil {
-		postBefore.Images = request.Images
+	if request.Files != nil {
+		postBefore.Files = request.Files
 	}
 
 	_, err = svc.db.PostRepo.EditPost(ctx, postBefore)

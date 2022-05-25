@@ -11,15 +11,13 @@ type Post struct {
 	ID            string   `json:"id"`
 	Author        Author   `json:"author"`
 	Message       string   `json:"message"`
-	Images        []string `json:"images,omitempty"`
-	CreatedAt int64    `json:"created_at"`
-  CountComments int64    `json:"count_comments"`
+	Files         []string `json:"files,omitempty"`
+	CreatedAt     int64    `json:"created_at"`
+	CountComments int64    `json:"count_comments"`
 }
 
 type CreatePostRequest struct {
 	Message string   `json:"message" validate:"required"`
-	Images  []string `json:"images,omitempty"`
-	Videos  []string `json:"videos,omitempty"`
 	Files   []string `json:"files,omitempty"`
 }
 
@@ -37,7 +35,7 @@ type GetPostResponse struct {
 type EditPostRequest struct {
 	PostID  string   `json:"post_id"`
 	Message string   `json:"message"`
-	Images  []string `json:"images,omitempty"`
+	Files   []string `json:"files,omitempty"`
 }
 
 type EditPostResponse BasicResponse

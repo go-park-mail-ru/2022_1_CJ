@@ -67,7 +67,7 @@ func TestPost(t *testing.T) *core.Post {
 		ID:        "12345678",
 		AuthorID:  "123456789",
 		Message:   "Hi it's my first post",
-		Images:    []string{"src/image.jpg"},
+		Files:     []string{"src/image.jpg"},
 		CreatedAt: 1323123,
 	}
 }
