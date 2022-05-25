@@ -56,7 +56,7 @@ func TestFriends(t *testing.T) *core.Friends {
 	return &core.Friends{
 		ID:                "12345678",
 		OutcomingRequests: []string{"123", "234"},
-		IncomingRequest:   []string{"2345", "2357"},
+		IncomingRequests:  []string{"2345", "2357"},
 		Friends:           []string{"123567", "213123", "214335345"},
 	}
 }

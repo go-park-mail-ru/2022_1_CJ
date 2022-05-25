@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"github.com/gofrs/uuid"
 	"io/ioutil"
 	"net"
 	"net/http"
