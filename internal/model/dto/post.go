@@ -12,7 +12,8 @@ type Post struct {
 	Author        Author   `json:"author"`
 	Message       string   `json:"message"`
 	Images        []string `json:"images,omitempty"`
-	CountComments int64    `json:"count_comments"`
+	CreatedAt int64    `json:"created_at"`
+  CountComments int64    `json:"count_comments"`
 }
 
 type CreatePostRequest struct {

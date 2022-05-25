@@ -29,6 +29,7 @@ func Dialog2DTO(dialog *core.Dialog, userID string) dto.Dialog {
 			participants = append(participants, id)
 		}
 	}
+
 	return dto.Dialog{
 		DialogID:     dialog.ID,
 		Name:         dialog.Name,

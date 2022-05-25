@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	HeaderKeyUserID       = "User-ID"
-	HeaderKeyRequestID    = "X-Request-ID"
+	HeaderKeyUserID       = "User-Id"
+	HeaderKeyRequestID    = "X-Request-Id"
 	HeaderKeyUserAuthType = "User-Auth-Type"
 )
 
