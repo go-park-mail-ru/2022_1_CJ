@@ -1,153 +1,150 @@
 package service
 
-//func TestSignupUser(t *testing.T) {
-//	ctrl := gomock.NewController(t)
-//	defer ctrl.Finish()
-//
-//	TestBD, testRepo := TestRepositories(t, ctrl)
-//	dbUserImpl := service.NewAuthService(TestLogger(t), TestBD)
-//
-//	ctx := context.Background()
-//
-//	type Input struct {
-//		info *dto.SignupUserRequest
-//	}
-//	type InputCheckUserEmailExistence struct {
-//		email string
-//	}
-//	type OutputCheckUserEmailExistence struct {
-//		exists bool
-//		err    error
-//	}
-//
-//	type InputCreateUser struct {
-//		user *core.User
-//	}
-//
-//	type OutputCreateUser struct {
-//		err error
-//	}
-//	type InputCreateFriends struct {
-//		friendsID string
-//		userID    string
-//	}
-//
-//	type OutputCreateFriends struct {
-//		err error
-//	}
-//	type Output struct {
-//		res *dto.SignupUserResponse
-//		err error
-//	}
-//	tests := []struct {
-//		name                          string
-//		input                         Input
-//		inputCheckUserEmailExistence  InputCheckUserEmailExistence
-//		outputCheckUserEmailExistence OutputCheckUserEmailExistence
-//		inputCreateUser               InputCreateUser
-//		outputCreateUser              OutputCreateUser
-//		inputCreateFriends            InputCreateFriends
-//		outputCreateFriends           OutputCreateFriends
-//		output                        Output
-//	}{
-//		{
-//			name: "With taken email",
-//			input: Input{info: &dto.SignupUserRequest{Name: common.UserName{First: "Sasha", Last: "Web"},
-//				Email:    "wrong",
-//				Password: "1234"}},
-//			inputCheckUserEmailExistence:  InputCheckUserEmailExistence{email: "wrong"},
-//			outputCheckUserEmailExistence: OutputCheckUserEmailExistence{exists: true, err: nil},
-//			output:                        Output{nil, constants.ErrEmailAlreadyTaken},
-//		},
-//		//{
-//		//	name: "Can't insert in userRepo",
-//		//	input: Input{info: &dto.SignupUserRequest{Name: common.UserName{First: "Sasha", Last: "Web"},
-//		//											Email:    "SashaWeb@mail.ru",
-//		//											Password: "12 34"}},
-//		//	inputCheckUserEmailExistence:  InputCheckUserEmailExistence{email: "SashaWeb@mail.ru"},
-//		//	outputCheckUserEmailExistence: OutputCheckUserEmailExistence{exists: false, err: nil},
-//		//	inputCreateUser: InputCreateUser{post: &core.User{
-//		//											Name: common.UserName{First: "Sasha", Last: "Web"},
-//		//											Email: "SashaWeb@mail.ru"}},
-//		//	outputCreateUser: OutputCreateUser{},
-//		//	output:           Output{nil, nil},
-//		//},
-//	}
-//
-//	gomock.InOrder(
-//		testRepo.mockUserR.EXPECT().CheckUserEmailExistence(ctx, tests[0].inputCheckUserEmailExistence.email).Return(
-//			tests[0].outputCheckUserEmailExistence.exists, tests[0].outputCheckUserEmailExistence.err),
-//	)
-//
-//	for _, test := range tests {
-//		t.Run(test.name, func(t *testing.T) {
-//
-//			res, errRes := service.AuthService.SignupUser(dbUserImpl, ctx, test.input.info)
-//			if !assert.Equal(t, test.output.res, res) {
-//				t.Error("got : ", res, " expected :", test.output.res)
-//			}
-//			if !assert.Equal(t, test.output.err, errRes) {
-//				t.Error("got : ", errRes, " expected :", test.output.err)
-//			}
-//		})
-//	}
-//}
-//
-//func TestLoginUser(t *testing.T) {
-//	ctrl := gomock.NewController(t)
-//	defer ctrl.Finish()
-//
-//	TestBD, testRepo := TestRepositories(t, ctrl)
-//	dbUserImpl := service.NewAuthService(TestLogger(t), TestBD)
-//
-//	ctx := context.Background()
-//
-//	type Input struct {
-//		info *dto.LoginUserRequest
-//	}
-//	type InputGetUserByEmail struct {
-//		email string
-//	}
-//	type OutputGetUserByEmail struct {
-//		user *core.User
-//		err  error
-//	}
-//
-//	type Output struct {
-//		res *dto.LoginUserResponse
-//		err error
-//	}
-//	tests := []struct {
-//		name                  string
-//		input                 Input
-//		inputGetUserByEmail   InputGetUserByEmail
-//		outputGetUserByEmaile OutputGetUserByEmail
-//		output                Output
-//	}{
-//		{
-//			name:                  "With wrong post",
-//			input:                 Input{info: &dto.LoginUserRequest{Email: "wrong", Password: "1234"}},
-//			inputGetUserByEmail:   InputGetUserByEmail{email: "wrong"},
-//			outputGetUserByEmaile: OutputGetUserByEmail{user: nil, err: constants.ErrDBNotFound},
-//			output:                Output{nil, constants.ErrDBNotFound},
-//		},
-//	}
-//
-//	gomock.InOrder(
-//		testRepo.mockUserR.EXPECT().GetUserByEmail(ctx, tests[0].inputGetUserByEmail.email).Return(
-//			tests[0].outputGetUserByEmaile.user, tests[0].outputGetUserByEmaile.err),
-//	)
-//
-//	for _, test := range tests {
-//		t.Run(test.name, func(t *testing.T) {
-//
-//			res, errRes := service.AuthService.LoginUser(dbUserImpl, ctx, test.input.info)
-//			if !assert.Equal(t, test.output.res, res) {
-//				t.Error("got : ", res, " expected :", test.output.res)
-//			}
-//			if !assert.Equal(t, test.output.err, errRes) {
-//				t.Error("got : ", errRes, " expected :", test.output.err)
-//			}
-//		})
-//	}
-//}
+import (
+	"context"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/utils"
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
+
+func TestSignupUser(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	TestBD, testRepo := TestRepositories(t, ctrl)
+	dbUserImpl := NewAuthService(TestLogger(t), TestBD)
+
+	ctx := context.Background()
+
+	type Input struct {
+		info   *dto.SignupUserRequest
+		userID string
+		token  string
+	}
+
+	type InputCreateUser struct {
+		user *core.User
+	}
+
+	type OutputCreateUser struct {
+		err error
+	}
+	type InputCreateFriends struct {
+		userID string
+	}
+
+	type OutputCreateFriends struct {
+		err error
+	}
+	type Output struct {
+		res *dto.SignupUserResponse
+		err error
+	}
+	expected, _ := utils.GenerateCSRFToken("2")
+
+	tests := []struct {
+		name                string
+		input               Input
+		inputCreateUser     InputCreateUser
+		outputCreateUser    OutputCreateUser
+		inputCreateFriends  InputCreateFriends
+		outputCreateFriends OutputCreateFriends
+		output              Output
+	}{
+		{
+			name: "Can't create user",
+			input: Input{info: &dto.SignupUserRequest{Name: common.UserName{First: "Sasha", Last: "Web"},
+				Email:    "wrong",
+				Password: "1234",
+			}, userID: "0", token: "0"},
+			inputCreateUser: InputCreateUser{user: &core.User{
+				ID:    "0",
+				Name:  common.UserName{First: "Sasha", Last: "Web"},
+				Email: "wrong",
+			}},
+			outputCreateUser: OutputCreateUser{err: constants.ErrEmailAlreadyTaken},
+			output:           Output{nil, constants.ErrEmailAlreadyTaken},
+		},
+		{
+			name: "CreateFriends error",
+			input: Input{info: &dto.SignupUserRequest{Name: common.UserName{First: "Sasha", Last: "Web"},
+				Email:    "wrong",
+				Password: "1234",
+			}, userID: "1", token: "0"},
+			inputCreateUser: InputCreateUser{user: &core.User{
+				ID:    "1",
+				Name:  common.UserName{First: "Sasha", Last: "Web"},
+				Email: "wrong",
+			}},
+			outputCreateUser: OutputCreateUser{err: nil},
+			inputCreateFriends: InputCreateFriends{
+				userID: "1",
+			},
+			outputCreateFriends: OutputCreateFriends{err: constants.ErrEmailAlreadyTaken},
+			output:              Output{nil, constants.ErrEmailAlreadyTaken},
+		},
+		{
+			name: "Success",
+			input: Input{info: &dto.SignupUserRequest{Name: common.UserName{First: "Sasha", Last: "Web"},
+				Email:    "wrong",
+				Password: "1234",
+			}, userID: "2", token: "0"},
+			inputCreateUser: InputCreateUser{user: &core.User{
+				ID:    "2",
+				Name:  common.UserName{First: "Sasha", Last: "Web"},
+				Email: "wrong",
+			}},
+			outputCreateUser: OutputCreateUser{err: nil},
+			inputCreateFriends: InputCreateFriends{
+				userID: "2",
+			},
+			outputCreateFriends: OutputCreateFriends{err: nil},
+			output:              Output{&dto.SignupUserResponse{AuthToken: "0", CSRFToken: expected}, nil},
+		},
+	}
+
+	gomock.InOrder(
+		testRepo.mockUserR.EXPECT().CreateUser(ctx, tests[0].inputCreateUser.user).Return(tests[0].outputCreateUser.err),
+		testRepo.mockUserR.EXPECT().CreateUser(ctx, tests[1].inputCreateUser.user).Return(tests[1].outputCreateUser.err),
+		testRepo.mockFriendsR.EXPECT().CreateFriends(ctx, tests[1].inputCreateFriends.userID).Return(tests[1].outputCreateFriends.err),
+		testRepo.mockUserR.EXPECT().CreateUser(ctx, tests[2].inputCreateUser.user).Return(tests[2].outputCreateUser.err),
+		testRepo.mockFriendsR.EXPECT().CreateFriends(ctx, tests[2].inputCreateFriends.userID).Return(tests[2].outputCreateFriends.err),
+	)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+
+			res, errRes := AuthService.SignupUser(dbUserImpl, ctx, test.input.info, test.input.userID, test.input.token)
+			if !assert.Equal(t, test.output.res, res) {
+				t.Error("got : ", res, " expected :", test.output.res)
+			}
+			if !assert.Equal(t, test.output.err, errRes) {
+				t.Error("got : ", errRes, " expected :", test.output.err)
+			}
+		})
+	}
+}
+
+func TestLoginUser(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	TestBD, _ := TestRepositories(t, ctrl)
+	dbUserImpl := NewAuthService(TestLogger(t), TestBD)
+
+	ctx := context.Background()
+	expected, _ := utils.GenerateCSRFToken("0")
+	t.Run("Success", func(t *testing.T) {
+
+		res, _ := AuthService.LoginUser(dbUserImpl, ctx, "0", "1")
+		if !assert.Equal(t, res.CSRFToken, expected) {
+			t.Error("got : ", res, " expected :", res.CSRFToken)
+		}
+	})
+
+}
