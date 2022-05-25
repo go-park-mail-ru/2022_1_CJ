@@ -18,6 +18,8 @@ type Post struct {
 type CreatePostRequest struct {
 	Message string   `json:"message" validate:"required"`
 	Images  []string `json:"images,omitempty"`
+	Videos  []string `json:"videos,omitempty"`
+	Files   []string `json:"files,omitempty"`
 }
 
 type CreatePostResponse BasicResponse
