@@ -47,6 +47,7 @@ func Message2DTO(message core.Message, userID string) dto.MessageInfo {
 			IsRead:      message.IsRead,
 			CreatedAt:   message.CreatedAt,
 			Attachments: message.Attachments,
+			Images:      message.Images,
 		}
 	}
 	return dto.MessageInfo{
@@ -54,6 +55,7 @@ func Message2DTO(message core.Message, userID string) dto.MessageInfo {
 		Body:        message.Body,
 		CreatedAt:   message.CreatedAt,
 		Attachments: message.Attachments,
+		Images:      message.Images,
 	}
 }
 

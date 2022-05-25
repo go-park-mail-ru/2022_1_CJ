@@ -82,6 +82,7 @@ func (svc *chatServiceImpl) SendMessage(ctx context.Context, request *dto.SendMe
 		IsRead:      isRead,
 		ID:          request.Message.ID,
 		Attachments: request.Message.Attachments,
+		Images:      request.Message.Images,
 		CreatedAt:   request.Message.CreatedAt,
 	}
 

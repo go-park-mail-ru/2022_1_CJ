@@ -159,6 +159,7 @@ type CreatePostCommunityRequest struct {
 	CommunityID string   `json:"community_id"`
 	Message     string   `json:"message" validate:"required"`
 	Images      []string `json:"images,omitempty"`
+	Attachments []string `json:"attachments,omitempty"`
 }
 
 type CreatePostCommunityResponse BasicResponse
@@ -168,6 +169,7 @@ type EditPostCommunityRequest struct {
 	PostID      string   `json:"post_id"`
 	Message     string   `json:"message"`
 	Images      []string `json:"images,omitempty"`
+	Attachments []string `json:"attachments,omitempty"`
 }
 
 type EditPostCommunityResponse BasicResponse

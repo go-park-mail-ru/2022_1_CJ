@@ -7,29 +7,32 @@ import (
 
 func Post2Core(post *dto.Post) core.Post {
 	return core.Post{
-		ID:       post.ID,
-		AuthorID: post.Author.ID,
-		Message:  post.Message,
-		Images:   post.Images,
+		ID:          post.ID,
+		AuthorID:    post.Author.ID,
+		Message:     post.Message,
+		Images:      post.Images,
+		Attachments: post.Attachments,
 	}
 }
 
 func Post2DTOByUser(post *core.Post, author *core.User) dto.Post {
 	return dto.Post{
-		ID:        post.ID,
-		Author:    User2author(User2DTO(author)),
-		Message:   post.Message,
-		Images:    post.Images,
-		CreatedAt: post.CreatedAt,
+		ID:          post.ID,
+		Author:      User2author(User2DTO(author)),
+		Message:     post.Message,
+		Images:      post.Images,
+		Attachments: post.Attachments,
+		CreatedAt:   post.CreatedAt,
 	}
 }
 
 func Post2DTOByCommunity(post *core.Post, community *core.Community) dto.Post {
 	return dto.Post{
-		ID:        post.ID,
-		Author:    CommunityProfile2Author(Community2DTOSmallProfile(community)),
-		Message:   post.Message,
-		Images:    post.Images,
-		CreatedAt: post.CreatedAt,
+		ID:          post.ID,
+		Author:      CommunityProfile2Author(Community2DTOSmallProfile(community)),
+		Message:     post.Message,
+		Images:      post.Images,
+		Attachments: post.Attachments,
+		CreatedAt:   post.CreatedAt,
 	}
 }

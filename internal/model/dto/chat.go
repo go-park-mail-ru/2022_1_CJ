@@ -21,6 +21,7 @@ type Message struct {
 	DestinID    string   `json:"dst,omitempty"`
 	Body        string   `json:"body"`
 	Attachments []string `json:"attachments"`
+	Images      []string `json:"images"`
 	CreatedAt   int64    `json:"created_at"`
 }
 
@@ -30,6 +31,7 @@ type MessageInfo struct {
 	Body        string        `json:"body"`
 	IsRead      []core.IsRead `json:"is_read,omitempty"`
 	Attachments []string      `json:"attachments"`
+	Images      []string      `json:"images"`
 	CreatedAt   int64         `json:"created_at"`
 }
 

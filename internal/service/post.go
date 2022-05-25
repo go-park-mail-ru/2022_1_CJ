@@ -26,10 +26,11 @@ type postServiceImpl struct {
 
 func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.CreatePostRequest, userID string) (*dto.CreatePostResponse, error) {
 	post, err := svc.db.PostRepo.CreatePost(ctx, &core.Post{
-		AuthorID: userID,
-		Message:  request.Message,
-		Images:   request.Images,
-		Type:     constants.UserPost,
+		AuthorID:    userID,
+		Message:     request.Message,
+		Images:      request.Images,
+		Attachments: request.Attachments,
+		Type:        constants.UserPost,
 	})
 	if err != nil {
 		svc.log.Errorf("CreatePost error: %s", err)

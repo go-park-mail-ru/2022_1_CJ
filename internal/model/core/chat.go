@@ -11,6 +11,7 @@ type Message struct {
 	AuthorID    string   `bson:"author_id"`
 	IsRead      []IsRead `bson:"is_participants_read,omitempty"`
 	Attachments []string `json:"attachments"`
+	Images      []string `json:"images"`
 	CreatedAt   int64    `bson:"created_at"` // unix timestamp
 }
 
