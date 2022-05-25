@@ -38,7 +38,7 @@ mod:
 
 tests:
 	go test ./internal/... -cover -coverprofile=cover.out -coverpkg=./internal/...
-	cat cover.out | fgrep -v "handler" | fgrep -v "mocks" > cover1.out
+	cat cover.out | fgrep -v "handler" | fgrep -v "api" | fgrep -v "chat" | fgrep -v "mocks" > cover1.out
 	go tool cover -func=cover1.out
 
 mock:
