@@ -55,26 +55,36 @@ func (svc *postServiceImpl) CreatePost(ctx context.Context, request *dto.CreateP
 }
 
 func (svc *postServiceImpl) GetPost(ctx context.Context, request *dto.GetPostRequest, userID string) (*dto.GetPostResponse, error) {
-	post, err := svc.db.PostRepo.GetPostByID(ctx, request.PostID)
+	postCore, err := svc.db.PostRepo.GetPostByID(ctx, request.PostID)
 	if err != nil {
-		svc.log.Errorf("GetPostByID error: %s", err)
 		return nil, err
 	}
-	svc.log.Debug("GetPostByID success")
 
-	author, err := svc.db.UserRepo.GetUserByID(ctx, post.AuthorID)
-	if err != nil {
-		svc.log.Errorf("GetUserByID error: %s", err)
-		return nil, err
+	var post dto.Post
+	switch postCore.Type {
+	case constants.UserPost:
+		author, errUser := svc.db.UserRepo.GetUserByID(ctx, postCore.AuthorID)
+		if errUser != nil {
+			return nil, err
+		}
+		post = convert.Post2DTOByUser(postCore, author)
+
+	case constants.CommunityPost:
+		community, errComm := svc.db.CommunityRepo.GetCommunityByID(ctx, postCore.AuthorID)
+		if errComm != nil {
+			return nil, err
+		}
+		post = convert.Post2DTOByCommunity(postCore, community)
+	default:
+		return nil, constants.ErrDBNotFound
 	}
 
 	like, err := svc.db.LikeRepo.GetLikeBySubjectID(ctx, request.PostID)
 	if err != nil {
-		svc.log.Errorf("GetLikeBySubjectID error: %s", err)
 		return nil, err
 	}
 
-	return &dto.GetPostResponse{Post: convert.Post2DTOByUser(post, author), Likes: convert.Like2DTO(like, userID)}, nil
+	return &dto.GetPostResponse{Post: post, Likes: convert.Like2DTO(like, userID)}, nil
 }
 
 func (svc *postServiceImpl) EditPost(ctx context.Context, request *dto.EditPostRequest, userID string) (*dto.EditPostResponse, error) {

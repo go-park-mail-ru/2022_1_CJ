@@ -430,13 +430,11 @@ func (svc *communityServiceImpl) CreatePostCommunity(ctx context.Context, reques
 func (svc *communityServiceImpl) EditPostCommunity(ctx context.Context, request *dto.EditPostCommunityRequest, userID string) (*dto.EditPostCommunityResponse, error) {
 	err := svc.db.UserRepo.UserCheckCommunity(ctx, userID, request.CommunityID)
 	if err != nil {
-		svc.log.Errorf("UserCheckCommunity error: %s", err)
 		return nil, constants.ErrDBNotFound
 	}
 
 	community, err := svc.db.CommunityRepo.GetCommunityByID(ctx, request.CommunityID)
 	if err != nil {
-		svc.log.Errorf("GetCommunityByID error: %s", err)
 		return nil, constants.ErrDBNotFound
 	}
 
@@ -448,14 +446,20 @@ func (svc *communityServiceImpl) EditPostCommunity(ctx context.Context, request 
 		}
 	}
 
-	_, err = svc.db.PostRepo.EditPost(ctx, &core.Post{
-		AuthorID: request.CommunityID,
-		ID:       request.PostID,
-		Message:  request.Message,
-		Images:   request.Images,
-	})
+	post, err := svc.db.PostRepo.GetPostByID(ctx, request.PostID)
 	if err != nil {
-		svc.log.Errorf("EditPost error: %s", err)
+		return nil, err
+	}
+
+	if len(request.Message) != 0 {
+		post.Message = request.Message
+	}
+
+	post.Images = request.Images
+	post.Attachments = request.Attachments
+
+	_, err = svc.db.PostRepo.EditPost(ctx, post)
+	if err != nil {
 		return nil, err
 	}
 
