@@ -56,9 +56,26 @@ jobs:
       - name: Build
         run: make build
 
-#  deploy:
-#    needs: [ build ]
-#    name: Backend deploy
-#    runs-on: ubuntu-latest
-#    steps:
-
+  deploy:
+    needs: [ build ]
+    name: Backend deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: git pull
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd backend/
+            git pull
+      - name: run project
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd backend/
+            sudo make 
