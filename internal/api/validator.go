@@ -31,9 +31,14 @@ func (b *binderImpl) Bind(i interface{}, ctx echo.Context) error {
 	db := new(echo.DefaultBinder)
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(ctx.Request().Body)
-	sonic.Unmarshal(buf.Bytes(), i)
-
+	_, err := buf.ReadFrom(ctx.Request().Body)
+	if err != nil {
+		return err
+	}
+	err = sonic.Unmarshal(buf.Bytes(), i)
+	if err != nil {
+		return err
+	}
 	if err := db.BindQueryParams(ctx, i); err != nil {
 		return fmt.Errorf("%w: %v", constants.ErrBindRequest, err)
 	}

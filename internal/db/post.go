@@ -101,7 +101,7 @@ func (repo *postRepositoryImpl) GetPostsByUserID(ctx context.Context, userID str
 
 	findOptions := options.Find()
 
-	findOptions.SetSort(bson.D{{"created_at", -1}})
+	findOptions.SetSort(bson.D{{Key: "created_at", Value: -1}})
 
 	if limit != -1 {
 		findOptions.SetSkip((pageNumber - 1) * limit)
@@ -129,7 +129,7 @@ func (repo *postRepositoryImpl) GetPostsByUserID(ctx context.Context, userID str
 
 	// Sanitize
 	p := bluemonday.UGCPolicy()
-	for i, _ := range posts {
+	for i := range posts {
 		posts[i].Message = p.Sanitize(posts[i].Message)
 	}
 
@@ -181,7 +181,7 @@ func (repo *postRepositoryImpl) GetFeed(ctx context.Context, userID string, page
 
 	// Sanitize
 	p := bluemonday.UGCPolicy()
-	for i, _ := range posts {
+	for i := range posts {
 		posts[i].Message = p.Sanitize(posts[i].Message)
 	}
 

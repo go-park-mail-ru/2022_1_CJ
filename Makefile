@@ -50,3 +50,7 @@ mock:
 	&& mockgen -source=internal/db/community.go -destination=mocks/community_db_mock.go \
 	&& mockgen -source=internal/db/comment.go -destination=mocks/comment_db_mock.go \
 	&& mockgen -source=internal/mircoservices/auth-microservice/db/auth.go -destination=internal/mircoservices/auth-microservice/mocks/auth_db_mock.go
+
+lint:
+	go get github.com/golangci/golangci-lint/cmd/golangci-lint
+	golangci-lint run

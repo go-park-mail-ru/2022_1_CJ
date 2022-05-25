@@ -52,11 +52,11 @@ func TestGetCommentByID(t *testing.T) {
 
 		expectedComment := TestComment(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedComment.ID},
-			{"author_id", expectedComment.AuthorID},
-			{"message", expectedComment.Message},
-			{"images", expectedComment.Images},
-			{"created_at", expectedComment.CreatedAt},
+			{Key: "_id", Value: expectedComment.ID},
+			{Key: "author_id", Value: expectedComment.AuthorID},
+			{Key: "message", Value: expectedComment.Message},
+			{Key: "images", Value: expectedComment.Images},
+			{Key: "created_at", Value: expectedComment.CreatedAt},
 		}))
 		ctx := context.Background()
 		comment, err := commentCollection.GetCommentByID(ctx, TestPost(t).ID)
@@ -82,7 +82,7 @@ func TestDeleteComment(t *testing.T) {
 
 	mt.Run("success", func(mt *mtest.T) {
 		commentCollection, _ := NewCommentRepositoryTest(mt.Coll)
-		mt.AddMockResponses(bson.D{{"ok", 1}, {"acknowledged", true}, {"n", 1}})
+		mt.AddMockResponses(bson.D{{Key: "ok", Value: 1}, {Key: "acknowledged", Value: true}, {Key: "n", Value: 1}})
 
 		ctx := context.Background()
 		err := commentCollection.DeleteComment(ctx, TestPost(t).ID)

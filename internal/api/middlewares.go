@@ -36,7 +36,7 @@ func (svc *APIService) AuthMiddlewareMicro(rep cl.AuthRepository) echo.Middlewar
 				ctx.Request().Header.Set(constants.HeaderKeyUserID, UserID)
 			}
 
-			if code == true {
+			if code {
 				ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, newToken, viper.GetInt64(constants.ViperJWTTTLKey)))
 			}
 

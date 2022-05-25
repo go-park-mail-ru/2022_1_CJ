@@ -146,8 +146,6 @@ func (repo *chatRepositoryImpl) InitDialog(dialog *core.Dialog, userID string, a
 	dialog.ID = id
 	dialog.Name = name
 	dialog.Participants = append(dialog.Participants, userID)
-	for _, authorID := range authorIDs {
-		dialog.Participants = append(dialog.Participants, authorID)
-	}
+	dialog.Participants = append(dialog.Participants, authorIDs...)
 	return nil
 }

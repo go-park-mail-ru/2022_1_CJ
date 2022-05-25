@@ -53,14 +53,14 @@ func TestGetCommunityByID(t *testing.T) {
 
 		expectedCommunity := TestCommunity(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedCommunity.ID},
-			{"name", expectedCommunity.Name},
-			{"image", expectedCommunity.Image},
-			{"info", expectedCommunity.Info},
-			{"followers", expectedCommunity.FollowerIDs},
-			{"admins", expectedCommunity.AdminIDs},
-			{"posts", expectedCommunity.PostIDs},
-			{"created_at", expectedCommunity.CreatedAt},
+			{Key: "_id", Value: expectedCommunity.ID},
+			{Key: "name", Value: expectedCommunity.Name},
+			{Key: "image", Value: expectedCommunity.Image},
+			{Key: "info", Value: expectedCommunity.Info},
+			{Key: "followers", Value: expectedCommunity.FollowerIDs},
+			{Key: "admins", Value: expectedCommunity.AdminIDs},
+			{Key: "posts", Value: expectedCommunity.PostIDs},
+			{Key: "created_at", Value: expectedCommunity.CreatedAt},
 		}))
 		ctx := context.Background()
 		community, err := communityCollection.GetCommunityByID(ctx, TestPost(t).ID)
@@ -198,25 +198,25 @@ func TestGetAllCommunities(t *testing.T) {
 		expectedCommunity2.ID = "1"
 
 		first := mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedCommunity1.ID},
-			{"name", expectedCommunity1.Name},
-			{"image", expectedCommunity1.Image},
-			{"info", expectedCommunity1.Info},
-			{"followers", expectedCommunity1.FollowerIDs},
-			{"admins", expectedCommunity1.AdminIDs},
-			{"posts", expectedCommunity1.PostIDs},
-			{"created_at", expectedCommunity1.CreatedAt},
+			{Key: "_id", Value: expectedCommunity1.ID},
+			{Key: "name", Value: expectedCommunity1.Name},
+			{Key: "image", Value: expectedCommunity1.Image},
+			{Key: "info", Value: expectedCommunity1.Info},
+			{Key: "followers", Value: expectedCommunity1.FollowerIDs},
+			{Key: "admins", Value: expectedCommunity1.AdminIDs},
+			{Key: "posts", Value: expectedCommunity1.PostIDs},
+			{Key: "created_at", Value: expectedCommunity1.CreatedAt},
 		})
 
 		second := mtest.CreateCursorResponse(1, "foo.bar", mtest.NextBatch, bson.D{
-			{"_id", expectedCommunity2.ID},
-			{"name", expectedCommunity2.Name},
-			{"image", expectedCommunity2.Image},
-			{"info", expectedCommunity2.Info},
-			{"followers", expectedCommunity2.FollowerIDs},
-			{"admins", expectedCommunity2.AdminIDs},
-			{"posts", expectedCommunity2.PostIDs},
-			{"created_at", expectedCommunity2.CreatedAt},
+			{Key: "_id", Value: expectedCommunity2.ID},
+			{Key: "name", Value: expectedCommunity2.Name},
+			{Key: "image", Value: expectedCommunity2.Image},
+			{Key: "info", Value: expectedCommunity2.Info},
+			{Key: "followers", Value: expectedCommunity2.FollowerIDs},
+			{Key: "admins", Value: expectedCommunity2.AdminIDs},
+			{Key: "posts", Value: expectedCommunity2.PostIDs},
+			{Key: "created_at", Value: expectedCommunity2.CreatedAt},
 		})
 		killCursors := mtest.CreateCursorResponse(0, "foo.bar", mtest.NextBatch)
 		mt.AddMockResponses(first, second, killCursors, mtest.CreateSuccessResponse())
@@ -259,25 +259,25 @@ func TestSearchCommunities(t *testing.T) {
 		expectedCommunity2.ID = "1"
 
 		first := mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedCommunity1.ID},
-			{"name", expectedCommunity1.Name},
-			{"image", expectedCommunity1.Image},
-			{"info", expectedCommunity1.Info},
-			{"followers", expectedCommunity1.FollowerIDs},
-			{"admins", expectedCommunity1.AdminIDs},
-			{"posts", expectedCommunity1.PostIDs},
-			{"created_at", expectedCommunity1.CreatedAt},
+			{Key: "_id", Value: expectedCommunity1.ID},
+			{Key: "name", Value: expectedCommunity1.Name},
+			{Key: "image", Value: expectedCommunity1.Image},
+			{Key: "info", Value: expectedCommunity1.Info},
+			{Key: "followers", Value: expectedCommunity1.FollowerIDs},
+			{Key: "admins", Value: expectedCommunity1.AdminIDs},
+			{Key: "posts", Value: expectedCommunity1.PostIDs},
+			{Key: "created_at", Value: expectedCommunity1.CreatedAt},
 		})
 
 		second := mtest.CreateCursorResponse(1, "foo.bar", mtest.NextBatch, bson.D{
-			{"_id", expectedCommunity2.ID},
-			{"name", expectedCommunity2.Name},
-			{"image", expectedCommunity2.Image},
-			{"info", expectedCommunity2.Info},
-			{"followers", expectedCommunity2.FollowerIDs},
-			{"admins", expectedCommunity2.AdminIDs},
-			{"posts", expectedCommunity2.PostIDs},
-			{"created_at", expectedCommunity2.CreatedAt},
+			{Key: "_id", Value: expectedCommunity2.ID},
+			{Key: "name", Value: expectedCommunity2.Name},
+			{Key: "image", Value: expectedCommunity2.Image},
+			{Key: "info", Value: expectedCommunity2.Info},
+			{Key: "followers", Value: expectedCommunity2.FollowerIDs},
+			{Key: "admins", Value: expectedCommunity2.AdminIDs},
+			{Key: "posts", Value: expectedCommunity2.PostIDs},
+			{Key: "created_at", Value: expectedCommunity2.CreatedAt},
 		})
 		killCursors := mtest.CreateCursorResponse(0, "foo.bar", mtest.NextBatch)
 		mt.AddMockResponses(first, second, killCursors, mtest.CreateSuccessResponse())

@@ -5,14 +5,13 @@ import (
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func paginationOpts(limit, page int64) *options.FindOptions {
-	skip := page*limit - limit
-	opts := options.FindOptions{Limit: &limit, Skip: &skip}
-	return &opts
-}
+//func paginationOpts(limit, page int64) *options.FindOptions {
+//	skip := page*limit - limit
+//	opts := options.FindOptions{Limit: &limit, Skip: &skip}
+//	return &opts
+//}
 
 // wrapError translates mongo's ErrNoDocuments to custom error.
 func wrapError(err error) error {

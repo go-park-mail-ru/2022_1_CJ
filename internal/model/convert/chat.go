@@ -11,7 +11,7 @@ func Dialog2DTO(dialog *core.Dialog, userID string) dto.Dialog {
 		if message.AuthorID != userID {
 			for _, id := range message.IsRead {
 				if id.Participant == userID {
-					if id.IsRead == false {
+					if !id.IsRead {
 						nonRead += 1
 					} else {
 						break

@@ -134,7 +134,7 @@ func TestMessage(t *testing.T) *core.Message {
 		ID:        "12345678",
 		Body:      "hi message",
 		AuthorID:  "12345671",
-		IsRead:    []core.IsRead{{"12345672", false}},
+		IsRead:    []core.IsRead{{Participant: "12345672", IsRead: false}},
 		CreatedAt: 124565,
 	}
 }

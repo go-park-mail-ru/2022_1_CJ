@@ -53,11 +53,11 @@ func TestIsChatExist(t *testing.T) {
 
 		expectedDialog := TestDialog(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedDialog.ID},
-			{"name", expectedDialog.Name},
-			{"participants", expectedDialog.Participants},
-			{"messages", expectedDialog.Messages},
-			{"created_at", expectedDialog.CreatedAt},
+			{Key: "_id", Value: expectedDialog.ID},
+			{Key: "name", Value: expectedDialog.Name},
+			{Key: "participants", Value: expectedDialog.Participants},
+			{Key: "messages", Value: expectedDialog.Messages},
+			{Key: "created_at", Value: expectedDialog.CreatedAt},
 		}))
 		ctx := context.Background()
 		err := chatCollection.IsChatExist(ctx, TestDialog(t).ID)
@@ -83,11 +83,11 @@ func TestIsUniqDialog(t *testing.T) {
 
 		expectedDialog := TestDialog(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedDialog.ID},
-			{"name", expectedDialog.Name},
-			{"participants", expectedDialog.Participants},
-			{"messages", expectedDialog.Messages},
-			{"created_at", expectedDialog.CreatedAt},
+			{Key: "_id", Value: expectedDialog.ID},
+			{Key: "name", Value: expectedDialog.Name},
+			{Key: "participants", Value: expectedDialog.Participants},
+			{Key: "messages", Value: expectedDialog.Messages},
+			{Key: "created_at", Value: expectedDialog.CreatedAt},
 		}))
 		ctx := context.Background()
 		err := chatCollection.IsUniqDialog(ctx, TestDialog(t).Participants[0], TestDialog(t).Participants[1])
@@ -149,11 +149,11 @@ func TestGetDialogByID(t *testing.T) {
 
 		expectedDialog := TestDialog(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedDialog.ID},
-			{"name", expectedDialog.Name},
-			{"participants", expectedDialog.Participants},
-			{"messages", expectedDialog.Messages},
-			{"created_at", expectedDialog.CreatedAt},
+			{Key: "_id", Value: expectedDialog.ID},
+			{Key: "name", Value: expectedDialog.Name},
+			{Key: "participants", Value: expectedDialog.Participants},
+			{Key: "messages", Value: expectedDialog.Messages},
+			{Key: "created_at", Value: expectedDialog.CreatedAt},
 		}))
 		ctx := context.Background()
 		dialog, err := chatCollection.GetDialogByID(ctx, expectedDialog.ID)

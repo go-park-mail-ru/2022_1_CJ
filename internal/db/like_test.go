@@ -52,11 +52,11 @@ func TestGetLikeBySubjectID(t *testing.T) {
 
 		expectedLike := TestLike(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedLike.ID},
-			{"subject_id", expectedLike.Subject},
-			{"amount", expectedLike.Amount},
-			{"user_ids", expectedLike.UserIDs},
-			{"created_at", expectedLike.CreatedAt},
+			{Key: "_id", Value: expectedLike.ID},
+			{Key: "subject_id", Value: expectedLike.Subject},
+			{Key: "amount", Value: expectedLike.Amount},
+			{Key: "user_ids", Value: expectedLike.UserIDs},
+			{Key: "created_at", Value: expectedLike.CreatedAt},
 		}))
 		ctx := context.Background()
 		like, err := likeCollection.GetLikeBySubjectID(ctx, TestPost(t).ID)

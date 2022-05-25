@@ -63,10 +63,10 @@ func TestGetUserByID(t *testing.T) {
 		authCollection, _ := NewAuthRepositoryTest(mt.Coll)
 		expectedlyUser := AuthUser(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedlyUser.ID},
-			{"email", expectedlyUser.Email},
-			{"password", expectedlyUser.Password},
-			{"created_at", expectedlyUser.CreatedAt},
+			{Key: "_id", Value: expectedlyUser.ID},
+			{Key: "email", Value: expectedlyUser.Email},
+			{Key: "password", Value: expectedlyUser.Password},
+			{Key: "created_at", Value: expectedlyUser.CreatedAt},
 		}))
 		ctx := context.Background()
 		authUser, err := authCollection.GetUserByID(ctx, AuthUser(t).ID)
@@ -94,10 +94,10 @@ func TestGetUserByEmail(t *testing.T) {
 		authCollection, _ := NewAuthRepositoryTest(mt.Coll)
 		expectedlyUser := AuthUser(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedlyUser.ID},
-			{"email", expectedlyUser.Email},
-			{"password", expectedlyUser.Password},
-			{"created_at", expectedlyUser.CreatedAt},
+			{Key: "_id", Value: expectedlyUser.ID},
+			{Key: "email", Value: expectedlyUser.Email},
+			{Key: "password", Value: expectedlyUser.Password},
+			{Key: "created_at", Value: expectedlyUser.CreatedAt},
 		}))
 		ctx := context.Background()
 		authUser, err := authCollection.GetUserByEmail(ctx, AuthUser(t).Email)

@@ -69,13 +69,13 @@ func TestCreatePost(t *testing.T) {
 			name: "Can't insert in postRepo",
 			input: Input{info: &dto.CreatePostRequest{
 				Message: "It's my first post!",
-				Images:  []string{"src/img.jpg"}},
+				Files:   []string{"src/img.jpg"}},
 				userID: "0"},
 			inputCreatePost: InputCreatePost{post: &core.Post{
 				AuthorID: "0",
 				Message:  "It's my first post!",
 				Type:     constants.UserPost,
-				Images:   []string{"src/img.jpg"}}},
+				Files:    []string{"src/img.jpg"}}},
 			outputCreatePost: OutputCreatePost{post: nil,
 				err: err},
 			output: Output{nil, err},
@@ -84,18 +84,18 @@ func TestCreatePost(t *testing.T) {
 			name: "Can't insert in userRepo",
 			input: Input{info: &dto.CreatePostRequest{
 				Message: "It's my second post!",
-				Images:  []string{"src/img.jpg"}},
+				Files:   []string{"src/img.jpg"}},
 				userID: "1"},
 			inputCreatePost: InputCreatePost{post: &core.Post{
 				AuthorID: "1",
 				Message:  "It's my second post!",
 				Type:     constants.UserPost,
-				Images:   []string{"src/img.jpg"}}},
+				Files:    []string{"src/img.jpg"}}},
 			outputCreatePost: OutputCreatePost{post: &core.Post{
 				ID:       "1",
 				AuthorID: "1",
 				Message:  "It's my second post!",
-				Images:   []string{"src/img.jpg"}},
+				Files:    []string{"src/img.jpg"}},
 				err: nil},
 			inputUserAddPost:  InputUserAddPost{userID: "1", postID: "1"},
 			outputUserAddPost: OutputUserAddPost{err: err},
@@ -105,18 +105,18 @@ func TestCreatePost(t *testing.T) {
 			name: "Success",
 			input: Input{info: &dto.CreatePostRequest{
 				Message: "It's my second post!",
-				Images:  []string{"src/img.jpg"}},
+				Files:   []string{"src/img.jpg"}},
 				userID: "1"},
 			inputCreatePost: InputCreatePost{post: &core.Post{
 				AuthorID: "1",
 				Message:  "It's my second post!",
 				Type:     constants.UserPost,
-				Images:   []string{"src/img.jpg"}}},
+				Files:    []string{"src/img.jpg"}}},
 			outputCreatePost: OutputCreatePost{post: &core.Post{
 				ID:       "1",
 				AuthorID: "1",
 				Message:  "It's my second post!",
-				Images:   []string{"src/img.jpg"}},
+				Files:    []string{"src/img.jpg"}},
 				err: nil},
 			inputUserAddPost:  InputUserAddPost{userID: "1", postID: "1"},
 			outputUserAddPost: OutputUserAddPost{err: nil},
@@ -204,7 +204,7 @@ func TestGetPost(t *testing.T) {
 			outputGetPost: OutputGetPost{post: &core.Post{
 				AuthorID: "1",
 				Message:  "It's my second post!",
-				Images:   []string{"src/img.jpg"}}, err: nil},
+				Files:    []string{"src/img.jpg"}}, err: nil},
 			inputCreateLike: InputCreateLike{like: &core.Like{Subject: "677be1d2-9b64-48e9-9341-5ba0c2f57686"}},
 			outputCreateLike: OutputCreateLike{
 				like: &core.Like{
@@ -219,7 +219,7 @@ func TestGetPost(t *testing.T) {
 			output: Output{&dto.GetPostResponse{Post: convert.Post2DTOByUser(&core.Post{
 				AuthorID: "1",
 				Message:  "It's my second post!",
-				Images:   []string{"src/img.jpg"}}, &core.User{ID: "1"}), Likes: convert.Like2DTO(&core.Like{
+				Files:    []string{"src/img.jpg"}}, &core.User{ID: "1"}), Likes: convert.Like2DTO(&core.Like{
 				ID:        "1",
 				Subject:   "677be1d2-9b64-48e9-9341-5ba0c2f57686",
 				Amount:    0,
@@ -320,7 +320,7 @@ func TestEditPost(t *testing.T) {
 			input: Input{info: &dto.EditPostRequest{
 				PostID:  "1",
 				Message: "It's my first post!",
-				Images:  []string{"src/img.jpg"}},
+				Files:   []string{"src/img.jpg"}},
 				userID: "0"},
 			inputGetUserByID:  InputGetUserByID{userID: "0"},
 			outputGetUserByID: OutputGetUserByID{user: nil, err: constants.ErrDBNotFound},
@@ -331,7 +331,7 @@ func TestEditPost(t *testing.T) {
 			input: Input{info: &dto.EditPostRequest{
 				PostID:  "1",
 				Message: "It's my first post!",
-				Images:  []string{"src/img.jpg"}},
+				Files:   []string{"src/img.jpg"}},
 				userID: "1"},
 			inputGetUserByID:    InputGetUserByID{userID: "1"},
 			outputGetUserByID:   OutputGetUserByID{user: &core.User{ID: "1"}, err: nil},
@@ -344,7 +344,7 @@ func TestEditPost(t *testing.T) {
 			input: Input{info: &dto.EditPostRequest{
 				PostID:  "1",
 				Message: "It's my first post!",
-				Images:  []string{"src/img.jpg"}},
+				Files:   []string{"src/img.jpg"}},
 				userID: "2"},
 			inputGetUserByID:    InputGetUserByID{userID: "2"},
 			outputGetUserByID:   OutputGetUserByID{user: &core.User{ID: "2"}, err: nil},
@@ -359,7 +359,7 @@ func TestEditPost(t *testing.T) {
 			input: Input{info: &dto.EditPostRequest{
 				PostID:  "1",
 				Message: "It's my first post!",
-				Images:  []string{"src/img.jpg"}},
+				Files:   []string{"src/img.jpg"}},
 				userID: "3"},
 			inputGetUserByID:    InputGetUserByID{userID: "3"},
 			outputGetUserByID:   OutputGetUserByID{user: &core.User{ID: "3"}, err: nil},
@@ -370,12 +370,12 @@ func TestEditPost(t *testing.T) {
 			inputEditPost: InputEditPost{&core.Post{
 				ID:       "1",
 				Message:  "It's my first post!",
-				Images:   []string{"src/img.jpg"},
+				Files:    []string{"src/img.jpg"},
 				AuthorID: "3"}},
 			outputEditPost: OutputEditPost{post: &core.Post{
 				ID:       "1",
 				Message:  "It's my first post!",
-				Images:   []string{"src/img.jpg"},
+				Files:    []string{"src/img.jpg"},
 				AuthorID: "3"},
 				err: nil},
 			output: Output{&dto.EditPostResponse{}, nil},

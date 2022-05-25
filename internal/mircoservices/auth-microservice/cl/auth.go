@@ -26,7 +26,7 @@ func NewAuthRepository(log *logrus.Entry, cl handler.UserAuthClient) AuthReposit
 
 func (redisConnect *AuthRepositoryImpl) ParseError(err error) error {
 	getErr, ok := status.FromError(err)
-	if ok == true {
+	if ok {
 		if val, ok := constants.ParseError[getErr.Message()]; ok {
 			return val
 		}

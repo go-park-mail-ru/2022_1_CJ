@@ -70,7 +70,7 @@ func (c *Conn) readPump() {
 			DialogManager.Lock()
 			room, ok := DialogManager.Rooms[name]
 			DialogManager.Unlock()
-			if ok == true {
+			if ok {
 				room.Leave(c)
 			}
 			c.Lock()
@@ -90,7 +90,7 @@ func (c *Conn) readPump() {
 		data.AuthorID = c.ID
 
 		if err != nil {
-			if _, wok := err.(*websocket.CloseError); wok == false {
+			if _, wok := err.(*websocket.CloseError); !wok {
 				break
 			}
 			c.Lock()
@@ -99,7 +99,7 @@ func (c *Conn) readPump() {
 				DialogManager.Lock()
 				room, rok := DialogManager.Rooms[name]
 				DialogManager.Unlock()
-				if rok == false {
+				if !rok {
 					c.Lock()
 					continue
 				}
@@ -154,7 +154,7 @@ func (c *Conn) Join(name string) {
 	DialogManager.Lock()
 	room, ok := DialogManager.Rooms[name]
 	DialogManager.Unlock()
-	if ok == false {
+	if !ok {
 		room = NewRoom(name)
 	}
 	c.Lock()
@@ -234,7 +234,7 @@ func (c *Conn) LeftChat(msg *dto.Message) {
 	DialogManager.Lock()
 	room, ok := DialogManager.Rooms[msg.DialogID]
 	DialogManager.Unlock()
-	if ok == false {
+	if !ok {
 		return
 	}
 	room.Lock()
@@ -252,19 +252,19 @@ func (c *Conn) ReadMessage(msg *dto.Message) {
 		DialogManager.Lock()
 		room, rok := DialogManager.Rooms[msg.DialogID]
 		DialogManager.Unlock()
-		if rok == false {
+		if !rok {
 			return
 		}
 		room.Lock()
 		id, mok := room.Members[msg.DestinID]
 		room.Unlock()
-		if mok == false {
+		if !mok {
 			return
 		}
 		ConnManager.Lock()
 		dst, cok := ConnManager.Conns[id]
 		ConnManager.Unlock()
-		if cok == false {
+		if !cok {
 			return
 		}
 		if msg.Body != constants.Empty {
@@ -285,13 +285,13 @@ func (c *Conn) Leave(name string) {
 	DialogManager.Lock()
 	room, rok := DialogManager.Rooms[name]
 	DialogManager.Unlock()
-	if rok == false {
+	if !rok {
 		return
 	}
 	c.Lock()
 	_, cok := c.Dialogs[name]
 	c.Unlock()
-	if cok == false {
+	if !cok {
 		return
 	}
 	c.Lock()
@@ -317,7 +317,7 @@ func (c *Conn) Emit(msg *dto.Message) {
 	DialogManager.Lock()
 	room, ok := DialogManager.Rooms[msg.DialogID]
 	DialogManager.Unlock()
-	if ok == true {
+	if ok {
 		room.Emit(c, msg)
 	}
 }

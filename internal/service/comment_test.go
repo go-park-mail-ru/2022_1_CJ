@@ -242,48 +242,48 @@ func TestDeleteComment(t *testing.T) {
 		err  error
 	}
 
-	type InputGetCommentByID struct {
-		commentID string
-	}
-	type OutputGetCommentByID struct {
-		comment *core.Comment
-		err     error
-	}
-
-	type InputGetPostByID struct {
-		postID string
-	}
-
-	type OutputGetPostByID struct {
-		post *core.Post
-		err  error
-	}
-
-	type InputPostCheckComment struct {
-		post      *core.Post
-		commentID string
-	}
-
-	type OutputPostCheckComment struct {
-		err error
-	}
-
-	type InputDeleteComment struct {
-		commentID string
-	}
-
-	type OutputDeleteComment struct {
-		err error
-	}
-
-	type InputPostDeleteComment struct {
-		postID    string
-		commentID string
-	}
-
-	type OutputPostDeleteComment struct {
-		err error
-	}
+	//type InputGetCommentByID struct {
+	//	commentID string
+	//}
+	//type OutputGetCommentByID struct {
+	//	comment *core.Comment
+	//	err     error
+	//}
+	//
+	//type InputGetPostByID struct {
+	//	postID string
+	//}
+	//
+	//type OutputGetPostByID struct {
+	//	post *core.Post
+	//	err  error
+	//}
+	//
+	//type InputPostCheckComment struct {
+	//	post      *core.Post
+	//	commentID string
+	//}
+	//
+	//type OutputPostCheckComment struct {
+	//	err error
+	//}
+	//
+	//type InputDeleteComment struct {
+	//	commentID string
+	//}
+	//
+	//type OutputDeleteComment struct {
+	//	err error
+	//}
+	//
+	//type InputPostDeleteComment struct {
+	//	postID    string
+	//	commentID string
+	//}
+	//
+	//type OutputPostDeleteComment struct {
+	//	err error
+	//}
 
 	type Output struct {
 		res *dto.DeleteCommentResponse
@@ -291,21 +291,21 @@ func TestDeleteComment(t *testing.T) {
 	}
 
 	tests := []struct {
-		name                    string
-		input                   Input
-		inputGetUserByID        InputGetUserByID
-		outputGetUserByID       OutputGetUserByID
-		inputUserCheckPost      InputGetCommentByID
-		outputUserCheckPost     OutputGetCommentByID
-		inputGetPostByID        InputGetPostByID
-		outputGetPostByID       OutputGetPostByID
-		onputPostCheckComment   InputPostCheckComment
-		outputPostCheckComment  OutputPostCheckComment
-		inputDeleteComment      InputDeleteComment
-		outputDeleteComment     OutputDeleteComment
-		inputPostDeleteComment  InputPostDeleteComment
-		outputPostDeleteComment OutputPostDeleteComment
-		output                  Output
+		name              string
+		input             Input
+		inputGetUserByID  InputGetUserByID
+		outputGetUserByID OutputGetUserByID
+		//inputUserCheckPost      InputGetCommentByID
+		//outputUserCheckPost     OutputGetCommentByID
+		//inputGetPostByID        InputGetPostByID
+		//outputGetPostByID       OutputGetPostByID
+		//onputPostCheckComment   InputPostCheckComment
+		//outputPostCheckComment  OutputPostCheckComment
+		//inputDeleteComment      InputDeleteComment
+		//outputDeleteComment     OutputDeleteComment
+		//inputPostDeleteComment  InputPostDeleteComment
+		//outputPostDeleteComment OutputPostDeleteComment
+		output Output
 	}{
 		{
 			name: "Can't find User in db",
@@ -357,41 +357,41 @@ func TestEditComment(t *testing.T) {
 		user *core.User
 		err  error
 	}
-
-	type InputGetCommentByID struct {
-		commentID string
-	}
-	type OutputGetCommentByID struct {
-		comment *core.Comment
-		err     error
-	}
-
-	type InputGetPostByID struct {
-		postID string
-	}
-
-	type OutputGetPostByID struct {
-		post *core.Post
-		err  error
-	}
-
-	type InputPostCheckComment struct {
-		post      *core.Post
-		commentID string
-	}
-
-	type OutputPostCheckComment struct {
-		err error
-	}
-
-	type InputEditComment struct {
-		comment *core.Comment
-	}
-
-	type OutputEditComment struct {
-		comment *core.Comment
-		err     error
-	}
+	//
+	//type InputGetCommentByID struct {
+	//	commentID string
+	//}
+	//type OutputGetCommentByID struct {
+	//	comment *core.Comment
+	//	err     error
+	//}
+	//
+	//type InputGetPostByID struct {
+	//	postID string
+	//}
+	//
+	//type OutputGetPostByID struct {
+	//	post *core.Post
+	//	err  error
+	//}
+	//
+	//type InputPostCheckComment struct {
+	//	post      *core.Post
+	//	commentID string
+	//}
+	//
+	//type OutputPostCheckComment struct {
+	//	err error
+	//}
+	//
+	//type InputEditComment struct {
+	//	comment *core.Comment
+	//}
+	//
+	//type OutputEditComment struct {
+	//	comment *core.Comment
+	//	err     error
+	//}
 
 	type Output struct {
 		res *dto.EditCommentResponse
@@ -399,19 +399,19 @@ func TestEditComment(t *testing.T) {
 	}
 
 	tests := []struct {
-		name                   string
-		input                  Input
-		inputGetUserByID       InputGetUserByID
-		outputGetUserByID      OutputGetUserByID
-		inputUserCheckPost     InputGetCommentByID
-		outputUserCheckPost    OutputGetCommentByID
-		inputGetPostByID       InputGetPostByID
-		outputGetPostByID      OutputGetPostByID
-		onputPostCheckComment  InputPostCheckComment
-		outputPostCheckComment OutputPostCheckComment
-		inputEditPost          InputEditComment
-		outputEditPost         OutputEditComment
-		output                 Output
+		name              string
+		input             Input
+		inputGetUserByID  InputGetUserByID
+		outputGetUserByID OutputGetUserByID
+		//inputUserCheckPost     InputGetCommentByID
+		//outputUserCheckPost    OutputGetCommentByID
+		//inputGetPostByID       InputGetPostByID
+		//outputGetPostByID      OutputGetPostByID
+		//onputPostCheckComment  InputPostCheckComment
+		//outputPostCheckComment OutputPostCheckComment
+		//inputEditPost          InputEditComment
+		//outputEditPost         OutputEditComment
+		output Output
 	}{
 		{
 			name: "Can't find User in db",
