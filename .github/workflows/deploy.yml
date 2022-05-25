@@ -27,12 +27,14 @@ jobs:
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.46.2
           $(go env GOPATH)/bin/golangci-lint run
 
-  deploy:
+  build:
     needs: [ linter ]
-    name: Run Docker
-    runs-on: self-hosted
+    name: Run Build
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Run Docker
-        run: make
+      - name: Shutdown process
+        run: make down
+      - name: Build
+        run: make build
