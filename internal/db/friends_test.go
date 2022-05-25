@@ -1,91 +1,90 @@
 package db
 
-//import (
-//	"context"
-//	"github.com/stretchr/testify/assert"
-//	"go.mongodb.org/mongo-driver/bson"
-//	"go.mongodb.org/mongo-driver/mongo"
-//	"go.mongodb.org/mongo-driver/mongo/integration/mtest"
-//	"testing"
-//)
-//
-//func TestCreateFriends(t *testing.T) {
-//	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-//	defer mt.Close()
-//
-//	mt.Run("success", func(mt *mtest.T) {
-//		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
-//
-//		mt.AddMockResponses(mtest.CreateSuccessResponse())
-//		friends := TestFriends(t)
-//		ctx := context.Background()
-//		err := friendsCollection.CreateFriends(ctx, friends.ID)
-//		assert.Nil(t, err)
-//	})
-//
-//	mt.Run("custom error duplicate in insert", func(mt *mtest.T) {
-//		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
-//
-//		mt.AddMockResponses(mtest.CreateWriteErrorsResponse(mtest.WriteError{
-//			Index:   1,
-//			Code:    11000,
-//			Message: "duplicate key error",
-//		}))
-//		friends := TestFriends(t)
-//		ctx := context.Background()
-//		err := friendsCollection.CreateFriends(ctx, friends.ID)
-//		assert.NotNil(t, err)
-//		rte := mongo.IsDuplicateKeyError(err)
-//		assert.True(t, rte)
-//	})
-//}
-//
-//func TestIsUniqRequest(t *testing.T) {
-//	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-//	defer mt.Close()
-//
-//	mt.Run("already friends", func(mt *mtest.T) {
-//		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
-//
-//		mt.AddMockResponses(mtest.CreateSuccessResponse())
-//		ctx := context.Background()
-//		err := friendsCollection.IsUniqRequest(ctx, "123", "234")
-//		assert.NotNil(t, err)
-//	})
-//
-//	mt.Run("uniq request", func(mt *mtest.T) {
-//		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
-//
-//		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
-//		ctx := context.Background()
-//		err := friendsCollection.IsUniqRequest(ctx, "123", "234")
-//		assert.Nil(t, err)
-//	})
-//}
-//
-//func TestIsNotFriend(t *testing.T) {
-//	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-//	defer mt.Close()
-//
-//	mt.Run("already friends", func(mt *mtest.T) {
-//		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
-//
-//		mt.AddMockResponses(mtest.CreateSuccessResponse())
-//		ctx := context.Background()
-//		err := friendsCollection.IsNotFriend(ctx, "123", "234")
-//		assert.NotNil(t, err)
-//	})
-//
-//	mt.Run("not friends", func(mt *mtest.T) {
-//		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
-//
-//		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
-//		ctx := context.Background()
-//		err := friendsCollection.IsNotFriend(ctx, "123", "234")
-//		assert.Nil(t, err)
-//	})
-//}
-//
+import (
+	"context"
+	"github.com/stretchr/testify/assert"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/integration/mtest"
+	"testing"
+)
+
+func TestCreateFriends(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+	defer mt.Close()
+
+	mt.Run("success", func(mt *mtest.T) {
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
+
+		mt.AddMockResponses(mtest.CreateSuccessResponse())
+		friends := TestFriends(t)
+		ctx := context.Background()
+		err := friendsCollection.CreateFriends(ctx, friends.ID)
+		assert.Nil(t, err)
+	})
+
+	mt.Run("custom error duplicate in insert", func(mt *mtest.T) {
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
+
+		mt.AddMockResponses(mtest.CreateWriteErrorsResponse(mtest.WriteError{
+			Index:   1,
+			Code:    11000,
+			Message: "duplicate key error",
+		}))
+		friends := TestFriends(t)
+		ctx := context.Background()
+		err := friendsCollection.CreateFriends(ctx, friends.ID)
+		assert.NotNil(t, err)
+		rte := mongo.IsDuplicateKeyError(err)
+		assert.True(t, rte)
+	})
+}
+
+func TestIsUniqRequest(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+	defer mt.Close()
+
+	mt.Run("already friends", func(mt *mtest.T) {
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
+
+		mt.AddMockResponses(mtest.CreateSuccessResponse())
+		ctx := context.Background()
+		err := friendsCollection.IsUniqRequest(ctx, "123", "234")
+		assert.NotNil(t, err)
+	})
+
+	mt.Run("uniq request", func(mt *mtest.T) {
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
+
+		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
+		ctx := context.Background()
+		err := friendsCollection.IsUniqRequest(ctx, "123", "234")
+		assert.Nil(t, err)
+	})
+}
+
+func TestIsNotFriend(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+	defer mt.Close()
+
+	mt.Run("already friends", func(mt *mtest.T) {
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
+
+		mt.AddMockResponses(mtest.CreateSuccessResponse())
+		ctx := context.Background()
+		err := friendsCollection.IsNotFriend(ctx, "123", "234")
+		assert.NotNil(t, err)
+	})
+
+	mt.Run("not friends", func(mt *mtest.T) {
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
+
+		mt.AddMockResponses(mtest.CreateCursorResponse(0, "foo.bar", mtest.FirstBatch))
+		ctx := context.Background()
+		err := friendsCollection.IsNotFriend(ctx, "123", "234")
+		assert.Nil(t, err)
+	})
+}
+
 //func TestMakeOutcomingRequest(t *testing.T) {
 //	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 //	defer mt.Close()
@@ -95,11 +94,11 @@ package db
 //
 //		mt.AddMockResponses(mtest.CreateSuccessResponse())
 //		ctx := context.Background()
-//		err := friendsCollection.MakeOutcomingRequest(ctx, "123", "234")
+//		err := friendsCollection.CreateRequest(ctx, "123", "234")
 //		assert.Nil(t, err)
 //	})
 //}
-//
+
 //func TestMakeIncomingRequest(t *testing.T) {
 //	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 //	defer mt.Close()
@@ -114,29 +113,29 @@ package db
 //	})
 //}
 //
-//func TestMakeFriends(t *testing.T) {
-//	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-//	defer mt.Close()
-//
-//	mt.Run("success", func(mt *mtest.T) {
-//		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
-//
-//		mt.AddMockResponses(mtest.CreateSuccessResponse())
-//		mt.AddMockResponses(mtest.CreateSuccessResponse())
-//		ctx := context.Background()
-//		err := friendsCollection.MakeFriends(ctx, "123", "234")
-//		assert.Nil(t, err)
-//	})
-//
-//	mt.Run("UpdateOne error", func(mt *mtest.T) {
-//		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
-//
-//		ctx := context.Background()
-//		err := friendsCollection.MakeFriends(ctx, "123", "234")
-//		assert.NotNil(t, err)
-//	})
-//}
-//
+func TestMakeFriends(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+	defer mt.Close()
+
+	mt.Run("success", func(mt *mtest.T) {
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
+
+		mt.AddMockResponses(mtest.CreateSuccessResponse())
+		mt.AddMockResponses(mtest.CreateSuccessResponse())
+		ctx := context.Background()
+		err := friendsCollection.MakeFriends(ctx, "123", "234")
+		assert.Nil(t, err)
+	})
+
+	mt.Run("UpdateOne error", func(mt *mtest.T) {
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
+
+		ctx := context.Background()
+		err := friendsCollection.MakeFriends(ctx, "123", "234")
+		assert.NotNil(t, err)
+	})
+}
+
 //func TestDeleteOutcomingRequest(t *testing.T) {
 //	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 //	defer mt.Close()
@@ -181,29 +180,29 @@ package db
 //	})
 //}
 //
-//func TestDeleteFriend(t *testing.T) {
-//	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-//	defer mt.Close()
-//
-//	mt.Run("delete error", func(mt *mtest.T) {
-//		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
-//
-//		ctx := context.Background()
-//		err := friendsCollection.DeleteFriend(ctx, "123", "234")
-//		assert.NotNil(t, err)
-//	})
-//
-//	mt.Run("success delete", func(mt *mtest.T) {
-//		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
-//
-//		mt.AddMockResponses(mtest.CreateSuccessResponse())
-//		mt.AddMockResponses(mtest.CreateSuccessResponse())
-//		ctx := context.Background()
-//		err := friendsCollection.DeleteFriend(ctx, "123", "234")
-//		assert.Nil(t, err)
-//	})
-//}
-//
+func TestDeleteFriend(t *testing.T) {
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+	defer mt.Close()
+
+	mt.Run("delete error", func(mt *mtest.T) {
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
+
+		ctx := context.Background()
+		err := friendsCollection.DeleteFriend(ctx, "123", "234")
+		assert.NotNil(t, err)
+	})
+
+	mt.Run("success delete", func(mt *mtest.T) {
+		friendsCollection, _ := NewFriendsRepositoryTest(mt.Coll)
+
+		mt.AddMockResponses(mtest.CreateSuccessResponse())
+		mt.AddMockResponses(mtest.CreateSuccessResponse())
+		ctx := context.Background()
+		err := friendsCollection.DeleteFriend(ctx, "123", "234")
+		assert.Nil(t, err)
+	})
+}
+
 //func TestGetOutcomingRequestsByUserID(t *testing.T) {
 //	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 //	defer mt.Close()
