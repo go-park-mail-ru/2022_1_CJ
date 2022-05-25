@@ -1,14 +1,10 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - dev
   pull_request:
     branches:
       - main
       - dev
-      - checkCI
 
 jobs:
   tests:
@@ -23,6 +19,9 @@ jobs:
         uses: actions/checkout@v2
       - name: Start tests
         run: |
+          go get github.com/golang/mock/gomock
+          go install github.com/golang/mock/mockgen
+          go get golang.org/x/tools/go/packages
           make mod
           make mock
           make tests
@@ -40,7 +39,7 @@ jobs:
       - name: Run linter
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.46.2
-          $(go env GOPATH)/bin/golangci-lint run
+          $(go env GOPATH)/bin/golangci-lint run --timeout=5m
 
   build:
     needs: [ linter, tests ]
@@ -54,9 +53,26 @@ jobs:
       - name: Build
         run: make build
 
-#  deploy:
-#    needs: [ build ]
-#    name: Backend deploy
-#    runs-on: ubuntu-latest
-#    steps:
-
+  deploy:
+    needs: [ build ]
+    name: Backend deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: git pull
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd backend/
+            git pull
+      - name: run project
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd backend/
+            sudo make 
