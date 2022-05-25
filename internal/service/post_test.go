@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/convert"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
@@ -324,7 +325,7 @@ func TestEditPost(t *testing.T) {
 				userID: "0"},
 			inputGetUserByID:  InputGetUserByID{userID: "0"},
 			outputGetUserByID: OutputGetUserByID{user: nil, err: constants.ErrDBNotFound},
-			output:            Output{nil, constants.ErrDBNotFound},
+			output:            Output{nil, fmt.Errorf("GetUserByID: %w", constants.ErrDBNotFound)},
 		},
 		{
 			name: "Don't find posts in post by UserId",
@@ -337,7 +338,7 @@ func TestEditPost(t *testing.T) {
 			outputGetUserByID:   OutputGetUserByID{user: &core.User{ID: "1"}, err: nil},
 			inputUserCheckPost:  InputUserCheckPost{user: &core.User{ID: "1"}, postID: "1"},
 			outputUserCheckPost: OutputUserCheckPost{err: constants.ErrDBNotFound},
-			output:              Output{nil, constants.ErrDBNotFound},
+			output:              Output{nil, fmt.Errorf("UserCheckPost: %w", constants.ErrDBNotFound)},
 		},
 		{
 			name: "Don't find post by postID",
@@ -352,7 +353,7 @@ func TestEditPost(t *testing.T) {
 			outputUserCheckPost: OutputUserCheckPost{nil},
 			inputGetPostByID:    InputGetPostByID{postID: "1"},
 			outputGetPostByID:   OutputGetPostByID{nil, constants.ErrDBNotFound},
-			output:              Output{nil, constants.ErrDBNotFound},
+			output:              Output{nil, fmt.Errorf("GetPostByID: %w", constants.ErrDBNotFound)},
 		},
 		{
 			name: "Success",
@@ -368,10 +369,9 @@ func TestEditPost(t *testing.T) {
 			inputGetPostByID:    InputGetPostByID{postID: "1"},
 			outputGetPostByID:   OutputGetPostByID{&core.Post{ID: "1"}, nil},
 			inputEditPost: InputEditPost{&core.Post{
-				ID:       "1",
-				Message:  "It's my first post!",
-				Files:    []string{"src/img.jpg"},
-				AuthorID: "3"}},
+				ID:      "1",
+				Message: "It's my first post!",
+				Files:   []string{"src/img.jpg"}}},
 			outputEditPost: OutputEditPost{post: &core.Post{
 				ID:       "1",
 				Message:  "It's my first post!",
