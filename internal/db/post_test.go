@@ -53,11 +53,11 @@ func TestGetPostByID(t *testing.T) {
 
 		expectedPost := TestPost(t)
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedPost.ID},
-			{"author_id", expectedPost.AuthorID},
-			{"message", expectedPost.Message},
-			{"files", expectedPost.Files},
-			{"created_at", expectedPost.CreatedAt},
+			{Key: "_id", Value: expectedPost.ID},
+			{Key: "author_id", Value: expectedPost.AuthorID},
+			{Key: "message", Value: expectedPost.Message},
+			{Key: "files", Value: expectedPost.Files},
+			{Key: "created_at", Value: expectedPost.CreatedAt},
 		}))
 		ctx := context.Background()
 		post, err := postCollection.GetPostByID(ctx, TestPost(t).ID)
@@ -91,10 +91,10 @@ func TestGetPostsByUserID(t *testing.T) {
 			CreatedAt: 1323123,
 		}
 		first := mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedPost1.ID},
-			{"author_id", expectedPost1.AuthorID},
-			{"files", expectedPost1.Files},
-			{"created_at", expectedPost1.CreatedAt},
+			{Key: "_id", Value: expectedPost1.ID},
+			{Key: "author_id", Value: expectedPost1.AuthorID},
+			{Key: "files", Value: expectedPost1.Files},
+			{Key: "created_at", Value: expectedPost1.CreatedAt},
 		})
 
 		expectedPost2 := core.Post{
@@ -104,10 +104,10 @@ func TestGetPostsByUserID(t *testing.T) {
 			CreatedAt: 1323123,
 		}
 		second := mtest.CreateCursorResponse(1, "foo.bar", mtest.NextBatch, bson.D{
-			{"_id", expectedPost2.ID},
-			{"author_id", expectedPost2.AuthorID},
-			{"files", expectedPost2.Files},
-			{"created_at", expectedPost2.CreatedAt},
+			{Key: "_id", Value: expectedPost2.ID},
+			{Key: "author_id", Value: expectedPost2.AuthorID},
+			{Key: "files", Value: expectedPost2.Files},
+			{Key: "created_at", Value: expectedPost2.CreatedAt},
 		})
 
 		killCursors := mtest.CreateCursorResponse(0, "foo.bar", mtest.NextBatch)
@@ -129,7 +129,7 @@ func TestDeletePost(t *testing.T) {
 
 	mt.Run("success", func(mt *mtest.T) {
 		postCollection, _ := NewPostRepositoryTest(mt.Coll)
-		mt.AddMockResponses(bson.D{{"ok", 1}, {"acknowledged", true}, {"n", 1}})
+		mt.AddMockResponses(bson.D{{Key: "ok", Value: 1}, {Key: "acknowledged", Value: true}, {Key: "n", Value: 1}})
 
 		ctx := context.Background()
 		err := postCollection.DeletePost(ctx, TestPost(t).ID)
@@ -167,10 +167,10 @@ func TestGetFeed(t *testing.T) {
 			CreatedAt: 1323123,
 		}
 		first := mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedPost1.ID},
-			{"author_id", expectedPost1.AuthorID},
-			{"files", expectedPost1.Files},
-			{"created_at", expectedPost1.CreatedAt},
+			{Key: "_id", Value: expectedPost1.ID},
+			{Key: "author_id", Value: expectedPost1.AuthorID},
+			{Key: "files", Value: expectedPost1.Files},
+			{Key: "created_at", Value: expectedPost1.CreatedAt},
 		})
 
 		expectedPost2 := core.Post{
@@ -180,10 +180,10 @@ func TestGetFeed(t *testing.T) {
 			CreatedAt: 1323123,
 		}
 		second := mtest.CreateCursorResponse(1, "foo.bar", mtest.NextBatch, bson.D{
-			{"_id", expectedPost2.ID},
-			{"author_id", expectedPost2.AuthorID},
-			{"files", expectedPost2.Files},
-			{"created_at", expectedPost2.CreatedAt},
+			{Key: "_id", Value: expectedPost2.ID},
+			{Key: "author_id", Value: expectedPost2.AuthorID},
+			{Key: "files", Value: expectedPost2.Files},
+			{Key: "created_at", Value: expectedPost2.CreatedAt},
 		})
 
 		killCursors := mtest.CreateCursorResponse(0, "foo.bar", mtest.NextBatch)

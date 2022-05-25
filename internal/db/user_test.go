@@ -43,11 +43,11 @@ func TestCreateUser(t *testing.T) {
 		}
 
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedUser.ID},
-			{"name", expectedUser.Name},
-			{"email", expectedUser.Email},
-			{"images", expectedUser.Image},
-			{"phone", expectedUser.Phone},
+			{Key: "_id", Value: expectedUser.ID},
+			{Key: "name", Value: expectedUser.Name},
+			{Key: "email", Value: expectedUser.Email},
+			{Key: "images", Value: expectedUser.Image},
+			{Key: "phone", Value: expectedUser.Phone},
 		}))
 		user := TestUser(t)
 		ctx := context.Background()
@@ -91,11 +91,11 @@ func TestGetUserByID(t *testing.T) {
 			Phone: "+8(800)-555-35-35",
 		}
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedUser.ID},
-			{"name", expectedUser.Name},
-			{"email", expectedUser.Email},
-			{"images", expectedUser.Image},
-			{"phone", expectedUser.Phone},
+			{Key: "_id", Value: expectedUser.ID},
+			{Key: "name", Value: expectedUser.Name},
+			{Key: "email", Value: expectedUser.Email},
+			{Key: "images", Value: expectedUser.Image},
+			{Key: "phone", Value: expectedUser.Phone},
 		}))
 		user := TestUser(t)
 		ctx := context.Background()
@@ -134,11 +134,11 @@ func TestGetUserByEmail(t *testing.T) {
 			Phone: "+8(800)-555-35-35",
 		}
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedUser.ID},
-			{"name", expectedUser.Name},
-			{"email", expectedUser.Email},
-			{"images", expectedUser.Image},
-			{"phone", expectedUser.Phone},
+			{Key: "_id", Value: expectedUser.ID},
+			{Key: "name", Value: expectedUser.Name},
+			{Key: "email", Value: expectedUser.Email},
+			{Key: "images", Value: expectedUser.Image},
+			{Key: "phone", Value: expectedUser.Phone},
 		}))
 		user := TestUser(t)
 		ctx := context.Background()
@@ -176,11 +176,11 @@ func TestCheckUserEmailExistence(t *testing.T) {
 			Phone: "+8(800)-555-35-35",
 		}
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedUser.ID},
-			{"name", expectedUser.Name},
-			{"email", expectedUser.Email},
-			{"images", expectedUser.Image},
-			{"phone", expectedUser.Phone},
+			{Key: "_id", Value: expectedUser.ID},
+			{Key: "name", Value: expectedUser.Name},
+			{Key: "email", Value: expectedUser.Email},
+			{Key: "images", Value: expectedUser.Image},
+			{Key: "phone", Value: expectedUser.Phone},
 		}))
 		user := TestUser(t)
 		ctx := context.Background()
@@ -271,7 +271,7 @@ func TestUserDelete(t *testing.T) {
 
 	mt.Run("success", func(mt *mtest.T) {
 		userCollection, _ := NewUserRepositoryTest(mt.Coll)
-		mt.AddMockResponses(bson.D{{"ok", 1}, {"acknowledged", true}, {"n", 1}})
+		mt.AddMockResponses(bson.D{{Key: "ok", Value: 1}, {Key: "acknowledged", Value: true}, {Key: "n", Value: 1}})
 
 		ctx := context.Background()
 		err := userCollection.DeleteUser(ctx, TestUser(t))
@@ -294,8 +294,8 @@ func TestSelectUsers(t *testing.T) {
 			},
 		}
 		first := mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedUser1.ID},
-			{"name", expectedUser1.Name},
+			{Key: "_id", Value: expectedUser1.ID},
+			{Key: "name", Value: expectedUser1.Name},
 		})
 
 		expectedUser2 := core.User{
@@ -306,8 +306,8 @@ func TestSelectUsers(t *testing.T) {
 			},
 		}
 		second := mtest.CreateCursorResponse(1, "foo.bar", mtest.NextBatch, bson.D{
-			{"_id", expectedUser2.ID},
-			{"name", expectedUser2.Name},
+			{Key: "_id", Value: expectedUser2.ID},
+			{Key: "name", Value: expectedUser2.Name},
 		})
 
 		killCursors := mtest.CreateCursorResponse(0, "foo.bar", mtest.NextBatch)
@@ -356,11 +356,11 @@ func TestUserCheckDialog(t *testing.T) {
 			Phone: "+8(800)-555-35-35",
 		}
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedUser.ID},
-			{"name", expectedUser.Name},
-			{"email", expectedUser.Email},
-			{"images", expectedUser.Image},
-			{"phone", expectedUser.Phone},
+			{Key: "_id", Value: expectedUser.ID},
+			{Key: "name", Value: expectedUser.Name},
+			{Key: "email", Value: expectedUser.Email},
+			{Key: "images", Value: expectedUser.Image},
+			{Key: "phone", Value: expectedUser.Phone},
 		}))
 		ctx := context.Background()
 		err := userCollection.UserCheckDialog(ctx, TestUser(t).ID, TestDialog(t).ID)
@@ -397,12 +397,12 @@ func TestGetUserDialogs(t *testing.T) {
 			DialogIDs: []string{"12432536443"},
 		}
 		mt.AddMockResponses(mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
-			{"_id", expectedUser.ID},
-			{"name", expectedUser.Name},
-			{"email", expectedUser.Email},
-			{"images", expectedUser.Image},
-			{"phone", expectedUser.Phone},
-			{"dialog_ids", expectedUser.DialogIDs},
+			{Key: "_id", Value: expectedUser.ID},
+			{Key: "name", Value: expectedUser.Name},
+			{Key: "email", Value: expectedUser.Email},
+			{Key: "images", Value: expectedUser.Image},
+			{Key: "phone", Value: expectedUser.Phone},
+			{Key: "dialog_ids", Value: expectedUser.DialogIDs},
 		}))
 		user := TestUser(t)
 		ctx := context.Background()

@@ -392,11 +392,11 @@ func TestGetDialogs(t *testing.T) {
 	}
 
 	type InputGetDialogByID struct {
-		dialogID string
+		//dialogID string
 	}
 	type OutputGetDialogByID struct {
-		dialog *core.Dialog
-		err    error
+		//dialog *core.Dialog
+		//err    error
 	}
 
 	type Output struct {
@@ -576,13 +576,13 @@ func TestGetDialog(t *testing.T) {
 	}
 
 	type InputGetDialogByID struct {
-		dialogID string
-		err      error
+		//dialogID string
+		//err      error
 	}
 
 	type OutputGetDialogByID struct {
-		dialog *core.Dialog
-		err    error
+		//dialog *core.Dialog
+		//err    error
 	}
 
 	type Output struct {
