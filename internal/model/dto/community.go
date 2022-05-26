@@ -4,6 +4,7 @@ package dto
 type Community struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
+	Info  string `json:"info"`
 	Image string `json:"image"`
 }
 

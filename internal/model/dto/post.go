@@ -18,7 +18,7 @@ type Post struct {
 }
 
 type CreatePostRequest struct {
-	Message     string   `json:"message" validate:"required"`
+	Message     string   `json:"message"`
 	Images      []string `json:"images,omitempty"`
 	Attachments []string `json:"attachments,omitempty"`
 }
