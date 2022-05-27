@@ -32,6 +32,7 @@ func (c *AuthController) SignupUser(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
+
 	response, err := c.registry.AuthService.SignupUser(context.Background(), request, userID, token)
 	if err != nil {
 		return err

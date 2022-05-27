@@ -57,6 +57,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	registry := service.NewRegistry(log, repository)
 
 	authCtrl := controllers.NewAuthController(log, registry, authService)
+	oauthCtrl := controllers.NewOAuthController(log, registry)
 	fileCtrl := controllers.NewFileController(log, registry)
 	userCtrl := controllers.NewUserController(log, registry)
 	friendsCtrl := controllers.NewFriendsController(log, registry)
@@ -79,6 +80,10 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	authAPI.POST("/signup", authCtrl.SignupUser)
 	authAPI.POST("/login", authCtrl.LoginUser)
 	authAPI.DELETE("/logout", authCtrl.LogoutUser)
+
+	oauthAPI := api.Group("/oauth")
+
+	oauthAPI.GET("/telegram", oauthCtrl.AuthenticateThroughTelergam)
 
 	fileAPI := api.Group("/file", svc.AuthMiddlewareMicro(authService))
 

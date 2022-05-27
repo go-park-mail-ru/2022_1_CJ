@@ -39,7 +39,6 @@ func Dialog2DTO(dialog *core.Dialog, userID string) dto.Dialog {
 }
 
 func Message2DTO(message core.Message, userID string) dto.MessageInfo {
-
 	if userID == message.AuthorID {
 		return dto.MessageInfo{
 			AuthorID:    message.AuthorID,

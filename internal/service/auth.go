@@ -3,6 +3,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/sirupsen/logrus"
 
@@ -30,34 +31,26 @@ func (svc *AuthServiceImpl) SignupUser(ctx context.Context, request *dto.SignupU
 	}
 
 	if err := svc.db.UserRepo.CreateUser(ctx, user); err != nil {
-		svc.log.Errorf("CreateUser error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("CreateUser: %w", err)
 	}
 
 	if err := svc.db.FriendsRepo.CreateFriends(ctx, user.ID); err != nil {
-		svc.log.Errorf("CreateFriends error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("CreateFriends: %w", err)
 	}
 
-	// CSRF
 	csrfToken, err := utils.GenerateCSRFToken(user.ID)
 	if err != nil {
-		svc.log.Errorf("GenerateCSRFToken error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("GenerateCSRFToken: %w", err)
 	}
 
 	return &dto.SignupUserResponse{AuthToken: token, CSRFToken: csrfToken}, nil
 }
 
 func (svc *AuthServiceImpl) LoginUser(ctx context.Context, userID string, token string) (*dto.LoginUserResponse, error) {
-	// CSRF
 	csrfToken, err := utils.GenerateCSRFToken(userID)
 	if err != nil {
-		svc.log.Errorf("GenerateCSRFToken error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("GenerateCSRFToken: %w", err)
 	}
-	svc.log.Debugf("Generate csrf token success; Token: %s", csrfToken)
-
 	return &dto.LoginUserResponse{AuthToken: token, CSRFToken: csrfToken}, nil
 }
 
