@@ -14,21 +14,25 @@ type CreateChatResponse struct {
 
 // Message for chat for wb
 type Message struct {
-	ID        string `json:"_id"`
-	DialogID  string `json:"dialog_id"`
-	Event     string `json:"event"`
-	AuthorID  string `json:"author_id"`
-	DestinID  string `json:"dst,omitempty"`
-	Body      string `json:"body"`
-	CreatedAt int64  `json:"created_at"`
+	ID          string   `json:"_id"`
+	DialogID    string   `json:"dialog_id"`
+	Event       string   `json:"event"`
+	AuthorID    string   `json:"author_id"`
+	DestinID    string   `json:"dst,omitempty"`
+	Body        string   `json:"body"`
+	Attachments []string `json:"attachments"`
+	Images      []string `json:"images"`
+	CreatedAt   int64    `json:"created_at"`
 }
 
 // Message for chat for giving
 type MessageInfo struct {
-	AuthorID  string        `json:"author_id"`
-	Body      string        `json:"body"`
-	IsRead    []core.IsRead `json:"is_read,omitempty"`
-	CreatedAt int64         `json:"created_at"`
+	AuthorID    string        `json:"author_id"`
+	Body        string        `json:"body"`
+	IsRead      []core.IsRead `json:"is_read,omitempty"`
+	Attachments []string      `json:"attachments"`
+	Images      []string      `json:"images"`
+	CreatedAt   int64         `json:"created_at"`
 }
 
 type Dialog struct {

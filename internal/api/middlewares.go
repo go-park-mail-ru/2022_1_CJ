@@ -2,7 +2,6 @@ package api
 
 import (
 	"bytes"
-	"github.com/gofrs/uuid"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
+	"github.com/gofrs/uuid"
 	"github.com/spf13/viper"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"

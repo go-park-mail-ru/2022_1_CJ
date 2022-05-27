@@ -6,11 +6,13 @@ type IsRead struct {
 }
 
 type Message struct {
-	ID        string   `bson:"_id"`
-	Body      string   `bson:"body"`
-	AuthorID  string   `bson:"author_id"`
-	IsRead    []IsRead `bson:"is_participants_read,omitempty"`
-	CreatedAt int64    `bson:"created_at"` // unix timestamp
+	ID          string   `bson:"_id"`
+	Body        string   `bson:"body"`
+	AuthorID    string   `bson:"author_id"`
+	IsRead      []IsRead `bson:"is_participants_read,omitempty"`
+	Attachments []string `json:"attachments"`
+	Images      []string `json:"images"`
+	CreatedAt   int64    `bson:"created_at"` // unix timestamp
 }
 
 type Dialog struct {

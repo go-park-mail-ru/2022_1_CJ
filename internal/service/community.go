@@ -401,10 +401,11 @@ func (svc *communityServiceImpl) CreatePostCommunity(ctx context.Context, reques
 		}
 	}
 	post, err := svc.db.PostRepo.CreatePost(ctx, &core.Post{
-		AuthorID: community.ID,
-		Message:  request.Message,
-		Files:    request.Files,
-		Type:     constants.CommunityPost,
+		AuthorID:    community.ID,
+		Message:     request.Message,
+		Images:      request.Images,
+		Type:        constants.CommunityPost,
+		Attachments: request.Attachments,
 	})
 	if err != nil {
 		svc.log.Errorf("CreatePost error: %s", err)
@@ -451,7 +452,7 @@ func (svc *communityServiceImpl) EditPostCommunity(ctx context.Context, request 
 		AuthorID: request.CommunityID,
 		ID:       request.PostID,
 		Message:  request.Message,
-		Files:    request.Files,
+		Images:   request.Images,
 	})
 	if err != nil {
 		svc.log.Errorf("EditPost error: %s", err)

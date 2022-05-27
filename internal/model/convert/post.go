@@ -11,6 +11,7 @@ import (
 //		AuthorID: post.Author.ID,
 //		Message:  post.Message,
 //		Images:   post.Images,
+//		Attachments: post.Attachments,
 //	}
 //}
 
@@ -19,9 +20,10 @@ func Post2DTOByUser(post *core.Post, author *core.User) dto.Post {
 		ID:            post.ID,
 		Author:        User2author(User2DTO(author)),
 		Message:       post.Message,
-		Files:         post.Files,
-		CreatedAt:     post.CreatedAt,
+		Images:        post.Images,
+		Attachments:   post.Attachments,
 		CountComments: int64(len(post.CommentsIDs)),
+		CreatedAt:     post.CreatedAt,
 	}
 }
 
@@ -30,8 +32,9 @@ func Post2DTOByCommunity(post *core.Post, community *core.Community) dto.Post {
 		ID:            post.ID,
 		Author:        CommunityProfile2Author(Community2DTOSmallProfile(community)),
 		Message:       post.Message,
-		Files:         post.Files,
-		CreatedAt:     post.CreatedAt,
+		Images:        post.Images,
+		Attachments:   post.Attachments,
 		CountComments: int64(len(post.CommentsIDs)),
+		CreatedAt:     post.CreatedAt,
 	}
 }

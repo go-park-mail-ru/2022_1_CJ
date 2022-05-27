@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/monitoring"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/api/controllers"
@@ -56,6 +57,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	registry := service.NewRegistry(log, repository)
 
 	authCtrl := controllers.NewAuthController(log, registry, authService)
+	oauthCtrl := controllers.NewOAuthController(log, registry)
 	fileCtrl := controllers.NewFileController(log, registry)
 	userCtrl := controllers.NewUserController(log, registry)
 	friendsCtrl := controllers.NewFriendsController(log, registry)
@@ -79,9 +81,13 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	authAPI.POST("/login", authCtrl.LoginUser)
 	authAPI.DELETE("/logout", authCtrl.LogoutUser)
 
-	fileAPI := api.Group("/file", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
+	oauthAPI := api.Group("/oauth")
 
-	fileAPI.POST("/upload", fileCtrl.UploadFile)
+	oauthAPI.GET("/telegram", oauthCtrl.AuthenticateThroughTelergam)
+
+	fileAPI := api.Group("/file", svc.AuthMiddlewareMicro(authService))
+
+	fileAPI.POST("/upload", fileCtrl.UploadFile, svc.CSRFMiddleware())
 	fileAPI.GET("/get", fileCtrl.GetFile)
 
 	userAPI := api.Group("/user", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
