@@ -7,7 +7,3 @@ type AuthenticateThroughTelergamRequest struct {
 	PhotoURL  string `query:"photo_url"`
 	Hash      string `query:"hash" validate:"required"`
 }
-
-type AuthenticateThroughTelergamResponse struct {
-	CSRFToken string `json:"csrf_token"`
-}

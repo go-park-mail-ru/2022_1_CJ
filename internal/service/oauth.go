@@ -11,11 +11,10 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/utils"
 )
 
 type OAuthService interface {
-	AuthenticateThroughTelergam(ctx context.Context, request *dto.AuthenticateThroughTelergamRequest) (*dto.AuthenticateThroughTelergamResponse, error)
+	AuthenticateThroughTelergam(ctx context.Context, request *dto.AuthenticateThroughTelergamRequest) error
 }
 
 type OAuthServiceImpl struct {
@@ -23,17 +22,12 @@ type OAuthServiceImpl struct {
 	db  *db.Repository
 }
 
-func (svc *OAuthServiceImpl) AuthenticateThroughTelergam(ctx context.Context, request *dto.AuthenticateThroughTelergamRequest) (*dto.AuthenticateThroughTelergamResponse, error) {
+func (svc *OAuthServiceImpl) AuthenticateThroughTelergam(ctx context.Context, request *dto.AuthenticateThroughTelergamRequest) error {
 	// TODO: check hash
 
 	exists, err := svc.db.UserRepo.CheckUserIDExistence(ctx, request.ID)
 	if err != nil {
-		return nil, fmt.Errorf("CheckUserIDExistence: %w", err)
-	}
-
-	csrfToken, err := utils.GenerateCSRFToken(request.ID)
-	if err != nil {
-		return nil, fmt.Errorf("GenerateCSRFToken: %w", err)
+		return fmt.Errorf("CheckUserIDExistence: %w", err)
 	}
 
 	if !exists {
@@ -44,15 +38,15 @@ func (svc *OAuthServiceImpl) AuthenticateThroughTelergam(ctx context.Context, re
 		}
 
 		if err := svc.db.UserRepo.InsertUser(ctx, user); err != nil {
-			return nil, fmt.Errorf("CreateUser: %w", err)
+			return fmt.Errorf("CreateUser: %w", err)
 		}
 
 		if err := svc.db.FriendsRepo.CreateFriends(ctx, user.ID); err != nil {
-			return nil, fmt.Errorf("CreateFriends: %w", err)
+			return fmt.Errorf("CreateFriends: %w", err)
 		}
 	}
 
-	return &dto.AuthenticateThroughTelergamResponse{CSRFToken: csrfToken}, nil
+	return nil
 }
 
 func NewOAuthService(log *logrus.Entry, db *db.Repository) OAuthService {

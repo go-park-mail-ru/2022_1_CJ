@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
@@ -24,7 +25,7 @@ func (c *OAuthController) AuthenticateThroughTelergam(ctx echo.Context) error {
 		return err
 	}
 
-	response, err := c.registry.OAuthService.AuthenticateThroughTelergam(context.Background(), request)
+	err := c.registry.OAuthService.AuthenticateThroughTelergam(context.Background(), request)
 	if err != nil {
 		return err
 	}
@@ -34,10 +35,15 @@ func (c *OAuthController) AuthenticateThroughTelergam(ctx echo.Context) error {
 		return err
 	}
 
-	ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, authToken, viper.GetInt64(constants.ViperJWTTTLKey)))
-	ctx.SetCookie(utils.CreateCookie(constants.CookieKeyCSRFToken, response.CSRFToken, viper.GetInt64(constants.ViperCSRFTTLKey)))
+	csrfToken, err := utils.GenerateCSRFToken(request.ID)
+	if err != nil {
+		return fmt.Errorf("GenerateCSRFToken: %w", err)
+	}
 
-	return ctx.JSON(http.StatusOK, response)
+	ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, authToken, viper.GetInt64(constants.ViperJWTTTLKey)))
+	ctx.SetCookie(utils.CreateCookie(constants.CookieKeyCSRFToken, csrfToken, viper.GetInt64(constants.ViperCSRFTTLKey)))
+
+	return ctx.Redirect(http.StatusMovedPermanently, "/")
 }
 
 func NewOAuthController(log *logrus.Entry, registry *service.Registry) *OAuthController {
