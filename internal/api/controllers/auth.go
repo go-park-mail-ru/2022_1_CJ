@@ -2,14 +2,15 @@ package controllers
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/utils"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )

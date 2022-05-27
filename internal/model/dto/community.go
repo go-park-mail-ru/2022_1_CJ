@@ -158,7 +158,7 @@ type DeleteCommunityResponse BasicResponse
 type CreatePostCommunityRequest struct {
 	CommunityID string   `json:"community_id"`
 	Message     string   `json:"message" validate:"required"`
-	Images      []string `json:"images,omitempty"`
+	Files       []string `json:"files,omitempty"`
 }
 
 type CreatePostCommunityResponse BasicResponse
@@ -167,7 +167,7 @@ type EditPostCommunityRequest struct {
 	CommunityID string   `json:"community_id"`
 	PostID      string   `json:"post_id"`
 	Message     string   `json:"message"`
-	Images      []string `json:"images,omitempty"`
+	Files       []string `json:"files,omitempty"`
 }
 
 type EditPostCommunityResponse BasicResponse

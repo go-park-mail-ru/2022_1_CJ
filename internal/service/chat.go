@@ -13,7 +13,7 @@ import (
 )
 
 type ChatService interface {
-	CreateDialog(ctx context.Context, request *dto.CreateDialogRequest) (*dto.CreateDialogResponse, error)
+	CreateChat(ctx context.Context, request *dto.CreateChatRequest) (*dto.CreateChatResponse, error)
 	GetDialogs(ctx context.Context, request *dto.GetDialogsRequest) (*dto.GetDialogsResponse, error)
 	GetDialog(ctx context.Context, request *dto.GetDialogRequest) (*dto.GetDialogResponse, error)
 	GetDialogByUserID(ctx context.Context, request *dto.GetDialogByUserIDRequest, currentUserID string) (*dto.GetDialogByUserIDResponse, error)
@@ -28,16 +28,12 @@ type chatServiceImpl struct {
 	db  *db.Repository
 }
 
-func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.CreateDialogRequest) (*dto.CreateDialogResponse, error) {
-	switch {
-	case len(request.AuthorIDs) < 1:
-		return nil, constants.ErrSingleChat
-	case len(request.AuthorIDs) == 1:
+func (svc *chatServiceImpl) CreateChat(ctx context.Context, request *dto.CreateChatRequest) (*dto.CreateChatResponse, error) {
+	if len(request.AuthorIDs) == 1 {
 		if request.AuthorIDs[0] == request.UserID {
 			return nil, constants.ErrSingleChat
 		}
 		if err := svc.db.ChatRepo.IsUniqDialog(ctx, request.UserID, request.AuthorIDs[0]); err != nil {
-			svc.log.Errorf("IsUniqDialog error: %s", err)
 			return nil, err
 		}
 	}
@@ -63,7 +59,7 @@ func (svc *chatServiceImpl) CreateDialog(ctx context.Context, request *dto.Creat
 		}
 	}
 	svc.log.Debug("Add dialog to users success")
-	return &dto.CreateDialogResponse{DialogID: dialog.ID}, nil
+	return &dto.CreateChatResponse{DialogID: dialog.ID}, nil
 }
 
 func (svc *chatServiceImpl) SendMessage(ctx context.Context, request *dto.SendMessageRequest) (*dto.SendMessageResponse, error) {
@@ -129,8 +125,20 @@ func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDial
 		if err != nil {
 			svc.log.Errorf("GetDialogInfo error: %s", err)
 		}
+
 		dialogs = append(dialogs, convert.Dialog2DTO(dInf, request.UserID))
 	}
+
+	for i, dialog := range dialogs {
+		if len(dialog.Participants) == 1 {
+			participant, err := svc.db.UserRepo.GetUserByID(ctx, dialog.Participants[0])
+			if err != nil {
+				return nil, err
+			}
+			dialogs[i].Name = participant.Name.Full()
+		}
+	}
+
 	return &dto.GetDialogsResponse{Dialogs: dialogs, Total: total, AmountPages: page}, err
 }
 
@@ -150,7 +158,6 @@ func (svc *chatServiceImpl) CheckDialog(ctx context.Context, request *dto.CheckD
 		return err
 	}
 
-	svc.log.Info("Dialog: %s in User: %s", request.DialogID, request.UserID)
 	err = svc.db.UserRepo.UserCheckDialog(ctx, dialog.ID, request.UserID)
 	if err != nil {
 		svc.log.Errorf("Don't found in db")
@@ -162,21 +169,28 @@ func (svc *chatServiceImpl) CheckDialog(ctx context.Context, request *dto.CheckD
 func (svc *chatServiceImpl) GetDialog(ctx context.Context, request *dto.GetDialogRequest) (*dto.GetDialogResponse, error) {
 	err := svc.db.UserRepo.UserCheckDialog(ctx, request.DialogID, request.UserID)
 	if err != nil {
-		svc.log.Errorf("Don't found in db")
 		return nil, constants.ErrDBNotFound
 	}
 
-	dialog, err := svc.db.ChatRepo.GetDialogByID(ctx, request.DialogID)
+	dialogCore, err := svc.db.ChatRepo.GetDialogByID(ctx, request.DialogID)
 	if err != nil {
-		svc.log.Errorf("GetDialogByID error: %s", err)
 		return nil, err
 	}
 
 	var total int64
 	var page int64
-	dialog.Messages, total, page = utils.GetLimitMessage(&dialog.Messages, request.Limit, request.Page)
+	dialogCore.Messages, total, page = utils.GetLimitMessage(&dialogCore.Messages, request.Limit, request.Page)
 
-	return &dto.GetDialogResponse{Dialog: convert.Dialog2DTO(dialog, request.UserID), Messages: convert.Messages2DTO(dialog.Messages, request.UserID), Total: total, AmountPages: page}, err
+	dialog := convert.Dialog2DTO(dialogCore, request.UserID)
+	if len(dialog.Participants) == 1 {
+		participant, err := svc.db.UserRepo.GetUserByID(ctx, dialog.Participants[0])
+		if err != nil {
+			return nil, err
+		}
+		dialog.Name = participant.Name.Full()
+	}
+
+	return &dto.GetDialogResponse{Dialog: dialog, Messages: convert.Messages2DTO(dialogCore.Messages, request.UserID), Total: total, AmountPages: page}, err
 }
 
 func NewChatService(log *logrus.Entry, db *db.Repository) ChatService {

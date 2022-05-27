@@ -64,7 +64,7 @@ func (r *Dialog) Start() {
 			r.Lock()
 			id, ok := r.Members[c.ID]
 			r.Unlock()
-			if ok == false {
+			if !ok {
 				break
 			}
 			r.Lock()

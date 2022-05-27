@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func (svc *APIService) httpErrorHandler(err error, c echo.Context) {
@@ -23,7 +23,7 @@ func (svc *APIService) httpErrorHandler(err error, c echo.Context) {
 				}
 			}
 
-			c.JSON(code, dto.ErrorResponse{
+			_ = c.JSON(code, dto.ErrorResponse{
 				Message: msg,
 				Code:    code,
 			})
@@ -38,7 +38,7 @@ func (svc *APIService) httpErrorHandler(err error, c echo.Context) {
 		msg = "internal server error"
 	}
 
-	c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
+	_ = c.JSON(http.StatusInternalServerError, dto.ErrorResponse{
 		Message: msg,
 		Code:    http.StatusInternalServerError,
 	})

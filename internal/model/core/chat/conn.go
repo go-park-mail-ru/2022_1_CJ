@@ -9,7 +9,7 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 
 	"github.com/gorilla/websocket"
@@ -24,6 +24,7 @@ type Conn struct {
 	Dialogs map[string]string
 	reg     *service.Registry
 	log     *logrus.Entry
+	ctx     echo.Context
 }
 
 var (
@@ -52,6 +53,10 @@ func HandleData(c *Conn, msg *dto.Message) {
 			c.ReadMessage(msg)
 		case constants.SendChat:
 			c.SendMessage(msg)
+		case constants.SendFile:
+			c.SendFile(msg)
+		case constants.SendSticker:
+			c.SendSticker(msg)
 		default:
 			c.Send <- *ConstructMessage(msg.DialogID, constants.ErrChat, c.ID, constants.Empty, constants.ErrRequest)
 		}
@@ -65,7 +70,7 @@ func (c *Conn) readPump() {
 			DialogManager.Lock()
 			room, ok := DialogManager.Rooms[name]
 			DialogManager.Unlock()
-			if ok == true {
+			if ok {
 				room.Leave(c)
 			}
 			c.Lock()
@@ -85,7 +90,7 @@ func (c *Conn) readPump() {
 		data.AuthorID = c.ID
 
 		if err != nil {
-			if _, wok := err.(*websocket.CloseError); wok == false {
+			if _, wok := err.(*websocket.CloseError); !wok {
 				break
 			}
 			c.Lock()
@@ -94,7 +99,7 @@ func (c *Conn) readPump() {
 				DialogManager.Lock()
 				room, rok := DialogManager.Rooms[name]
 				DialogManager.Unlock()
-				if rok == false {
+				if !rok {
 					c.Lock()
 					continue
 				}
@@ -149,7 +154,7 @@ func (c *Conn) Join(name string) {
 	DialogManager.Lock()
 	room, ok := DialogManager.Rooms[name]
 	DialogManager.Unlock()
-	if ok == false {
+	if !ok {
 		room = NewRoom(name)
 	}
 	c.Lock()
@@ -169,10 +174,57 @@ func (c *Conn) SendMessage(msg *dto.Message) {
 
 	_, err = c.reg.ChatService.SendMessage(context.Background(), &dto.SendMessageRequest{Message: *msg})
 	if err != nil {
-		c.log.Infof("don't send message")
+		c.log.Errorf("don't send message: %s", err)
+		return
+	}
+	c.log.Info("send message")
+	c.Emit(msg)
+}
+
+func (c *Conn) SendFile(msg *dto.Message) {
+	ext := c.ctx.FormValue("ext")
+	if ext == "" {
+		c.log.Error("Extension is empty")
+		return
+	}
+
+	msgID, err := core.GenUUID()
+	if err != nil {
+		return
+	}
+	msg.ID = msgID
+	msg.CreatedAt = time.Now().Unix()
+
+	msg.Body, err = c.reg.StaticService.UploadFileChat(msgID, ext, msg.Body)
+	if err != nil {
+		c.log.Errorf("UploadFileChat error: %s", err)
+		return
+	}
+
+	_, err = c.reg.ChatService.SendMessage(context.Background(), &dto.SendMessageRequest{Message: *msg})
+	if err != nil {
+		c.log.Errorf("don't send message: %s", err)
 		return
 	}
 	c.log.Infof("send message")
+	c.Emit(msg)
+}
+
+// SendMessage ...
+func (c *Conn) SendSticker(msg *dto.Message) {
+	msgID, err := core.GenUUID()
+	if err != nil {
+		return
+	}
+	msg.ID = msgID
+	msg.CreatedAt = time.Now().Unix()
+
+	_, err = c.reg.ChatService.SendMessage(context.Background(), &dto.SendMessageRequest{Message: *msg})
+	if err != nil {
+		c.log.Errorf("don't send message: %s", err)
+		return
+	}
+	c.log.Info("send message")
 	c.Emit(msg)
 }
 
@@ -182,7 +234,7 @@ func (c *Conn) LeftChat(msg *dto.Message) {
 	DialogManager.Lock()
 	room, ok := DialogManager.Rooms[msg.DialogID]
 	DialogManager.Unlock()
-	if ok == false {
+	if !ok {
 		return
 	}
 	room.Lock()
@@ -200,19 +252,19 @@ func (c *Conn) ReadMessage(msg *dto.Message) {
 		DialogManager.Lock()
 		room, rok := DialogManager.Rooms[msg.DialogID]
 		DialogManager.Unlock()
-		if rok == false {
+		if !rok {
 			return
 		}
 		room.Lock()
 		id, mok := room.Members[msg.DestinID]
 		room.Unlock()
-		if mok == false {
+		if !mok {
 			return
 		}
 		ConnManager.Lock()
 		dst, cok := ConnManager.Conns[id]
 		ConnManager.Unlock()
-		if cok == false {
+		if !cok {
 			return
 		}
 		if msg.Body != constants.Empty {
@@ -233,13 +285,13 @@ func (c *Conn) Leave(name string) {
 	DialogManager.Lock()
 	room, rok := DialogManager.Rooms[name]
 	DialogManager.Unlock()
-	if rok == false {
+	if !rok {
 		return
 	}
 	c.Lock()
 	_, cok := c.Dialogs[name]
 	c.Unlock()
-	if cok == false {
+	if !cok {
 		return
 	}
 	c.Lock()
@@ -265,7 +317,7 @@ func (c *Conn) Emit(msg *dto.Message) {
 	DialogManager.Lock()
 	room, ok := DialogManager.Rooms[msg.DialogID]
 	DialogManager.Unlock()
-	if ok == true {
+	if ok {
 		room.Emit(c, msg)
 	}
 }
@@ -283,6 +335,7 @@ func NewConnection(ctx *echo.Context, log *logrus.Entry, registry *service.Regis
 		Dialogs: make(map[string]string),
 		log:     log,
 		reg:     registry,
+		ctx:     *ctx,
 	}
 	ConnManager.Lock()
 	ConnManager.Conns[conn.ID] = conn

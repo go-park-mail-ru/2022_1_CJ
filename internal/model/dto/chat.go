@@ -2,6 +2,16 @@ package dto
 
 import "github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 
+type CreateChatRequest struct {
+	UserID    string   `header:"User-Id" validate:"required"`
+	Name      string   `json:"name"`
+	AuthorIDs []string `json:"author_ids" validate:"required"`
+}
+
+type CreateChatResponse struct {
+	DialogID string `json:"dialog_id"`
+}
+
 // Message for chat for wb
 type Message struct {
 	ID        string `json:"_id"`
@@ -26,16 +36,6 @@ type Dialog struct {
 	Name         string   `json:"name"`
 	Participants []string `json:"participants"`
 	NonRead      int64    `json:"non_read"`
-}
-
-type CreateDialogRequest struct {
-	UserID    string   `json:"user_id"`
-	Name      string   `json:"name"`
-	AuthorIDs []string `json:"author_ids"`
-}
-
-type CreateDialogResponse struct {
-	DialogID string `json:"dialog_id"`
 }
 
 type SendMessageRequest struct {

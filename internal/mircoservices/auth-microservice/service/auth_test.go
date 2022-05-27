@@ -92,13 +92,13 @@ func TestSignupUser(t *testing.T) {
 		res bool
 		err error
 	}
-
+	// Unused struct
 	type InputCreateUser struct {
-		user *auth_core.User
+		//user *auth_core.User
 	}
 	type OutputCreateUser struct {
-		res string
-		err error
+		//res string
+		//err error
 	}
 
 	type Output struct {

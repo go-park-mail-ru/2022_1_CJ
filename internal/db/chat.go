@@ -2,18 +2,19 @@ package db
 
 import (
 	"context"
+	"time"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/microcosm-cc/bluemonday"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"time"
 )
 
 type ChatRepository interface {
-	IsUniqDialog(ctx context.Context, firstUserID string, secondUserID string) error
-	IsDialogExist(ctx context.Context, firstUserID string, secondUserID string) (string, error)
+	IsUniqDialog(ctx context.Context, userID1 string, userID2 string) error
+	IsDialogExist(ctx context.Context, userID1 string, userID2 string) (string, error)
 	CreateDialog(ctx context.Context, userID string, name string, authorIDs []string) (*core.Dialog, error)
 	IsChatExist(ctx context.Context, dialogID string) error
 	SendMessage(ctx context.Context, message core.Message, dialogID string) error
@@ -35,12 +36,8 @@ func NewChatRepositoryTest(collection *mongo.Collection) (*chatRepositoryImpl, e
 	return &chatRepositoryImpl{coll: collection}, nil
 }
 
-func (repo *chatRepositoryImpl) IsUniqDialog(ctx context.Context, firstUserID string, secondUserID string) error {
-	filter := bson.M{"$and": bson.A{
-		bson.D{{"participants", bson.M{"$size": 2}}},
-		bson.D{{"participants", firstUserID}},
-		bson.D{{"participants", secondUserID}},
-	}}
+func (repo *chatRepositoryImpl) IsUniqDialog(ctx context.Context, userID1 string, userID2 string) error {
+	filter := bson.M{"participants": bson.D{{Key: "$all", Value: bson.A{userID1, userID2}}}}
 	if err := repo.coll.FindOne(ctx, filter).Err(); err != mongo.ErrNoDocuments {
 		if err == nil {
 			return constants.ErrDialogAlreadyExist
@@ -51,13 +48,9 @@ func (repo *chatRepositoryImpl) IsUniqDialog(ctx context.Context, firstUserID st
 	return nil
 }
 
-func (repo *chatRepositoryImpl) IsDialogExist(ctx context.Context, firstUserID string, secondUserID string) (string, error) {
+func (repo *chatRepositoryImpl) IsDialogExist(ctx context.Context, userID1 string, userID2 string) (string, error) {
 	chat := &core.Dialog{}
-	filter := bson.M{"$and": bson.A{
-		bson.D{{"participants", bson.M{"$size": 2}}},
-		bson.D{{"participants", firstUserID}},
-		bson.D{{"participants", secondUserID}},
-	}}
+	filter := bson.M{"participants": bson.D{{Key: "$all", Value: bson.A{userID1, userID2}}}}
 	if err := repo.coll.FindOne(ctx, filter).Decode(&chat); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return "", nil
@@ -79,7 +72,7 @@ func (repo *chatRepositoryImpl) CreateDialog(ctx context.Context, userID string,
 
 	dialog.Name = p.Sanitize(dialog.Name)
 
-	for i, _ := range dialog.Participants {
+	for i := range dialog.Participants {
 		dialog.Participants[i] = p.Sanitize(dialog.Participants[i])
 	}
 
@@ -87,7 +80,7 @@ func (repo *chatRepositoryImpl) CreateDialog(ctx context.Context, userID string,
 }
 
 func (repo *chatRepositoryImpl) IsChatExist(ctx context.Context, dialogID string) error {
-	filter := bson.D{{"_id", dialogID}}
+	filter := bson.M{"_id": dialogID}
 	if err := repo.coll.FindOne(ctx, filter).Err(); err != mongo.ErrNoDocuments {
 		return err
 	}
@@ -125,7 +118,7 @@ func (repo *chatRepositoryImpl) ReadMessage(ctx context.Context, userID string, 
 
 func (repo *chatRepositoryImpl) GetDialogByID(ctx context.Context, DialogID string) (*core.Dialog, error) {
 	dialog := new(core.Dialog)
-	filter := bson.D{{"_id", DialogID}}
+	filter := bson.M{"_id": DialogID}
 	err := repo.coll.FindOne(ctx, filter).Decode(dialog)
 
 	// Sanitize
@@ -133,11 +126,11 @@ func (repo *chatRepositoryImpl) GetDialogByID(ctx context.Context, DialogID stri
 
 	dialog.Name = p.Sanitize(dialog.Name)
 
-	for i, _ := range dialog.Messages {
+	for i := range dialog.Messages {
 		dialog.Messages[i].Body = p.Sanitize(dialog.Messages[i].Body)
 	}
 
-	for i, _ := range dialog.Participants {
+	for i := range dialog.Participants {
 		dialog.Participants[i] = p.Sanitize(dialog.Participants[i])
 	}
 
@@ -153,8 +146,6 @@ func (repo *chatRepositoryImpl) InitDialog(dialog *core.Dialog, userID string, a
 	dialog.ID = id
 	dialog.Name = name
 	dialog.Participants = append(dialog.Participants, userID)
-	for _, authorID := range authorIDs {
-		dialog.Participants = append(dialog.Participants, authorID)
-	}
+	dialog.Participants = append(dialog.Participants, authorIDs...)
 	return nil
 }

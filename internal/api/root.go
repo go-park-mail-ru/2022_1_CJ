@@ -9,7 +9,7 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/handler"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -43,10 +43,10 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 		debug:  debug,
 	}
 
-	authService := cl.NewAuthRepository(log, handler.NewUserAuthClient(grpcConn))
-
 	svc.router.Validator = NewValidator()
 	svc.router.Binder = NewBinder()
+
+	authService := cl.NewAuthRepository(log, handler.NewUserAuthClient(grpcConn))
 
 	repository, err := db.NewRepository(dbConn)
 	if err != nil {
@@ -56,12 +56,14 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	registry := service.NewRegistry(log, repository)
 
 	authCtrl := controllers.NewAuthController(log, registry, authService)
+	fileCtrl := controllers.NewFileController(log, registry)
 	userCtrl := controllers.NewUserController(log, registry)
 	friendsCtrl := controllers.NewFriendsController(log, registry)
 	postCtrl := controllers.NewPostController(log, registry)
 	staticCtrl := controllers.NewStaticController(log, registry)
 	likeCtrl := controllers.NewLikeController(log, registry)
 	communitiesCtrl := controllers.NewCommunityController(log, registry)
+	commentCtrl := controllers.NewCommentController(log, registry)
 	chatCtrl := controllers.NewChatController(log, repository, registry)
 
 	svc.router.HTTPErrorHandler = svc.httpErrorHandler
@@ -77,6 +79,11 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	authAPI.POST("/login", authCtrl.LoginUser)
 	authAPI.DELETE("/logout", authCtrl.LogoutUser)
 
+	fileAPI := api.Group("/file", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
+
+	fileAPI.POST("/upload", fileCtrl.UploadFile)
+	fileAPI.GET("/get", fileCtrl.GetFile)
+
 	userAPI := api.Group("/user", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
 
 	userAPI.GET("/get", userCtrl.GetUserData)
@@ -89,12 +96,15 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 
 	friendsAPI := api.Group("/friends", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
 
-	friendsAPI.POST("/request", friendsCtrl.SendFriendRequest)
-	friendsAPI.POST("/accept", friendsCtrl.AcceptFriendRequest)
-	friendsAPI.GET("/requests/outcoming", friendsCtrl.GetOutcomingRequests)
-	friendsAPI.GET("/requests/incoming", friendsCtrl.GetIncomingRequests)
-	friendsAPI.GET("/get", friendsCtrl.GetFriendsByUserID)
+	friendsAPI.POST("/request/send", friendsCtrl.SendRequest)
+	friendsAPI.POST("/request/revoke", friendsCtrl.RevokeRequest)
+	friendsAPI.POST("/request/accept", friendsCtrl.AcceptRequest)
+
+	friendsAPI.GET("/get", friendsCtrl.GetFriends)
 	friendsAPI.DELETE("/delete", friendsCtrl.DeleteFriend)
+
+	friendsAPI.GET("/requests/incoming", friendsCtrl.GetIncomingRequests)
+	friendsAPI.GET("/requests/outcoming", friendsCtrl.GetOutcomingRequests)
 
 	postAPI := api.Group("/post", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
 
@@ -116,10 +126,10 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 
 	chatAPI := api.Group("/messenger", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
 
+	chatAPI.POST("/create", chatCtrl.CreateChat)
 	chatAPI.GET("/dialogs", chatCtrl.GetDialogs)
 	chatAPI.GET("/get", chatCtrl.GetDialog)
 	chatAPI.GET("/user_dialog", chatCtrl.GetDialogByUserID)
-	chatAPI.POST("/create", chatCtrl.CreateDialog)
 	chatAPI.GET("/ws", chatCtrl.WsHandler)
 
 	communitiesAPI := api.Group("/communities", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
@@ -144,6 +154,13 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 	communitiesPostAPI.POST("/create", communitiesCtrl.CreatePostCommunity)
 	communitiesPostAPI.PUT("/edit", communitiesCtrl.EditPostCommunity)
 	communitiesPostAPI.DELETE("/delete", communitiesCtrl.DeletePostCommunity)
+
+	commentAPI := api.Group("/comment", svc.AuthMiddlewareMicro(authService), svc.CSRFMiddleware())
+
+	commentAPI.POST("/create", commentCtrl.CreateComment)
+	commentAPI.GET("/get", commentCtrl.GetComments)
+	commentAPI.PUT("/edit", commentCtrl.EditComment)
+	commentAPI.POST("/delete", commentCtrl.DeleteComment)
 
 	return svc, nil
 }

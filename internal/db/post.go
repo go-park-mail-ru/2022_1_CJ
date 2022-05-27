@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/utils"
 	"github.com/microcosm-cc/bluemonday"
@@ -25,6 +26,10 @@ type PostRepository interface {
 	DeletePost(ctx context.Context, postID string) error
 
 	GetFeed(ctx context.Context, userID string, pageNumber int64, limit int64) ([]core.Post, *common.PageResponse, error)
+
+	PostAddComment(ctx context.Context, postID string, commentID string) error
+	PostCheckComment(ctx context.Context, post *core.Post, commentID string) error
+	PostDeleteComment(ctx context.Context, postID string, commentID string) error
 }
 
 type postRepositoryImpl struct {
@@ -54,6 +59,35 @@ func (repo *postRepositoryImpl) CreatePost(ctx context.Context, post *core.Post)
 	return post, err
 }
 
+// PostAddComment Add new comment
+func (repo *postRepositoryImpl) PostAddComment(ctx context.Context, postID string, commentID string) error {
+	if _, err := repo.coll.UpdateByID(ctx, postID, bson.M{"$push": bson.D{{Key: "comment_ids", Value: commentID}}}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// PostDeleteComment Delete comment
+func (repo *postRepositoryImpl) PostDeleteComment(ctx context.Context, postID string, commentID string) error {
+	filter := bson.M{"_id": postID, "comment_ids": commentID}
+	if err := repo.coll.FindOne(ctx, filter).Err(); err == mongo.ErrNoDocuments {
+		return constants.ErrDBNotFound
+	}
+	if _, err := repo.coll.UpdateByID(ctx, postID, bson.M{"$pull": bson.M{"comment_ids": commentID}}); err != nil {
+		return err
+	}
+	return nil
+}
+
+//PostCheckComment Check existing comment in post
+func (repo *postRepositoryImpl) PostCheckComment(ctx context.Context, post *core.Post, commentID string) error {
+	filter := bson.M{"_id": post.ID, "comment_ids": commentID}
+	if err := repo.coll.FindOne(ctx, filter).Err(); err == mongo.ErrNoDocuments {
+		return constants.ErrDBNotFound
+	}
+	return nil
+}
+
 func (repo *postRepositoryImpl) GetPostByID(ctx context.Context, postID string) (*core.Post, error) {
 	post := new(core.Post)
 	filter := bson.M{"_id": postID}
@@ -67,7 +101,7 @@ func (repo *postRepositoryImpl) GetPostsByUserID(ctx context.Context, userID str
 
 	findOptions := options.Find()
 
-	findOptions.SetSort(bson.D{{"created_at", -1}})
+	findOptions.SetSort(bson.D{{Key: "created_at", Value: -1}})
 
 	if limit != -1 {
 		findOptions.SetSkip((pageNumber - 1) * limit)
@@ -95,7 +129,7 @@ func (repo *postRepositoryImpl) GetPostsByUserID(ctx context.Context, userID str
 
 	// Sanitize
 	p := bluemonday.UGCPolicy()
-	for i, _ := range posts {
+	for i := range posts {
 		posts[i].Message = p.Sanitize(posts[i].Message)
 	}
 
@@ -147,7 +181,7 @@ func (repo *postRepositoryImpl) GetFeed(ctx context.Context, userID string, page
 
 	// Sanitize
 	p := bluemonday.UGCPolicy()
-	for i, _ := range posts {
+	for i := range posts {
 		posts[i].Message = p.Sanitize(posts[i].Message)
 	}
 
@@ -161,5 +195,6 @@ func (repo *postRepositoryImpl) InitPost(post *core.Post) error {
 	}
 	post.ID = uid
 	post.CreatedAt = time.Now().Unix()
+	post.CommentsIDs = []string{}
 	return nil
 }

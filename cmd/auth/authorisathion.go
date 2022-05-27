@@ -87,7 +87,7 @@ func main() {
 
 	handler.RegisterUserAuthServer(server, controller.CreateAuthServer(mongoDB, logrus.NewEntry(log)))
 
-	log.Infof("Server started listen at", listenAddr)
+	log.Infof("Server started listen at: %s", listenAddr)
 
 	err = server.Serve(lis)
 	if err != nil {

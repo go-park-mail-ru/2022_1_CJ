@@ -2,9 +2,7 @@ package api
 
 import (
 	"bytes"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
 	"github.com/gofrs/uuid"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -12,10 +10,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
+	"github.com/spf13/viper"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/utils"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
 
@@ -35,7 +36,7 @@ func (svc *APIService) AuthMiddlewareMicro(rep cl.AuthRepository) echo.Middlewar
 				ctx.Request().Header.Set(constants.HeaderKeyUserID, UserID)
 			}
 
-			if code == true {
+			if code {
 				ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, newToken, viper.GetInt64(constants.ViperJWTTTLKey)))
 			}
 

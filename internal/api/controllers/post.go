@@ -7,7 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/service"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,7 +24,6 @@ func (c *PostController) CreatePost(ctx echo.Context) error {
 	}
 
 	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
-
 	response, err := c.registry.PostService.CreatePost(context.Background(), request, userID)
 	if err != nil {
 		return err

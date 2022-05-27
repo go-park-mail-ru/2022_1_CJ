@@ -1,3 +1,5 @@
+[![CI](https://github.com/go-park-mail-ru/2022_1_CJ/actions/workflows/deploy.yml/badge.svg)](https://github.com/go-park-mail-ru/2022_1_CJ/actions/workflows/deploy.yml)
+
 # Команда "CJ"
 ### Социальная сеть vk.com
 
