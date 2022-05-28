@@ -43,7 +43,7 @@ func (c *OAuthController) AuthenticateThroughTelergam(ctx echo.Context) error {
 	ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, authToken, viper.GetInt64(constants.ViperJWTTTLKey)))
 	ctx.SetCookie(utils.CreateCookie(constants.CookieKeyCSRFToken, csrfToken, viper.GetInt64(constants.ViperCSRFTTLKey)))
 
-	return ctx.NoContent(http.StatusOK)
+	return ctx.Redirect(http.StatusMovedPermanently, "/")
 }
 
 func NewOAuthController(log *logrus.Entry, registry *service.Registry) *OAuthController {
