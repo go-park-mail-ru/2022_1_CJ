@@ -41,25 +41,21 @@ func (svc *chatServiceImpl) CreateChat(ctx context.Context, request *dto.CreateC
 
 	dialog, err := svc.db.ChatRepo.CreateDialog(ctx, request.UserID, request.Name, request.AuthorIDs)
 	if err != nil {
-		svc.log.Errorf("CreateDialog error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("CreateDialog: %w", err)
 	}
 
 	if err := svc.db.UserRepo.AddDialog(ctx, dialog.ID, request.UserID); err != nil {
-		svc.log.Errorf("AddDialog error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("AddDialog: %w", err)
 	}
 
-	svc.log.Debug("Create dialog success")
 	for _, id := range request.AuthorIDs {
 		if id != request.UserID {
 			if err := svc.db.UserRepo.AddDialog(ctx, dialog.ID, id); err != nil {
-				svc.log.Errorf("AddDialog error: %s", err)
-				return nil, err
+				return nil, fmt.Errorf("AddDialog: %w", err)
 			}
 		}
 	}
-	svc.log.Debug("Add dialog to users success")
+
 	return &dto.CreateChatResponse{DialogID: dialog.ID}, nil
 }
 
@@ -135,6 +131,7 @@ func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDial
 				return nil, err
 			}
 			dialogs[i].Name = participant.Name.Full()
+			dialogs[i].Image = participant.Image
 		}
 	}
 
@@ -187,6 +184,7 @@ func (svc *chatServiceImpl) GetDialog(ctx context.Context, request *dto.GetDialo
 			return nil, err
 		}
 		dialog.Name = participant.Name.Full()
+		dialog.Image = participant.Image
 	}
 
 	return &dto.GetDialogResponse{Dialog: dialog, Messages: convert.Messages2DTO(dialogCore.Messages, request.UserID), Total: total, AmountPages: page}, err

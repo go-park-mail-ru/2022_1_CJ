@@ -40,6 +40,7 @@ type Dialog struct {
 	Name         string   `json:"name"`
 	Participants []string `json:"participants"`
 	NonRead      int64    `json:"non_read"`
+	Image        string   `json:"image"`
 }
 
 type SendMessageRequest struct {
