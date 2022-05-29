@@ -56,7 +56,7 @@ func TestGetPostByID(t *testing.T) {
 			{Key: "_id", Value: expectedPost.ID},
 			{Key: "author_id", Value: expectedPost.AuthorID},
 			{Key: "message", Value: expectedPost.Message},
-			{Key: "files", Value: expectedPost.Files},
+			{Key: "attachments", Value: expectedPost.Attachments},
 			{Key: "created_at", Value: expectedPost.CreatedAt},
 		}))
 		ctx := context.Background()
@@ -85,28 +85,28 @@ func TestGetPostsByUserID(t *testing.T) {
 		postCollection, _ := NewPostRepositoryTest(mt.Coll)
 
 		expectedPost1 := core.Post{
-			ID:        "12345678",
-			AuthorID:  "123456789",
-			Files:     []string{"src/image1.jpg"},
-			CreatedAt: 1323123,
+			ID:          "12345678",
+			AuthorID:    "123456789",
+			Attachments: []string{"src/image1.jpg"},
+			CreatedAt:   1323123,
 		}
 		first := mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
 			{Key: "_id", Value: expectedPost1.ID},
 			{Key: "author_id", Value: expectedPost1.AuthorID},
-			{Key: "files", Value: expectedPost1.Files},
+			{Key: "attachments", Value: expectedPost1.Attachments},
 			{Key: "created_at", Value: expectedPost1.CreatedAt},
 		})
 
 		expectedPost2 := core.Post{
-			ID:        "101010101",
-			AuthorID:  "123456789",
-			Files:     []string{"src/image2.jpg"},
-			CreatedAt: 1323123,
+			ID:          "101010101",
+			AuthorID:    "123456789",
+			Attachments: []string{"src/image2.jpg"},
+			CreatedAt:   1323123,
 		}
 		second := mtest.CreateCursorResponse(1, "foo.bar", mtest.NextBatch, bson.D{
 			{Key: "_id", Value: expectedPost2.ID},
 			{Key: "author_id", Value: expectedPost2.AuthorID},
-			{Key: "files", Value: expectedPost2.Files},
+			{Key: "attachments", Value: expectedPost2.Attachments},
 			{Key: "created_at", Value: expectedPost2.CreatedAt},
 		})
 
@@ -117,8 +117,8 @@ func TestGetPostsByUserID(t *testing.T) {
 		posts, _, err := postCollection.GetPostsByUserID(ctx, "123456789", 1, -1)
 		assert.Nil(t, err)
 		assert.Equal(t, []core.Post{
-			{ID: expectedPost1.ID, AuthorID: expectedPost1.AuthorID, Files: expectedPost1.Files, CreatedAt: expectedPost1.CreatedAt},
-			{ID: expectedPost2.ID, AuthorID: expectedPost2.AuthorID, Files: expectedPost2.Files, CreatedAt: expectedPost2.CreatedAt},
+			{ID: expectedPost1.ID, AuthorID: expectedPost1.AuthorID, Attachments: expectedPost1.Attachments, CreatedAt: expectedPost1.CreatedAt},
+			{ID: expectedPost2.ID, AuthorID: expectedPost2.AuthorID, Attachments: expectedPost2.Attachments, CreatedAt: expectedPost2.CreatedAt},
 		}, posts)
 	})
 }
@@ -161,28 +161,28 @@ func TestGetFeed(t *testing.T) {
 		postCollection, _ := NewPostRepositoryTest(mt.Coll)
 
 		expectedPost1 := core.Post{
-			ID:        "12345678",
-			AuthorID:  "123456789",
-			Files:     []string{"src/image1.jpg"},
-			CreatedAt: 1323123,
+			ID:          "12345678",
+			AuthorID:    "123456789",
+			Attachments: []string{"src/image1.jpg"},
+			CreatedAt:   1323123,
 		}
 		first := mtest.CreateCursorResponse(1, "foo.bar", mtest.FirstBatch, bson.D{
 			{Key: "_id", Value: expectedPost1.ID},
 			{Key: "author_id", Value: expectedPost1.AuthorID},
-			{Key: "files", Value: expectedPost1.Files},
+			{Key: "attachments", Value: expectedPost1.Attachments},
 			{Key: "created_at", Value: expectedPost1.CreatedAt},
 		})
 
 		expectedPost2 := core.Post{
-			ID:        "101010101",
-			AuthorID:  "123456789",
-			Files:     []string{"src/image2.jpg"},
-			CreatedAt: 1323123,
+			ID:          "101010101",
+			AuthorID:    "123456789",
+			Attachments: []string{"src/image2.jpg"},
+			CreatedAt:   1323123,
 		}
 		second := mtest.CreateCursorResponse(1, "foo.bar", mtest.NextBatch, bson.D{
 			{Key: "_id", Value: expectedPost2.ID},
 			{Key: "author_id", Value: expectedPost2.AuthorID},
-			{Key: "files", Value: expectedPost2.Files},
+			{Key: "attachments", Value: expectedPost2.Attachments},
 			{Key: "created_at", Value: expectedPost2.CreatedAt},
 		})
 
@@ -193,8 +193,8 @@ func TestGetFeed(t *testing.T) {
 		posts, _, err := postCollection.GetFeed(ctx, "12", 1, -1)
 		assert.Nil(t, err)
 		assert.Equal(t, []core.Post{
-			{ID: expectedPost1.ID, AuthorID: expectedPost1.AuthorID, Files: expectedPost1.Files, CreatedAt: expectedPost1.CreatedAt},
-			{ID: expectedPost2.ID, AuthorID: expectedPost2.AuthorID, Files: expectedPost2.Files, CreatedAt: expectedPost2.CreatedAt},
+			{ID: expectedPost1.ID, AuthorID: expectedPost1.AuthorID, Attachments: expectedPost1.Attachments, CreatedAt: expectedPost1.CreatedAt},
+			{ID: expectedPost2.ID, AuthorID: expectedPost2.AuthorID, Attachments: expectedPost2.Attachments, CreatedAt: expectedPost2.CreatedAt},
 		}, posts)
 	})
 }

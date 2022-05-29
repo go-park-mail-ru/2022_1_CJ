@@ -69,14 +69,14 @@ func TestCreatePost(t *testing.T) {
 		{
 			name: "Can't insert in postRepo",
 			input: Input{info: &dto.CreatePostRequest{
-				Message: "It's my first post!",
-				Files:   []string{"src/img.jpg"}},
+				Message:     "It's my first post!",
+				Attachments: []string{"src/img.jpg"}},
 				userID: "0"},
 			inputCreatePost: InputCreatePost{post: &core.Post{
-				AuthorID: "0",
-				Message:  "It's my first post!",
-				Type:     constants.UserPost,
-				Files:    []string{"src/img.jpg"}}},
+				AuthorID:    "0",
+				Message:     "It's my first post!",
+				Type:        constants.UserPost,
+				Attachments: []string{"src/img.jpg"}}},
 			outputCreatePost: OutputCreatePost{post: nil,
 				err: err},
 			output: Output{nil, err},
@@ -84,19 +84,19 @@ func TestCreatePost(t *testing.T) {
 		{
 			name: "Can't insert in userRepo",
 			input: Input{info: &dto.CreatePostRequest{
-				Message: "It's my second post!",
-				Files:   []string{"src/img.jpg"}},
+				Message:     "It's my second post!",
+				Attachments: []string{"src/img.jpg"}},
 				userID: "1"},
 			inputCreatePost: InputCreatePost{post: &core.Post{
-				AuthorID: "1",
-				Message:  "It's my second post!",
-				Type:     constants.UserPost,
-				Files:    []string{"src/img.jpg"}}},
+				AuthorID:    "1",
+				Message:     "It's my second post!",
+				Type:        constants.UserPost,
+				Attachments: []string{"src/img.jpg"}}},
 			outputCreatePost: OutputCreatePost{post: &core.Post{
-				ID:       "1",
-				AuthorID: "1",
-				Message:  "It's my second post!",
-				Files:    []string{"src/img.jpg"}},
+				ID:          "1",
+				AuthorID:    "1",
+				Message:     "It's my second post!",
+				Attachments: []string{"src/img.jpg"}},
 				err: nil},
 			inputUserAddPost:  InputUserAddPost{userID: "1", postID: "1"},
 			outputUserAddPost: OutputUserAddPost{err: err},
@@ -105,19 +105,19 @@ func TestCreatePost(t *testing.T) {
 		{
 			name: "Success",
 			input: Input{info: &dto.CreatePostRequest{
-				Message: "It's my second post!",
-				Files:   []string{"src/img.jpg"}},
+				Message:     "It's my second post!",
+				Attachments: []string{"src/img.jpg"}},
 				userID: "1"},
 			inputCreatePost: InputCreatePost{post: &core.Post{
-				AuthorID: "1",
-				Message:  "It's my second post!",
-				Type:     constants.UserPost,
-				Files:    []string{"src/img.jpg"}}},
+				AuthorID:    "1",
+				Message:     "It's my second post!",
+				Type:        constants.UserPost,
+				Attachments: []string{"src/img.jpg"}}},
 			outputCreatePost: OutputCreatePost{post: &core.Post{
-				ID:       "1",
-				AuthorID: "1",
-				Message:  "It's my second post!",
-				Files:    []string{"src/img.jpg"}},
+				ID:          "1",
+				AuthorID:    "1",
+				Message:     "It's my second post!",
+				Attachments: []string{"src/img.jpg"}},
 				err: nil},
 			inputUserAddPost:  InputUserAddPost{userID: "1", postID: "1"},
 			outputUserAddPost: OutputUserAddPost{err: nil},
@@ -166,61 +166,81 @@ func TestGetPost(t *testing.T) {
 		userID string
 	}
 
-	type Output struct {
-		res *dto.GetPostResponse
+	type InputGetPostById struct {
+		postID string
+	}
+
+	type OutputGetPostById struct {
+		pos *core.Post
 		err error
 	}
-	type OutputGetPost struct {
-		post *core.Post
+
+	type InputGetUserById struct {
+		authorID string
+	}
+
+	type OutputGetUserById struct {
+		user *core.User
 		err  error
 	}
-	type InputCreateLike struct {
-		like *core.Like
+
+	type InputGetLikeBySubjectID struct {
+		postID string
 	}
-	type OutputCreateLike struct {
+
+	type OutputGetLikeBySubjectID struct {
 		like *core.Like
 		err  error
 	}
 
+	type Output struct {
+		res *dto.GetPostResponse
+		err error
+	}
+
 	tests := []struct {
-		name             string
-		input            Input
-		outputGetPost    OutputGetPost
-		inputCreateLike  InputCreateLike
-		outputCreateLike OutputCreateLike
-		output           Output
+		name                     string
+		input                    Input
+		inputGetPostById         InputGetPostById
+		outputGetPostById        OutputGetPostById
+		inputGetUserById         InputGetUserById
+		outputGetUserById        OutputGetUserById
+		inputGetLikeBySubjectID  InputGetLikeBySubjectID
+		outputGetLikeBySubjectID OutputGetLikeBySubjectID
+		output                   Output
 	}{
 		{
 			name: "Can't find in postRepo",
 			input: Input{info: &dto.GetPostRequest{
 				PostID: "0"}, userID: "0"},
-			outputGetPost: OutputGetPost{post: nil, err: constants.ErrDBNotFound},
-
-			output: Output{nil, constants.ErrDBNotFound},
+			inputGetPostById:  InputGetPostById{postID: "0"},
+			outputGetPostById: OutputGetPostById{pos: &core.Post{}, err: constants.ErrDBNotFound},
+			output:            Output{nil, constants.ErrDBNotFound},
 		},
 		{
 			name: "Success",
 			input: Input{info: &dto.GetPostRequest{
 				PostID: "677be1d2-9b64-48e9-9341-5ba0c2f57686"}, userID: "1"},
-			outputGetPost: OutputGetPost{post: &core.Post{
-				AuthorID: "1",
-				Message:  "It's my second post!",
-				Files:    []string{"src/img.jpg"}}, err: nil},
-			inputCreateLike: InputCreateLike{like: &core.Like{Subject: "677be1d2-9b64-48e9-9341-5ba0c2f57686"}},
-			outputCreateLike: OutputCreateLike{
-				like: &core.Like{
-					ID:        "1",
-					Subject:   "677be1d2-9b64-48e9-9341-5ba0c2f57686",
-					Amount:    0,
-					UserIDs:   nil,
-					CreatedAt: 0,
-				},
-				err: nil,
-			},
+			inputGetPostById: InputGetPostById{postID: "677be1d2-9b64-48e9-9341-5ba0c2f57686"},
+			outputGetPostById: OutputGetPostById{pos: &core.Post{
+				AuthorID:    "1",
+				Message:     "It's my second post!",
+				Type:        "user",
+				Attachments: []string{"src/img.jpg"}}, err: nil},
+			inputGetUserById:        InputGetUserById{authorID: "1"},
+			outputGetUserById:       OutputGetUserById{user: &core.User{ID: "1", Posts: []string{"677be1d2-9b64-48e9-9341-5ba0c2f57686"}}},
+			inputGetLikeBySubjectID: InputGetLikeBySubjectID{postID: "677be1d2-9b64-48e9-9341-5ba0c2f57686"},
+			outputGetLikeBySubjectID: OutputGetLikeBySubjectID{like: &core.Like{
+				ID:        "1",
+				Subject:   "677be1d2-9b64-48e9-9341-5ba0c2f57686",
+				Amount:    0,
+				UserIDs:   nil,
+				CreatedAt: 0,
+			}, err: nil},
 			output: Output{&dto.GetPostResponse{Post: convert.Post2DTOByUser(&core.Post{
-				AuthorID: "1",
-				Message:  "It's my second post!",
-				Files:    []string{"src/img.jpg"}}, &core.User{ID: "1"}), Likes: convert.Like2DTO(&core.Like{
+				AuthorID:    "1",
+				Message:     "It's my second post!",
+				Attachments: []string{"src/img.jpg"}}, &core.User{ID: "1"}), Likes: convert.Like2DTO(&core.Like{
 				ID:        "1",
 				Subject:   "677be1d2-9b64-48e9-9341-5ba0c2f57686",
 				Amount:    0,
@@ -231,10 +251,11 @@ func TestGetPost(t *testing.T) {
 	}
 
 	gomock.InOrder(
-		testRepo.mockPostR.EXPECT().GetPostByID(ctx, tests[0].input.info.PostID).Return(tests[0].outputGetPost.post, tests[0].outputGetPost.err),
-		testRepo.mockPostR.EXPECT().GetPostByID(ctx, tests[1].input.info.PostID).Return(tests[1].outputGetPost.post, tests[1].outputGetPost.err),
-		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[1].outputGetPost.post.AuthorID).Return(&core.User{ID: "1"}, nil),
-		testRepo.mockLikeR.EXPECT().GetLikeBySubjectID(ctx, tests[1].inputCreateLike.like.Subject).Return(tests[1].outputCreateLike.like, tests[1].outputCreateLike.err),
+		testRepo.mockPostR.EXPECT().GetPostByID(ctx, tests[0].input.info.PostID).Return(tests[0].outputGetPostById.pos, tests[0].outputGetPostById.err),
+
+		testRepo.mockPostR.EXPECT().GetPostByID(ctx, tests[1].input.info.PostID).Return(tests[1].outputGetPostById.pos, tests[1].outputGetPostById.err),
+		testRepo.mockUserR.EXPECT().GetUserByID(ctx, tests[1].inputGetUserById.authorID).Return(tests[1].outputGetUserById.user, tests[1].outputGetUserById.err),
+		testRepo.mockLikeR.EXPECT().GetLikeBySubjectID(ctx, tests[1].inputGetLikeBySubjectID.postID).Return(tests[1].outputGetLikeBySubjectID.like, tests[1].outputGetLikeBySubjectID.err),
 	)
 
 	for _, test := range tests {
@@ -319,9 +340,9 @@ func TestEditPost(t *testing.T) {
 		{
 			name: "Can't find User in db",
 			input: Input{info: &dto.EditPostRequest{
-				PostID:  "1",
-				Message: "It's my first post!",
-				Files:   []string{"src/img.jpg"}},
+				PostID:      "1",
+				Message:     "It's my first post!",
+				Attachments: []string{"src/img.jpg"}},
 				userID: "0"},
 			inputGetUserByID:  InputGetUserByID{userID: "0"},
 			outputGetUserByID: OutputGetUserByID{user: nil, err: constants.ErrDBNotFound},
@@ -330,9 +351,9 @@ func TestEditPost(t *testing.T) {
 		{
 			name: "Don't find posts in post by UserId",
 			input: Input{info: &dto.EditPostRequest{
-				PostID:  "1",
-				Message: "It's my first post!",
-				Files:   []string{"src/img.jpg"}},
+				PostID:      "1",
+				Message:     "It's my first post!",
+				Attachments: []string{"src/img.jpg"}},
 				userID: "1"},
 			inputGetUserByID:    InputGetUserByID{userID: "1"},
 			outputGetUserByID:   OutputGetUserByID{user: &core.User{ID: "1"}, err: nil},
@@ -343,9 +364,9 @@ func TestEditPost(t *testing.T) {
 		{
 			name: "Don't find post by postID",
 			input: Input{info: &dto.EditPostRequest{
-				PostID:  "1",
-				Message: "It's my first post!",
-				Files:   []string{"src/img.jpg"}},
+				PostID:      "1",
+				Message:     "It's my first post!",
+				Attachments: []string{"src/img.jpg"}},
 				userID: "2"},
 			inputGetUserByID:    InputGetUserByID{userID: "2"},
 			outputGetUserByID:   OutputGetUserByID{user: &core.User{ID: "2"}, err: nil},
@@ -358,9 +379,9 @@ func TestEditPost(t *testing.T) {
 		{
 			name: "Success",
 			input: Input{info: &dto.EditPostRequest{
-				PostID:  "1",
-				Message: "It's my first post!",
-				Files:   []string{"src/img.jpg"}},
+				PostID:      "1",
+				Message:     "It's my first post!",
+				Attachments: []string{"src/img.jpg"}},
 				userID: "3"},
 			inputGetUserByID:    InputGetUserByID{userID: "3"},
 			outputGetUserByID:   OutputGetUserByID{user: &core.User{ID: "3"}, err: nil},
@@ -370,12 +391,10 @@ func TestEditPost(t *testing.T) {
 			outputGetPostByID:   OutputGetPostByID{&core.Post{ID: "1"}, nil},
 			inputEditPost: InputEditPost{&core.Post{
 				ID:      "1",
-				Message: "It's my first post!",
-				Files:   []string{"src/img.jpg"}}},
+				Message: "It's my first post!"}},
 			outputEditPost: OutputEditPost{post: &core.Post{
 				ID:       "1",
 				Message:  "It's my first post!",
-				Files:    []string{"src/img.jpg"},
 				AuthorID: "3"},
 				err: nil},
 			output: Output{&dto.EditPostResponse{}, nil},

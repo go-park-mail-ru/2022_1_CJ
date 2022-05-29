@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
@@ -68,7 +69,7 @@ func TestSignupUser(t *testing.T) {
 				Email: "wrong",
 			}},
 			outputCreateUser: OutputCreateUser{err: constants.ErrEmailAlreadyTaken},
-			output:           Output{nil, constants.ErrEmailAlreadyTaken},
+			output:           Output{nil, fmt.Errorf("CreateUser: %w", constants.ErrEmailAlreadyTaken)},
 		},
 		{
 			name: "CreateFriends error",
@@ -86,7 +87,7 @@ func TestSignupUser(t *testing.T) {
 				userID: "1",
 			},
 			outputCreateFriends: OutputCreateFriends{err: constants.ErrEmailAlreadyTaken},
-			output:              Output{nil, constants.ErrEmailAlreadyTaken},
+			output:              Output{nil, fmt.Errorf("CreateFriends: %w", constants.ErrEmailAlreadyTaken)},
 		},
 		{
 			name: "Success",

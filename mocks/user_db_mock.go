@@ -65,6 +65,21 @@ func (mr *MockUserRepositoryMockRecorder) CheckUserEmailExistence(ctx, email int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserEmailExistence", reflect.TypeOf((*MockUserRepository)(nil).CheckUserEmailExistence), ctx, email)
 }
 
+// CheckUserIDExistence mocks base method.
+func (m *MockUserRepository) CheckUserIDExistence(ctx context.Context, id string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckUserIDExistence", ctx, id)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckUserIDExistence indicates an expected call of CheckUserIDExistence.
+func (mr *MockUserRepositoryMockRecorder) CheckUserIDExistence(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckUserIDExistence", reflect.TypeOf((*MockUserRepository)(nil).CheckUserIDExistence), ctx, id)
+}
+
 // CreateUser mocks base method.
 func (m *MockUserRepository) CreateUser(ctx context.Context, user *core.User) error {
 	m.ctrl.T.Helper()
@@ -136,6 +151,20 @@ func (m *MockUserRepository) GetUserDialogs(ctx context.Context, userID string) 
 func (mr *MockUserRepositoryMockRecorder) GetUserDialogs(ctx, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserDialogs", reflect.TypeOf((*MockUserRepository)(nil).GetUserDialogs), ctx, userID)
+}
+
+// InsertUser mocks base method.
+func (m *MockUserRepository) InsertUser(ctx context.Context, user *core.User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertUser", ctx, user)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InsertUser indicates an expected call of InsertUser.
+func (mr *MockUserRepositoryMockRecorder) InsertUser(ctx, user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertUser", reflect.TypeOf((*MockUserRepository)(nil).InsertUser), ctx, user)
 }
 
 // IsUserInDialog mocks base method.
