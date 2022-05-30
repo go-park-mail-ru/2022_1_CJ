@@ -7,9 +7,10 @@ import (
 
 func Comment2DTO(post *core.Comment, user *core.User) dto.Comment {
 	return dto.Comment{
-		ID:      post.ID,
-		Message: post.Message,
-		Images:  post.Images,
-		Author:  User2DTO(user),
+		ID:        post.ID,
+		Message:   post.Message,
+		Images:    post.Images,
+		Author:    User2DTO(user),
+		CreatedAt: post.CreatedAt,
 	}
 }

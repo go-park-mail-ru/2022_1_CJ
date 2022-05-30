@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/dto"
@@ -210,7 +211,7 @@ func TestSendMessage(t *testing.T) {
 				Dialog: nil,
 				err:    err,
 			},
-			output: Output{nil, err},
+			output: Output{nil, fmt.Errorf("GetDialogByID: %w", err)},
 		},
 		{
 			name: "success",

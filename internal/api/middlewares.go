@@ -2,7 +2,6 @@ package api
 
 import (
 	"bytes"
-	"github.com/gofrs/uuid"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/cl"
+	"github.com/gofrs/uuid"
 	"github.com/spf13/viper"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
@@ -155,6 +155,7 @@ func (svc *APIService) LoggingMiddleware() echo.MiddlewareFunc {
 func (svc *APIService) AccessLogMiddleware() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx echo.Context) error {
+			res := ctx.Response()
 			id, _ := uuid.NewV4()
 
 			start := time.Now()
@@ -162,19 +163,21 @@ func (svc *APIService) AccessLogMiddleware() echo.MiddlewareFunc {
 
 			svc.log.Infof("ID: %s; URL: %s; METHOD: %s", id.String(), ctx.Request().URL.Path, ctx.Request().Method)
 
-			err := next(ctx)
+			if err := next(ctx); err != nil {
+				ctx.Error(err)
+			}
 
 			responseTime := time.Since(start)
 			svc.log.Infof("ID: %s; TIME FOR ANSWER: %s", id.String(), responseTime)
 
-			status := strconv.Itoa(ctx.Response().Status)
+			status := res.Status
 			path := ctx.Request().URL.Path
 			method := ctx.Request().Method
 
-			svc.metrics.Hits.WithLabelValues(status, path, method).Inc()
-			svc.metrics.Duration.WithLabelValues(status, path, method).Observe(responseTime.Seconds())
+			svc.metrics.Hits.WithLabelValues(strconv.Itoa(status), path, method).Inc()
+			svc.metrics.Duration.WithLabelValues(strconv.Itoa(status), path, method).Observe(responseTime.Seconds())
 
-			return err
+			return nil
 		}
 	}
 }

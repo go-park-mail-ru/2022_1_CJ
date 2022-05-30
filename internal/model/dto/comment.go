@@ -1,10 +1,11 @@
 package dto
 
 type Comment struct {
-	ID      string   `json:"id"`
-	Author  User     `json:"author"`
-	Message string   `json:"message"`
-	Images  []string `json:"images,omitempty"`
+	ID        string   `json:"id"`
+	Author    User     `json:"author"`
+	Message   string   `json:"message"`
+	Images    []string `json:"images,omitempty"`
+	CreatedAt int64    `json:"created_at"`
 }
 
 type CreateCommentRequest struct {

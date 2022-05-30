@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
@@ -40,33 +41,28 @@ func (svc *chatServiceImpl) CreateChat(ctx context.Context, request *dto.CreateC
 
 	dialog, err := svc.db.ChatRepo.CreateDialog(ctx, request.UserID, request.Name, request.AuthorIDs)
 	if err != nil {
-		svc.log.Errorf("CreateDialog error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("CreateDialog: %w", err)
 	}
 
 	if err := svc.db.UserRepo.AddDialog(ctx, dialog.ID, request.UserID); err != nil {
-		svc.log.Errorf("AddDialog error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("AddDialog: %w", err)
 	}
 
-	svc.log.Debug("Create dialog success")
 	for _, id := range request.AuthorIDs {
 		if id != request.UserID {
 			if err := svc.db.UserRepo.AddDialog(ctx, dialog.ID, id); err != nil {
-				svc.log.Errorf("AddDialog error: %s", err)
-				return nil, err
+				return nil, fmt.Errorf("AddDialog: %w", err)
 			}
 		}
 	}
-	svc.log.Debug("Add dialog to users success")
+
 	return &dto.CreateChatResponse{DialogID: dialog.ID}, nil
 }
 
 func (svc *chatServiceImpl) SendMessage(ctx context.Context, request *dto.SendMessageRequest) (*dto.SendMessageResponse, error) {
 	dialog, err := svc.db.ChatRepo.GetDialogByID(ctx, request.Message.DialogID)
 	if err != nil {
-		svc.log.Errorf("Chat not exist error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("GetDialogByID: %w", err)
 	}
 
 	var isRead []core.IsRead
@@ -77,20 +73,19 @@ func (svc *chatServiceImpl) SendMessage(ctx context.Context, request *dto.SendMe
 	}
 
 	message := core.Message{
-		Body:      request.Message.Body,
-		AuthorID:  request.Message.AuthorID,
-		IsRead:    isRead,
-		ID:        request.Message.ID,
-		CreatedAt: request.Message.CreatedAt}
-
-	svc.log.Debugf("Text: %s; DialogID: %s; AuthorID: %s", message.Body, request.Message.DialogID, message.AuthorID)
-
-	if err := svc.db.ChatRepo.SendMessage(ctx, message, request.Message.DialogID); err != nil {
-		svc.log.Errorf("SendMessage error: %s", err)
-		return nil, err
+		Body:        request.Message.Body,
+		AuthorID:    request.Message.AuthorID,
+		IsRead:      isRead,
+		ID:          request.Message.ID,
+		Attachments: request.Message.Attachments,
+		Images:      request.Message.Images,
+		CreatedAt:   request.Message.CreatedAt,
 	}
 
-	svc.log.Debug("Message was sent successful")
+	if err := svc.db.ChatRepo.SendMessage(ctx, message, request.Message.DialogID); err != nil {
+		return nil, fmt.Errorf("SendMessage: %w", err)
+	}
+
 	return &dto.SendMessageResponse{}, nil
 }
 
@@ -136,6 +131,7 @@ func (svc *chatServiceImpl) GetDialogs(ctx context.Context, request *dto.GetDial
 				return nil, err
 			}
 			dialogs[i].Name = participant.Name.Full()
+			dialogs[i].Image = participant.Image
 		}
 	}
 
@@ -188,6 +184,7 @@ func (svc *chatServiceImpl) GetDialog(ctx context.Context, request *dto.GetDialo
 			return nil, err
 		}
 		dialog.Name = participant.Name.Full()
+		dialog.Image = participant.Image
 	}
 
 	return &dto.GetDialogResponse{Dialog: dialog, Messages: convert.Messages2DTO(dialogCore.Messages, request.UserID), Total: total, AmountPages: page}, err

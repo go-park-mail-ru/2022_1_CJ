@@ -2,13 +2,14 @@ package service
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
-	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
-	"github.com/sirupsen/logrus"
 	"io"
 	"mime/multipart"
 	"os"
 	"path/filepath"
+
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/db"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
+	"github.com/sirupsen/logrus"
 )
 
 type StaticService interface {

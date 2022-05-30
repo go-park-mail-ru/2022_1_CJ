@@ -19,11 +19,11 @@ type PostController struct {
 func (c *PostController) CreatePost(ctx echo.Context) error {
 	request := new(dto.CreatePostRequest)
 	if err := ctx.Bind(request); err != nil {
-		c.log.Errorf("Bind error: %s", err)
 		return err
 	}
 
 	userID := ctx.Request().Header.Get(constants.HeaderKeyUserID)
+
 	response, err := c.registry.PostService.CreatePost(context.Background(), request, userID)
 	if err != nil {
 		return err

@@ -20,6 +20,7 @@ func Community2DTOSmallProfile(community *core.Community) dto.CommunityProfile {
 	return dto.CommunityProfile{
 		ID:    community.ID,
 		Name:  community.Name,
+		Info:  community.Info,
 		Image: community.Image,
 	}
 }
@@ -28,6 +29,7 @@ func Community2DTO(community *core.Community) dto.Community {
 	return dto.Community{
 		ID:    community.ID,
 		Name:  community.Name,
+		Info:  community.Info,
 		Image: community.Image,
 	}
 }

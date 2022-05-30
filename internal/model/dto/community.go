@@ -4,6 +4,7 @@ package dto
 type Community struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
+	Info  string `json:"info"`
 	Image string `json:"image"`
 }
 
@@ -158,7 +159,8 @@ type DeleteCommunityResponse BasicResponse
 type CreatePostCommunityRequest struct {
 	CommunityID string   `json:"community_id"`
 	Message     string   `json:"message" validate:"required"`
-	Files       []string `json:"files,omitempty"`
+	Images      []string `json:"images,omitempty"`
+	Attachments []string `json:"attachments,omitempty"`
 }
 
 type CreatePostCommunityResponse BasicResponse
@@ -167,7 +169,8 @@ type EditPostCommunityRequest struct {
 	CommunityID string   `json:"community_id"`
 	PostID      string   `json:"post_id"`
 	Message     string   `json:"message"`
-	Files       []string `json:"files,omitempty"`
+	Images      []string `json:"images,omitempty"`
+	Attachments []string `json:"attachments,omitempty"`
 }
 
 type EditPostCommunityResponse BasicResponse

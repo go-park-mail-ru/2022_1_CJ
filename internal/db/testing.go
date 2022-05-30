@@ -64,11 +64,11 @@ func TestFriends(t *testing.T) *core.Friends {
 func TestPost(t *testing.T) *core.Post {
 	t.Helper()
 	return &core.Post{
-		ID:        "12345678",
-		AuthorID:  "123456789",
-		Message:   "Hi it's my first post",
-		Files:     []string{"src/image.jpg"},
-		CreatedAt: 1323123,
+		ID:          "12345678",
+		AuthorID:    "123456789",
+		Message:     "Hi it's my first post",
+		Attachments: []string{"src/image.jpg"},
+		CreatedAt:   1323123,
 	}
 }
 

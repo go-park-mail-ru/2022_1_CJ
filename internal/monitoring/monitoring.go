@@ -19,7 +19,7 @@ func RegisterMonitoring(server *echo.Echo) *PrometheusMetrics {
 		Help: "help",
 	}, []string{"status", "path", "method"})
 	metrics.Duration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name: "duration",
+		Name: "duration_",
 		Help: "help",
 	}, []string{"status", "path", "method"})
 

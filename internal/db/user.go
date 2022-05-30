@@ -18,10 +18,12 @@ import (
 
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *core.User) error
+	InsertUser(ctx context.Context, user *core.User) error
 
 	GetUserByID(ctx context.Context, ID string) (*core.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*core.User, error)
 
+	CheckUserIDExistence(ctx context.Context, id string) (bool, error)
 	CheckUserEmailExistence(ctx context.Context, email string) (bool, error)
 
 	UpdateUser(ctx context.Context, user *core.User) error
@@ -79,6 +81,14 @@ func (repo *userRepositoryImpl) CreateUser(ctx context.Context, user *core.User)
 	return err
 }
 
+func (repo *userRepositoryImpl) InsertUser(ctx context.Context, user *core.User) error {
+	if err := repo.InitUser(user); err != nil {
+		return err
+	}
+	_, err := repo.coll.InsertOne(ctx, user)
+	return err
+}
+
 func (repo *userRepositoryImpl) GetUserByID(ctx context.Context, ID string) (*core.User, error) {
 	user := new(core.User)
 	filter := bson.M{"_id": ID}
@@ -100,6 +110,19 @@ func (repo *userRepositoryImpl) GetUserByEmail(ctx context.Context, email string
 	userSanitize(user)
 
 	return user, wrapError(err)
+}
+
+// CheckUserEmailExistence checks whether user with given id exists. Returns true if id is already taken.
+func (repo *userRepositoryImpl) CheckUserIDExistence(ctx context.Context, id string) (bool, error) {
+	filter := bson.M{"_id": id}
+	err := repo.coll.FindOne(ctx, filter).Err()
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
 }
 
 // CheckUserEmailExistence checks whether user with given email exists. Returns true if email is already taken.
@@ -260,7 +283,9 @@ func (repo *userRepositoryImpl) IsUserInDialog(ctx context.Context, userID strin
 }
 
 func (repo *userRepositoryImpl) InitUser(user *core.User) error {
-	user.Image = "/default.jpeg"
+	if len(user.Image) == 0 {
+		user.Image = "/default.jpeg"
+	}
 	user.CreatedAt = time.Now().Unix()
 	return nil
 }
