@@ -171,12 +171,11 @@ func (svc *APIService) AccessLogMiddleware() echo.MiddlewareFunc {
 			svc.log.Infof("ID: %s; TIME FOR ANSWER: %s", id.String(), responseTime)
 
 			status := res.Status
-			svc.log.Infof("STATUS: %d", status)
 			path := ctx.Request().URL.Path
 			method := ctx.Request().Method
 
-			svc.metrics.Hits.WithLabelValues(strconv.Itoa(res.Status), path, method).Inc()
-			svc.metrics.Duration.WithLabelValues(strconv.Itoa(res.Status), path, method).Observe(responseTime.Seconds())
+			svc.metrics.Hits.WithLabelValues(strconv.Itoa(status), path, method).Inc()
+			svc.metrics.Duration.WithLabelValues(strconv.Itoa(status), path, method).Observe(responseTime.Seconds())
 
 			return nil
 		}
