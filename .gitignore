@@ -17,3 +17,5 @@ vendor/
 .idea/
 
 var
+
+resources/config/config_prod.yaml

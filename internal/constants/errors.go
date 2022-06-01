@@ -32,6 +32,8 @@ var (
 	ErrAuthTokenInvalid        = &CodedError{errors.New("authorization token is invalid"), http.StatusUnauthorized}
 	ErrUnexpectedSigningMethod = &CodedError{errors.New("unexpected signing method"), http.StatusUnauthorized}
 
+	ErrHashInvalid = &CodedError{errors.New("hash is invalid"), http.StatusUnauthorized}
+
 	// Forbidden
 	ErrAuthTokenExpired = &CodedError{errors.New("authorization token is expired"), http.StatusForbidden}
 	ErrAuthorIDMismatch = &CodedError{errors.New("author id mismatch"), http.StatusForbidden}

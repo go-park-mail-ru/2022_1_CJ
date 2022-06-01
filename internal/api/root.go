@@ -83,7 +83,7 @@ func NewAPIService(log *logrus.Entry, dbConn *mongo.Database, debug bool, grpcCo
 
 	oauthAPI := api.Group("/oauth")
 
-	oauthAPI.GET("/telegram", oauthCtrl.AuthenticateThroughTelergam)
+	oauthAPI.GET("/telegram", oauthCtrl.AuthenticateThroughTelergam, svc.OAuthTelegramMiddleware())
 
 	fileAPI := api.Group("/file", svc.AuthMiddlewareMicro(authService))
 
