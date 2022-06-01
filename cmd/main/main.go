@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"os"
@@ -86,6 +87,8 @@ func main() {
 	grpcConn, err := grpc.Dial(
 		listenAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
+		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
 	)
 	if err != nil {
 		log.Fatalf("failed to check auth connection: %s", err)

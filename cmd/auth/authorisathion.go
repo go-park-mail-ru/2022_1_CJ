@@ -3,8 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/api"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/controller"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/handler"
+	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/labstack/echo/v4"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -22,6 +27,26 @@ const (
 	configPost       = "microservice_auth.port"
 	configNetwork    = "microservice_auth.network"
 )
+
+var (
+	// Create a metrics registry.
+	reg = prometheus.NewRegistry()
+
+	// Create some standard server metrics.
+	grpcMetrics = grpc_prometheus.NewServerMetrics()
+
+	// Create a customized counter metric.
+	info = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "grpcMetrics",
+		Help: "help",
+	}, []string{"name"})
+)
+
+func init() {
+	// Register standard server metrics and customized metrics to registry.
+	reg.MustRegister(grpcMetrics, info)
+	info.WithLabelValues("Test")
+}
 
 func main() {
 	// -------------------- Set up viper (config) -------------------- //
@@ -73,6 +98,33 @@ func main() {
 	log.Info("connected to MongoDB")
 	mongoDB := client.Database(viper.GetString("db.database"))
 
+	//-------------------- Set up metrics -------------------- //
+	s := echo.New()
+	s.Validator = api.NewValidator()
+	s.Binder = api.NewBinder()
+
+	s.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
+
+	server := grpc.NewServer(
+		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
+		grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
+		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 5 * time.Minute}),
+	)
+
+	grpc_prometheus.EnableHandlingTimeHistogram()
+
+	grpcMetrics.InitializeMetrics(server)
+
+	log.Info("success init metrics: auth gRPC")
+
+	listAdr := viper.GetString(configHost) + ":" + "9082"
+	go func() {
+		err := s.Start(listAdr)
+		if err != nil {
+			log.Fatalln("cant start metrics", err)
+		}
+	}()
+
 	//-------------------- Set up service -------------------- //
 
 	listenAddr := viper.GetString(configHost) + ":" + viper.GetString(configPost)
@@ -80,10 +132,6 @@ func main() {
 	if err != nil {
 		log.Fatalln("cant listen port", err)
 	}
-
-	server := grpc.NewServer(
-		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 5 * time.Minute}),
-	)
 
 	handler.RegisterUserAuthServer(server, controller.CreateAuthServer(mongoDB, logrus.NewEntry(log)))
 
