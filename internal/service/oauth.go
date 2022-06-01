@@ -23,8 +23,6 @@ type OAuthServiceImpl struct {
 }
 
 func (svc *OAuthServiceImpl) AuthenticateThroughTelergam(ctx context.Context, request *dto.AuthenticateThroughTelergamRequest) error {
-	// TODO: check hash
-
 	exists, err := svc.db.UserRepo.CheckUserIDExistence(ctx, request.ID)
 	if err != nil {
 		return fmt.Errorf("CheckUserIDExistence: %w", err)

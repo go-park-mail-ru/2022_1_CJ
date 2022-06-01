@@ -105,8 +105,6 @@ func main() {
 
 	s.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 
-	//metricsServer := &http.Server{Handler: promhttp.HandlerFor(reg, promhttp.HandlerOpts{}), Addr: fmt.Sprintf("0.0.0.0:%d", 9082)}
-
 	server := grpc.NewServer(
 		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 		grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
@@ -119,14 +117,13 @@ func main() {
 
 	log.Info("success init metrics: auth gRPC")
 
-	// Start your http server for prometheus.
-	//go func() {
-	//	if err := metricsServer.ListenAndServe(); err != nil {
-	//		log.Fatal("Unable to start a http server.")
-	//	}
-	//}()
 	listAdr := viper.GetString(configHost) + ":" + "9082"
-	go s.Start(listAdr)
+	go func() {
+		err := s.Start(listAdr)
+		if err != nil {
+			log.Fatalln("cant start metrics", err)
+		}
+	}()
 
 	//-------------------- Set up service -------------------- //
 

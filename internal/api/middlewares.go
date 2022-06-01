@@ -2,9 +2,14 @@ package api
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -38,6 +43,46 @@ func (svc *APIService) AuthMiddlewareMicro(rep cl.AuthRepository) echo.Middlewar
 
 			if code {
 				ctx.SetCookie(utils.CreateHTTPOnlyCookie(constants.CookieKeyAuthToken, newToken, viper.GetInt64(constants.ViperJWTTTLKey)))
+			}
+
+			return next(ctx)
+		}
+	}
+}
+
+func (svc *APIService) OAuthTelegramMiddleware() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+			queryParams := ctx.Request().URL.Query()
+			kvs := []string{}
+			hash := ""
+			for k, v := range queryParams {
+				if k == "hash" {
+					hash = v[0]
+					continue
+				}
+				kvs = append(kvs, k+"="+v[0])
+			}
+			sort.Strings(kvs)
+
+			var dataCheckString = ""
+			for _, s := range kvs {
+				if dataCheckString != "" {
+					dataCheckString += "\n"
+				}
+				dataCheckString += s
+			}
+
+			sha256hash := sha256.New()
+
+			telegramToken := viper.GetString("service.telegram_token")
+			_, _ = io.WriteString(sha256hash, telegramToken)
+
+			hmachash := hmac.New(sha256.New, sha256hash.Sum(nil))
+			_, _ = io.WriteString(hmachash, dataCheckString)
+
+			if hash != hex.EncodeToString(hmachash.Sum(nil)) {
+				return constants.ErrHashInvalid
 			}
 
 			return next(ctx)
