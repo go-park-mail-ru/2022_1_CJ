@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/controller"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/handler"
+	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,6 +15,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"net"
+	"net/http"
 	"os"
 	"time"
 )
@@ -22,6 +26,26 @@ const (
 	configPost       = "microservice_auth.port"
 	configNetwork    = "microservice_auth.network"
 )
+
+var (
+	// Create a metrics registry.
+	reg = prometheus.NewRegistry()
+
+	// Create some standard server metrics.
+	grpcMetrics = grpc_prometheus.NewServerMetrics()
+
+	// Create a customized counter metric.
+	info = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "grpcMetrics",
+		Help: "help",
+	}, []string{"name"})
+)
+
+func init() {
+	// Register standard server metrics and customized metrics to registry.
+	reg.MustRegister(grpcMetrics, info)
+	info.WithLabelValues("Test")
+}
 
 func main() {
 	// -------------------- Set up viper (config) -------------------- //
@@ -73,6 +97,29 @@ func main() {
 	log.Info("connected to MongoDB")
 	mongoDB := client.Database(viper.GetString("db.database"))
 
+	//-------------------- Set up metrics -------------------- //
+
+	metricsServer := &http.Server{Handler: promhttp.HandlerFor(reg, promhttp.HandlerOpts{}), Addr: fmt.Sprintf("0.0.0.0:%d", 3001)}
+
+	grpc_prometheus.EnableHandlingTimeHistogram()
+
+	server := grpc.NewServer(
+		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
+		grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
+		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 5 * time.Minute}),
+	)
+
+	grpcMetrics.InitializeMetrics(server)
+
+	log.Info("success init metrics: auth gRPC")
+
+	// Start your http server for prometheus.
+	go func() {
+		if err := metricsServer.ListenAndServe(); err != nil {
+			log.Fatal("Unable to start a http server.")
+		}
+	}()
+
 	//-------------------- Set up service -------------------- //
 
 	listenAddr := viper.GetString(configHost) + ":" + viper.GetString(configPost)
@@ -80,10 +127,6 @@ func main() {
 	if err != nil {
 		log.Fatalln("cant listen port", err)
 	}
-
-	server := grpc.NewServer(
-		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 5 * time.Minute}),
-	)
 
 	handler.RegisterUserAuthServer(server, controller.CreateAuthServer(mongoDB, logrus.NewEntry(log)))
 

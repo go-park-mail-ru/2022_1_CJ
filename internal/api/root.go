@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/monitoring"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/api/controllers"
