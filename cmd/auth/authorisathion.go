@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/api"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/controller"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/mircoservices/auth-microservice/handler"
 	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
@@ -15,7 +17,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"net"
-	"net/http"
 	"os"
 	"time"
 )
@@ -98,10 +99,13 @@ func main() {
 	mongoDB := client.Database(viper.GetString("db.database"))
 
 	//-------------------- Set up metrics -------------------- //
+	s := echo.New()
+	s.Validator = api.NewValidator()
+	s.Binder = api.NewBinder()
 
-	metricsServer := &http.Server{Handler: promhttp.HandlerFor(reg, promhttp.HandlerOpts{}), Addr: fmt.Sprintf("0.0.0.0:%d", 3001)}
+	s.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 
-	grpc_prometheus.EnableHandlingTimeHistogram()
+	//metricsServer := &http.Server{Handler: promhttp.HandlerFor(reg, promhttp.HandlerOpts{}), Addr: fmt.Sprintf("0.0.0.0:%d", 9082)}
 
 	server := grpc.NewServer(
 		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
@@ -109,16 +113,20 @@ func main() {
 		grpc.KeepaliveParams(keepalive.ServerParameters{MaxConnectionIdle: 5 * time.Minute}),
 	)
 
+	grpc_prometheus.EnableHandlingTimeHistogram()
+
 	grpcMetrics.InitializeMetrics(server)
 
 	log.Info("success init metrics: auth gRPC")
 
 	// Start your http server for prometheus.
-	go func() {
-		if err := metricsServer.ListenAndServe(); err != nil {
-			log.Fatal("Unable to start a http server.")
-		}
-	}()
+	//go func() {
+	//	if err := metricsServer.ListenAndServe(); err != nil {
+	//		log.Fatal("Unable to start a http server.")
+	//	}
+	//}()
+	listAdr := viper.GetString(configHost) + ":" + "9082"
+	go s.Start(listAdr)
 
 	//-------------------- Set up service -------------------- //
 
