@@ -448,12 +448,20 @@ func (svc *communityServiceImpl) EditPostCommunity(ctx context.Context, request 
 		}
 	}
 
-	_, err = svc.db.PostRepo.EditPost(ctx, &core.Post{
-		AuthorID: request.CommunityID,
-		ID:       request.PostID,
-		Message:  request.Message,
-		Images:   request.Images,
-	})
+	postBefore, err := svc.db.PostRepo.GetPostByID(ctx, request.PostID)
+	if err != nil {
+		return nil, fmt.Errorf("GetPostByID: %w", err)
+	}
+
+	if len(request.Message) != 0 {
+		postBefore.Message = request.Message
+	}
+
+	if request.Images != nil {
+		postBefore.Images = request.Images
+	}
+
+	_, err = svc.db.PostRepo.EditPost(ctx, postBefore)
 	if err != nil {
 		svc.log.Errorf("EditPost error: %s", err)
 		return nil, err
