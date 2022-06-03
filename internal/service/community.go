@@ -461,6 +461,10 @@ func (svc *communityServiceImpl) EditPostCommunity(ctx context.Context, request 
 		postBefore.Images = request.Images
 	}
 
+	if request.Attachments != nil {
+		postBefore.Attachments = request.Attachments
+	}
+
 	_, err = svc.db.PostRepo.EditPost(ctx, postBefore)
 	if err != nil {
 		svc.log.Errorf("EditPost error: %s", err)
