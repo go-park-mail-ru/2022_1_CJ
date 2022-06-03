@@ -3,6 +3,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 
@@ -16,7 +17,7 @@ import (
 type UserService interface {
 	GetUserData(ctx context.Context, userID string) (*dto.GetUserResponse, error)
 	GetUserPosts(ctx context.Context, request *dto.GetUserPostsRequest) (*dto.GetUserPostsResponse, error)
-	GetFeed(ctx context.Context, userID string, request *dto.GetUserFeedRequest) (*dto.GetUserFeedResponse, error)
+	GetFeed(ctx context.Context, request *dto.GetUserFeedRequest) (*dto.GetUserFeedResponse, error)
 	GetProfile(ctx context.Context, request *dto.GetProfileRequest) (*dto.GetProfileResponse, error)
 	EditProfile(ctx context.Context, request *dto.EditProfileRequest, userID string) (*dto.EditProfileResponse, error)
 	UpdatePhoto(ctx context.Context, url string, userID string) (*dto.UpdatePhotoResponse, error)
@@ -65,43 +66,37 @@ func (svc *userServiceImpl) GetUserPosts(ctx context.Context, request *dto.GetUs
 	return &dto.GetUserPostsResponse{Posts: posts, Total: pages.Total, AmountPages: pages.AmountPages}, nil
 }
 
-func (svc *userServiceImpl) GetFeed(ctx context.Context, userID string, request *dto.GetUserFeedRequest) (*dto.GetUserFeedResponse, error) {
-	_, err := svc.db.UserRepo.GetUserByID(ctx, userID)
+func (svc *userServiceImpl) GetFeed(ctx context.Context, request *dto.GetUserFeedRequest) (*dto.GetUserFeedResponse, error) {
+	_, err := svc.db.UserRepo.GetUserByID(ctx, request.UserID)
 	if err != nil {
-		svc.log.Errorf("GetUserByID error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("GetUserByID: %w", err)
 	}
 
-	postsCore, page, err := svc.db.PostRepo.GetFeed(ctx, userID, request.Page, request.Limit)
+	postsCore, page, err := svc.db.PostRepo.GetFeed(ctx, request.UserID, request.PaginationParameters)
 	if err != nil {
-		svc.log.Errorf("GetFeed error: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("GetFeed: %w", err)
 	}
-	svc.log.Debug("GetFeed success")
 
 	var posts []dto.GetPosts
 	for _, postCore := range postsCore {
 		like, err := svc.db.LikeRepo.GetLikeBySubjectID(ctx, postCore.ID)
 		if err != nil {
-			svc.log.Errorf("GetLikeBySubjectID error: %s", err)
-			return nil, err
+			return nil, fmt.Errorf("GetLikeBySubjectID: %w", err)
 		}
 		switch postCore.Type {
 		case constants.UserPost:
 			author, errUser := svc.db.UserRepo.GetUserByID(ctx, postCore.AuthorID)
 			if errUser != nil {
-				svc.log.Errorf("GetUserByID error: %s", err)
-				return nil, err
+				return nil, fmt.Errorf("GetUserByID: %w", err)
 			}
-			posts = append(posts, dto.GetPosts{Post: convert.Post2DTOByUser(&postCore, author), Likes: convert.Like2DTO(like, userID)})
+			posts = append(posts, dto.GetPosts{Post: convert.Post2DTOByUser(&postCore, author), Likes: convert.Like2DTO(like, request.UserID)})
 
 		case constants.CommunityPost:
 			community, errComm := svc.db.CommunityRepo.GetCommunityByID(ctx, postCore.AuthorID)
 			if errComm != nil {
-				svc.log.Errorf("GetUserByID error: %s", err)
-				return nil, err
+				return nil, fmt.Errorf("GetCommunityByID: %w", err)
 			}
-			posts = append(posts, dto.GetPosts{Post: convert.Post2DTOByCommunity(&postCore, community), Likes: convert.Like2DTO(like, userID)})
+			posts = append(posts, dto.GetPosts{Post: convert.Post2DTOByCommunity(&postCore, community), Likes: convert.Like2DTO(like, request.UserID)})
 		default:
 			return nil, constants.ErrDBNotFound
 		}

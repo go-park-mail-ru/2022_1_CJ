@@ -2,12 +2,13 @@ package db
 
 import (
 	"context"
+	"testing"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/integration/mtest"
-	"testing"
 )
 
 func TestCreatePost(t *testing.T) {
@@ -190,7 +191,7 @@ func TestGetFeed(t *testing.T) {
 		mt.AddMockResponses(first, second, killCursors)
 
 		ctx := context.Background()
-		posts, _, err := postCollection.GetFeed(ctx, "12", 1, -1)
+		posts, _, err := postCollection.GetFeed(ctx, "12", core.PaginationParameters{Limit: -1, Page: 1})
 		assert.Nil(t, err)
 		assert.Equal(t, []core.Post{
 			{ID: expectedPost1.ID, AuthorID: expectedPost1.AuthorID, Attachments: expectedPost1.Attachments, CreatedAt: expectedPost1.CreatedAt},

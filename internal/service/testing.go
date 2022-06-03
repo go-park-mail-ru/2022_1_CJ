@@ -33,8 +33,8 @@ func TestRepositories(t *testing.T, ctrl *gomock.Controller) (*db.Repository, *T
 	}
 	t.Helper()
 	return &db.Repository{UserRepo: MockRepo.mockUserR,
-		FriendsRepo:   MockRepo.mockFriendsR,
-		PostRepo:      MockRepo.mockPostR,
+		FriendsRepo: MockRepo.mockFriendsR,
+		// PostRepo:      MockRepo.mockPostR,
 		ChatRepo:      MockRepo.mockChatR,
 		LikeRepo:      MockRepo.mockLikeR,
 		CommunityRepo: MockRepo.mockCommunityR,
