@@ -2,11 +2,12 @@ package db
 
 import (
 	"context"
+	"time"
+
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/constants"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
 	"github.com/go-park-mail-ru/2022_1_CJ/internal/utils"
 	"github.com/microcosm-cc/bluemonday"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -25,7 +26,7 @@ type PostRepository interface {
 	EditPost(ctx context.Context, post *core.Post) (*core.Post, error)
 	DeletePost(ctx context.Context, postID string) error
 
-	GetFeed(ctx context.Context, userID string, pageNumber int64, limit int64) ([]core.Post, *common.PageResponse, error)
+	GetFeed(ctx context.Context, userID string, paginationParameters core.PaginationParameters) ([]core.Post, *common.PageResponse, error)
 
 	PostAddComment(ctx context.Context, postID string, commentID string) error
 	PostCheckComment(ctx context.Context, post *core.Post, commentID string) error
@@ -148,14 +149,14 @@ func (repo *postRepositoryImpl) DeletePost(ctx context.Context, postID string) e
 	return err
 }
 
-func (repo *postRepositoryImpl) GetFeed(ctx context.Context, userID string, pageNumber int64, limit int64) ([]core.Post, *common.PageResponse, error) {
+func (repo *postRepositoryImpl) GetFeed(ctx context.Context, userID string, paginationParameters core.PaginationParameters) ([]core.Post, *common.PageResponse, error) {
 	filter := bson.M{}
 	opts := options.Find()
 	opts.SetSort(bson.D{{Key: "created_at", Value: -1}})
 
-	if limit != -1 {
-		opts.SetSkip((pageNumber - 1) * limit)
-		opts.SetLimit(limit)
+	if paginationParameters.Limit != -1 {
+		opts.SetSkip((paginationParameters.Page - 1) * paginationParameters.Limit)
+		opts.SetLimit(paginationParameters.Limit)
 	}
 
 	cursor, err := repo.coll.Find(ctx, filter, opts)
@@ -173,9 +174,10 @@ func (repo *postRepositoryImpl) GetFeed(ctx context.Context, userID string, page
 	total, _ := repo.coll.CountDocuments(ctx, filter)
 	res := &common.PageResponse{
 		Total:       total,
-		AmountPages: total/limit + utils.IsLarge(total%limit > 0),
+		AmountPages: total/paginationParameters.Limit + utils.IsLarge(total%paginationParameters.Limit > 0),
 	}
-	if limit == -1 {
+
+	if paginationParameters.Page == -1 {
 		res.AmountPages = 1
 	}
 

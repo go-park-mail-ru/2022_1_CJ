@@ -1,6 +1,9 @@
 package dto
 
-import "github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
+import (
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/common"
+	"github.com/go-park-mail-ru/2022_1_CJ/internal/model/core"
+)
 
 // Only used in responses! Does not need validation.
 type User struct {
@@ -55,8 +58,8 @@ type GetUserPostsResponse struct {
 }
 
 type GetUserFeedRequest struct {
-	Limit int64 `query:"limit,omitempty"`
-	Page  int64 `query:"page,omitempty"`
+	UserID               string `header:"User-Id" validate:"required"`
+	PaginationParameters core.PaginationParameters
 }
 
 type GetUserFeedResponse struct {
