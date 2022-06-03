@@ -173,10 +173,6 @@ func (svc *chatServiceImpl) GetDialog(ctx context.Context, request *dto.GetDialo
 		return nil, err
 	}
 
-	var total int64
-	var page int64
-	messages, total, page := utils.GetLimitMessage(&dialogCore.Messages, request.Limit, request.Page)
-
 	dialog := convert.Dialog2DTO(dialogCore, request.UserID)
 	if len(dialog.Participants) == 1 {
 		participant, err := svc.db.UserRepo.GetUserByID(ctx, dialog.Participants[0])
@@ -187,7 +183,7 @@ func (svc *chatServiceImpl) GetDialog(ctx context.Context, request *dto.GetDialo
 		dialog.Image = participant.Image
 	}
 
-	return &dto.GetDialogResponse{Dialog: dialog, Messages: convert.Messages2DTO(messages, request.UserID), Total: total, AmountPages: page}, err
+	return &dto.GetDialogResponse{Dialog: dialog, Messages: convert.Messages2DTO(dialogCore.Messages, request.UserID), Total: 0, AmountPages: 0}, err
 }
 
 func NewChatService(log *logrus.Entry, db *db.Repository) ChatService {

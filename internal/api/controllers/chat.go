@@ -63,15 +63,12 @@ func (c *ChatController) GetDialog(ctx echo.Context) error {
 		return err
 	}
 
-	request.UserID = ctx.Request().Header.Get(constants.HeaderKeyUserID)
-
-	if request.Limit < -1 || request.Limit == 0 {
-		request.Limit = 10
+	paginationParameters, err := parsePaginationParametersQuery(ctx)
+	if err != nil {
+		return err
 	}
 
-	if request.Page <= 0 {
-		request.Page = 1
-	}
+	request.PaginationParameters = paginationParameters
 
 	response, err := c.registry.ChatService.GetDialog(context.Background(), request)
 	if err != nil {

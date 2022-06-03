@@ -68,10 +68,9 @@ type GetDialogsResponse struct {
 }
 
 type GetDialogRequest struct { //
-	UserID   string
-	DialogID string `query:"dialog_id"`
-	Limit    int64  `query:"limit,omitempty"`
-	Page     int64  `query:"page,omitempty"`
+	UserID               string `header:"User-Id" validate:"required"`
+	DialogID             string `query:"dialog_id"`
+	PaginationParameters core.PaginationParameters
 }
 
 type GetDialogResponse struct {
